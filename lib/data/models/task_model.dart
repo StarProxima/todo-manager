@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
 
 class Task {
@@ -68,9 +67,7 @@ class Task {
     return Task(
       id: map['id'] as String,
       text: map['text'] as String,
-      importance:
-          EnumToString.fromString(Importance.values, map['importance']) ??
-              Importance.basic,
+      importance: (map['importance'] as String).toImportance(),
       deadline: map['deadline'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['deadline'] as int)
           : null,
@@ -97,4 +94,13 @@ enum Importance {
   low,
   basic,
   important,
+}
+
+extension StringToEnum on String {
+  Importance toImportance() {
+    return Importance.values.firstWhere(
+      (element) => element.name == this,
+      orElse: () => throw Exception('Unknown importance $this'),
+    );
+  }
 }
