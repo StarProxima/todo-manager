@@ -17,7 +17,6 @@ class TaskRepository extends Repository {
 
     if (response.status == 200) {
       revision = jsonDecode(response.data)['revision'];
-
       return (jsonDecode(response.data)['list'] as Iterable)
           .map((e) => Task.fromMap(e))
           .toList();
@@ -51,6 +50,21 @@ class TaskRepository extends Repository {
         "status": "ok",
         "element": ${task.toJson()}
       }''',
+      headers: {
+        "Authorization": "Bearer Elesding",
+        "Content-Type": "application/json",
+        "X-Last-Known-Revision": "$revision",
+      },
+    );
+    if (response.status == 200) {
+      revision = jsonDecode(response.data)['revision'];
+    }
+    return response;
+  }
+
+  Future<ResponseData> deleteTask(Task task) async {
+    final ResponseData response = await deleteRequest(
+      url: "$baseUrl/list/${task.id}",
       headers: {
         "Authorization": "Bearer Elesding",
         "Content-Type": "application/json",

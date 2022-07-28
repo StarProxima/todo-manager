@@ -45,6 +45,13 @@ class _MyAppState extends State<MyApp> {
     log('${response.data} ${response.status}');
   }
 
+  void deleteTask() async {
+    var response = await TaskRepository().deleteTask(
+      lastTask!,
+    );
+    log('${response.data} ${response.status}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -65,6 +72,10 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: editTask,
                 child: const Text('editTask'),
+              ),
+              ElevatedButton(
+                onPressed: deleteTask,
+                child: const Text('deleteTask'),
               ),
             ],
           ),
