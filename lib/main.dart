@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/data/repositories/task_repository.dart';
+import 'package:todo_manager/ui/pages/home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -72,34 +73,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(),
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            children: [
-              ElevatedButton(
-                onPressed: getTaskList,
-                child: const Text('getTaskList'),
-              ),
-              ElevatedButton(
-                onPressed: addTask,
-                child: const Text('addTask'),
-              ),
-              ElevatedButton(
-                onPressed: editTask,
-                child: const Text('editTask'),
-              ),
-              ElevatedButton(
-                onPressed: deleteTask,
-                child: const Text('deleteTask'),
-              ),
-              ElevatedButton(
-                onPressed: patchTasks,
-                child: const Text('patchTasks'),
-              ),
-            ],
-          ),
-        ),
-      ),
+      home: const HomePage(),
     );
   }
 }
