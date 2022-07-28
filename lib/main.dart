@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/data/repositories/task_repository.dart';
@@ -22,7 +20,7 @@ class _MyAppState extends State<MyApp> {
     final tasks = await TaskRepository().getTasks();
 
     lastTask = tasks.isNotEmpty ? tasks.last : null;
-    log(tasks.toString());
+    print(tasks.toString());
   }
 
   void addTask() async {
@@ -33,7 +31,7 @@ class _MyAppState extends State<MyApp> {
         text: 'way',
       ),
     );
-    log('${response.data} ${response.status}');
+    print(response);
   }
 
   void editTask() async {
@@ -42,14 +40,14 @@ class _MyAppState extends State<MyApp> {
         text: 'NOOO WAAAY',
       ),
     );
-    log('${response.data} ${response.status}');
+    print(response);
   }
 
   void deleteTask() async {
     var response = await TaskRepository().deleteTask(
       lastTask!,
     );
-    log('${response.data} ${response.status}');
+    print(response);
   }
 
   void patchTasks() async {

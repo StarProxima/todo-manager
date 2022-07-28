@@ -1,4 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
 abstract class Repository {
@@ -18,10 +20,7 @@ abstract class Repository {
         )
         .timeout(const Duration(seconds: _countSecTimeOut));
 
-    return ResponseData(
-      data: utf8.decode(response.bodyBytes),
-      status: response.statusCode,
-    );
+    return ResponseData.fromHttpResponce(response);
   }
 
   static Future<ResponseData> get({
@@ -36,10 +35,7 @@ abstract class Repository {
           )
           .timeout(const Duration(seconds: _countSecTimeOut));
 
-      return ResponseData(
-        data: utf8.decode(response.bodyBytes),
-        status: response.statusCode,
-      );
+      return ResponseData.fromHttpResponce(response);
     } catch (e) {
       return const ResponseData(data: _timeOutMessage);
     }
@@ -59,10 +55,7 @@ abstract class Repository {
           )
           .timeout(const Duration(seconds: _countSecTimeOut));
 
-      return ResponseData(
-        data: utf8.decode(response.bodyBytes),
-        status: response.statusCode,
-      );
+      return ResponseData.fromHttpResponce(response);
     } catch (e) {
       return const ResponseData(data: _timeOutMessage);
     }
@@ -82,10 +75,7 @@ abstract class Repository {
           )
           .timeout(const Duration(seconds: _countSecTimeOut));
 
-      return ResponseData(
-        data: utf8.decode(response.bodyBytes),
-        status: response.statusCode,
-      );
+      return ResponseData.fromHttpResponce(response);
     } catch (e) {
       return const ResponseData(data: _timeOutMessage);
     }
@@ -103,10 +93,7 @@ abstract class Repository {
           )
           .timeout(const Duration(seconds: _countSecTimeOut));
 
-      return ResponseData(
-        data: utf8.decode(response.bodyBytes),
-        status: response.statusCode,
-      );
+      return ResponseData.fromHttpResponce(response);
     } catch (e) {
       return const ResponseData(data: _timeOutMessage);
     }
@@ -123,4 +110,29 @@ class ResponseData {
     this.status = 500,
     this.isSuccesful = false,
   });
+
+  factory ResponseData.fromHttpResponce(http.Response response) {
+    return ResponseData(
+      data: utf8.decode(response.bodyBytes),
+      status: response.statusCode,
+      isSuccesful: response.statusCode.toString().contains('2'),
+    );
+  }
+
+  ResponseData copyWith({
+    String? data,
+    int? status,
+    bool? isSuccesful,
+  }) {
+    return ResponseData(
+      data: data ?? this.data,
+      status: status ?? this.status,
+      isSuccesful: isSuccesful ?? this.isSuccesful,
+    );
+  }
+
+  @override
+  String toString() => '''ResponseData(
+data: $data,
+status: $status, isSuccesful: $isSuccesful)''';
 }
