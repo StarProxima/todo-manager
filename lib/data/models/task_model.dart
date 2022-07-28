@@ -44,19 +44,23 @@ class Task {
     String? id,
     String? text,
     Importance? importance,
-    DateTime? deadline,
     bool? done,
+    DateTime? deadline,
     Color? color,
     DateTime? createdAt,
     DateTime? changedAt,
     String? lastUpdatedBy,
   }) {
-    return Task(
+    return Task.full(
+      id: id ?? this.id,
       text: text ?? this.text,
       importance: importance ?? this.importance,
-      deadline: deadline ?? this.deadline,
       done: done ?? this.done,
+      deadline: deadline ?? this.deadline,
       color: color ?? this.color,
+      createdAt: createdAt ?? this.createdAt,
+      changedAt: changedAt ?? this.changedAt,
+      lastUpdatedBy: lastUpdatedBy ?? this.lastUpdatedBy,
     );
   }
 

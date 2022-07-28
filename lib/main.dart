@@ -8,11 +8,21 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Task? lastTask;
+
   void getTaskList() async {
-    log((await TaskRepository().getTaskList()).toString());
+    final tasks = await TaskRepository().getTasks();
+
+    lastTask = tasks.isNotEmpty ? tasks.last : null;
+    log(tasks.toString());
   }
 
   void addTask() async {
@@ -21,6 +31,15 @@ class MyApp extends StatelessWidget {
         importance: Importance.low,
         done: false,
         text: 'way',
+      ),
+    );
+    log('${response.data} ${response.status}');
+  }
+
+  void editTask() async {
+    var response = await TaskRepository().editTask(
+      lastTask!.copyWith(
+        text: 'NOOO WAAAY',
       ),
     );
     log('${response.data} ${response.status}');
@@ -42,6 +61,10 @@ class MyApp extends StatelessWidget {
               ElevatedButton(
                 onPressed: addTask,
                 child: const Text('addTask'),
+              ),
+              ElevatedButton(
+                onPressed: editTask,
+                child: const Text('editTask'),
               ),
             ],
           ),
