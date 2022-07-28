@@ -5,18 +5,16 @@ abstract class Repository {
   static const int _countSecTimeOut = 10;
   static const String _timeOutMessage = "Ошибка подключения к серверу";
 
-  const Repository();
-
-  Future<ResponseData> postRequest({
+  static Future<ResponseData> post({
     required String url,
-    required String parametrs,
-    required Map<String, String> headers,
+    Map<String, String>? headers,
+    String? body,
   }) async {
     http.Response response = await http
         .post(
           Uri.parse(url),
           headers: headers,
-          body: parametrs,
+          body: body,
         )
         .timeout(const Duration(seconds: _countSecTimeOut));
 
@@ -26,8 +24,8 @@ abstract class Repository {
     );
   }
 
-  Future<ResponseData> getRequest(
-    String url, {
+  static Future<ResponseData> get({
+    required String url,
     Map<String, String>? headers,
   }) async {
     try {
@@ -47,17 +45,17 @@ abstract class Repository {
     }
   }
 
-  Future<ResponseData> putRequest({
+  static Future<ResponseData> put({
     required String url,
-    required String parametrs,
-    required Map<String, String> headers,
+    String? body,
+    Map<String, String>? headers,
   }) async {
     try {
       http.Response response = await http
           .put(
             Uri.parse(url),
             headers: headers,
-            body: parametrs,
+            body: body,
           )
           .timeout(const Duration(seconds: _countSecTimeOut));
 
@@ -70,9 +68,32 @@ abstract class Repository {
     }
   }
 
-  Future<ResponseData> deleteRequest({
+  static Future<ResponseData> patch({
     required String url,
-    required Map<String, String> headers,
+    Map<String, String>? headers,
+    String? body,
+  }) async {
+    try {
+      http.Response response = await http
+          .patch(
+            Uri.parse(url),
+            headers: headers,
+            body: body,
+          )
+          .timeout(const Duration(seconds: _countSecTimeOut));
+
+      return ResponseData(
+        data: utf8.decode(response.bodyBytes),
+        status: response.statusCode,
+      );
+    } catch (e) {
+      return const ResponseData(data: _timeOutMessage);
+    }
+  }
+
+  static Future<ResponseData> delete({
+    required String url,
+    Map<String, String>? headers,
   }) async {
     try {
       http.Response response = await http
