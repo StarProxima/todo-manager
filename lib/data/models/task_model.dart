@@ -1,19 +1,34 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
 class Task {
-  String id;
+  late final String id;
   String text;
   Importance importance;
-  DateTime? deadline;
   bool done;
+  DateTime? deadline;
   Color? color;
-  DateTime createdAt;
-  DateTime changedAt;
-  String lastUpdatedBy;
+  late final DateTime createdAt;
+  late DateTime changedAt;
+  late String lastUpdatedBy;
 
   Task({
+    required this.text,
+    required this.importance,
+    this.deadline,
+    required this.done,
+    this.color,
+  }) {
+    // ? Generate unique id
+    id = DateTime.now().millisecondsSinceEpoch.toString();
+    createdAt = DateTime.now();
+    changedAt = DateTime.now();
+    lastUpdatedBy = 'Pacman';
+  }
+
+  Task.full({
     required this.id,
     required this.text,
     required this.importance,
@@ -37,15 +52,11 @@ class Task {
     String? lastUpdatedBy,
   }) {
     return Task(
-      id: id ?? this.id,
       text: text ?? this.text,
       importance: importance ?? this.importance,
       deadline: deadline ?? this.deadline,
       done: done ?? this.done,
       color: color ?? this.color,
-      createdAt: createdAt ?? this.createdAt,
-      changedAt: changedAt ?? this.changedAt,
-      lastUpdatedBy: lastUpdatedBy ?? this.lastUpdatedBy,
     );
   }
 
@@ -64,7 +75,7 @@ class Task {
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
-    return Task(
+    return Task.full(
       id: map['id'] as String,
       text: map['text'] as String,
       importance: (map['importance'] as String).toImportance(),

@@ -99,7 +99,7 @@ class ResponseData {
 
   const ResponseData({
     required this.data,
-    this.status = 404,
+    this.status = 500,
     this.isSuccesful = false,
   });
 }

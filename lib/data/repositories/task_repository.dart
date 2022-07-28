@@ -6,6 +6,7 @@ import 'package:todo_manager/data/repositories/repository.dart';
 
 class TaskRepository extends Repository {
   static const String baseUrl = 'https://beta.mrdekk.ru/todobackend';
+  static int? revision = 0;
 
   Future<List<Task>> getTaskList() async {
     final ResponseData response = await getRequest(
@@ -16,6 +17,8 @@ class TaskRepository extends Repository {
     );
     log(response.data);
     if (response.status == 200) {
+      revision = jsonDecode(response.data)['revision'];
+      log('revision: $revision');
       return (jsonDecode(response.data)['list'] as Iterable)
           .map((e) => Task.fromMap(e))
           .toList();
@@ -31,8 +34,9 @@ class TaskRepository extends Repository {
         "element": ${task.toJson()}
       }''',
       headers: {
-        "Authorization": 'Bearer Elesding',
-        "X-Last-Known-Revision": '1',
+        "Authorization": "Bearer Elesding",
+        "Content-Type": "application/json",
+        "X-Last-Known-Revision": "$revision",
       },
     );
 

@@ -18,12 +18,8 @@ class MyApp extends StatelessWidget {
   void addTask() async {
     var response = await TaskRepository().addTask(
       Task(
-        id: '1',
-        changedAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        done: false,
         importance: Importance.low,
-        lastUpdatedBy: 'Pacman',
+        done: false,
         text: 'way',
       ),
     );
