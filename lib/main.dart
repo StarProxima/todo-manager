@@ -52,6 +52,23 @@ class _MyAppState extends State<MyApp> {
     log('${response.data} ${response.status}');
   }
 
+  void patchTasks() async {
+    final tasks = await TaskRepository().getTasks();
+    tasks.addAll([
+      Task(
+        importance: Importance.low,
+        done: false,
+        text: 'way',
+      ),
+      Task(
+        importance: Importance.low,
+        done: false,
+        text: 'way',
+      ),
+    ]);
+    print(await TaskRepository().patchTasks(tasks));
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -76,6 +93,10 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: deleteTask,
                 child: const Text('deleteTask'),
+              ),
+              ElevatedButton(
+                onPressed: patchTasks,
+                child: const Text('patchTasks'),
               ),
             ],
           ),

@@ -24,6 +24,29 @@ class TaskRepository {
     return [];
   }
 
+  Future<List<Task>> patchTasks(List<Task> tasks) async {
+    final ResponseData response = await Repository.patch(
+      url: "$baseUrl/list",
+      headers: {
+        "Authorization": "Bearer Elesding",
+        "Content-Type": "application/json",
+        "X-Last-Known-Revision": "$revision",
+      },
+      body: jsonEncode({
+        "status": "ok",
+        "list": tasks.map((e) => e.toMap()).toList(),
+      }),
+    );
+
+    if (response.status == 200) {
+      revision = jsonDecode(response.data)['revision'];
+      return (jsonDecode(response.data)['list'] as Iterable)
+          .map((e) => Task.fromMap(e))
+          .toList();
+    }
+    return [];
+  }
+
   Future<ResponseData> addTask(Task task) async {
     final ResponseData response = await Repository.post(
       url: "$baseUrl/list",
