@@ -19,7 +19,7 @@ class _TaskCardState extends State<TaskCard> {
           value: widget.task.done,
           onChanged: (value) {
             setState(() {
-              widget.task.done = value == true;
+              widget.task.edit(done: value == true);
             });
           },
         ),

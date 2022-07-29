@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/data/repositories/task_repository.dart';
@@ -28,8 +30,9 @@ class _HomePageState extends State<HomePage> {
 
   void editTask() async {
     if (tasks.isNotEmpty) {
-      var response = await TaskRepository()
-          .editTask(tasks.last.copyWith(text: 'Edited text <3'));
+      tasks.last.edit(text: 'Edited text <3');
+      log(tasks.last.toString());
+      var response = await TaskRepository().editTask(tasks.last);
       await getTasks();
       print(response);
     }

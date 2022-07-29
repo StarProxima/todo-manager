@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 import 'dart:math';
 
@@ -25,7 +24,6 @@ class Task {
     this.color,
   }) {
     var now = DateTime.now();
-    // generate cringe unique id
     id = '${now.millisecondsSinceEpoch}${_count++}';
     createdAt = now;
     changedAt = now;
@@ -49,8 +47,9 @@ class Task {
     String loremImpusText =
         'ultricies leo integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus vel facilisis volutpat est velit egestas dui id ornare arcu odio ut sem nulla pharetra diam sit amet nisl suscipit adipiscing bibendum est ultricies integer quis auctor elit sed vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt nunc pulvinar sapien et ligula ullamcorper malesuada proin libero nunc consequat interdum varius sit amet mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan tortor posuere ac ut consequat semper viverra nam libero justo laoreet sit amet cursus sit amet dictum sit amet justo donec enim diam vulputate ut';
     String text = '';
+    List<String> words = loremImpusText.split(' ');
     for (int i = 0; i < random.nextInt(300) + 1; i++) {
-      text += '${loremImpusText.split(' ')[random.nextInt(100)]} ';
+      text += '${words[random.nextInt(100)]} ';
     }
     return Task(
       text: text,
@@ -81,6 +80,26 @@ class Task {
       changedAt: changedAt ?? this.changedAt,
       lastUpdatedBy: lastUpdatedBy ?? this.lastUpdatedBy,
     );
+  }
+
+  //Вот тут не уверен, как лучше обновлять сопутствующие данные в модели при
+  //изменении её полей. Засунуть обработку в сеттеры - больше кода, меньше читаемость,
+  //не совсем ожидаемое поведение, на зато всё всегда обновлять будет.
+  //Сделать все поля final и зануть обновление в copyWith - тоже такое себе.
+  void edit({
+    String? text,
+    Importance? importance,
+    bool? done,
+    DateTime? deadline,
+    Color? color,
+  }) {
+    this.text = text ?? this.text;
+    this.importance = importance ?? this.importance;
+    this.done = done ?? this.done;
+    this.deadline = deadline ?? this.deadline;
+    this.color = color ?? this.color;
+    changedAt = DateTime.now();
+    lastUpdatedBy = 'Pacman';
   }
 
   Map<String, dynamic> toMap() {
