@@ -115,7 +115,7 @@ class ResponseData {
     return ResponseData(
       data: utf8.decode(response.bodyBytes),
       status: response.statusCode,
-      isSuccesful: response.statusCode.toString().contains('2'),
+      isSuccesful: response.statusCode.toString()[0] == '2',
     );
   }
 

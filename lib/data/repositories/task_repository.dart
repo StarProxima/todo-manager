@@ -15,7 +15,7 @@ class TaskRepository {
       },
     );
 
-    if (response.status == 200) {
+    if (response.isSuccesful) {
       revision = jsonDecode(response.data)['revision'];
       return (jsonDecode(response.data)['list'] as Iterable)
           .map((e) => Task.fromMap(e))
@@ -38,7 +38,7 @@ class TaskRepository {
       }),
     );
 
-    if (response.status == 200) {
+    if (response.isSuccesful) {
       revision = jsonDecode(response.data)['revision'];
       return (jsonDecode(response.data)['list'] as Iterable)
           .map((e) => Task.fromMap(e))
@@ -60,7 +60,7 @@ class TaskRepository {
         "element": task.toMap(),
       }),
     );
-    if (response.status == 200) {
+    if (response.isSuccesful) {
       revision = jsonDecode(response.data)['revision'];
     }
     return response;
@@ -94,7 +94,7 @@ class TaskRepository {
         "X-Last-Known-Revision": "$revision",
       },
     );
-    if (response.status == 200) {
+    if (response.isSuccesful) {
       revision = jsonDecode(response.data)['revision'];
     }
     return response;

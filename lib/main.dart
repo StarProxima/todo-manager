@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/ui/pages/home_page.dart';
+
+import 'ui/styles/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,13 +15,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Task? lastTask;
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(),
+      theme: AppTheme.themeData,
       home: const HomePage(),
     );
   }
