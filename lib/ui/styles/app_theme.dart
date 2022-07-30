@@ -71,7 +71,7 @@ abstract class AppTheme {
     ),
     labelSmall: GoogleFonts.roboto(
       textStyle: const TextStyle(
-        color: _AppLightColors.textLabelPrimary,
+        color: _AppLightColors.textLabelTertiary,
         fontSize: 14,
         fontWeight: FontWeight.w400,
       ),
@@ -84,6 +84,15 @@ abstract class AppColors {
   static const Color red = Color(0xFFFF3B30);
   static const Color green = Color(0xFF34C759);
   static const Color blue = Color(0xFF007AFF);
+}
+
+abstract class AppTextStyle {
+  static const TextStyle crossedOut = TextStyle(
+    color: _AppLightColors.textLabelTertiary,
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    decoration: TextDecoration.lineThrough,
+  );
 }
 
 abstract class _AppLightColors {
