@@ -7,8 +7,8 @@ class TaskRepository {
   static const String baseUrl = 'https://beta.mrdekk.ru/todobackend';
   static int? revision = 0;
 
-  Future<List<Task>> getTasks() async {
-    final ResponseData response = await Repository.get(
+  Future<ResponseData<List<Task>>> getTasks() async {
+    final Response response = await Repository.get(
       url: "$baseUrl/list",
       headers: {
         "Authorization": "Bearer Elesding",
@@ -16,16 +16,19 @@ class TaskRepository {
     );
 
     if (response.isSuccesful) {
-      revision = jsonDecode(response.data)['revision'];
-      return (jsonDecode(response.data)['list'] as Iterable)
-          .map((e) => Task.fromMap(e))
-          .toList();
+      revision = jsonDecode(response.body)['revision'];
+      return ResponseData.response(
+        response,
+        (jsonDecode(response.body)['list'] as Iterable)
+            .map((e) => Task.fromMap(e))
+            .toList(),
+      );
     }
-    return [];
+    return ResponseData.response(response);
   }
 
-  Future<List<Task>> patchTasks(List<Task> tasks) async {
-    final ResponseData response = await Repository.patch(
+  Future<ResponseData<List<Task>>> patchTasks(List<Task> tasks) async {
+    final Response response = await Repository.patch(
       url: "$baseUrl/list",
       headers: {
         "Authorization": "Bearer Elesding",
@@ -39,16 +42,19 @@ class TaskRepository {
     );
 
     if (response.isSuccesful) {
-      revision = jsonDecode(response.data)['revision'];
-      return (jsonDecode(response.data)['list'] as Iterable)
-          .map((e) => Task.fromMap(e))
-          .toList();
+      revision = jsonDecode(response.body)['revision'];
+      return ResponseData.response(
+        response,
+        (jsonDecode(response.body)['list'] as Iterable)
+            .map((e) => Task.fromMap(e))
+            .toList(),
+      );
     }
-    return [];
+    return ResponseData.response(response);
   }
 
   Future<ResponseData> addTask(Task task) async {
-    final ResponseData response = await Repository.post(
+    final Response response = await Repository.post(
       url: "$baseUrl/list",
       headers: {
         "Authorization": "Bearer Elesding",
@@ -61,13 +67,13 @@ class TaskRepository {
       }),
     );
     if (response.isSuccesful) {
-      revision = jsonDecode(response.data)['revision'];
+      revision = jsonDecode(response.body)['revision'];
     }
-    return response;
+    return ResponseData.response(response);
   }
 
   Future<ResponseData> editTask(Task task) async {
-    final ResponseData response = await Repository.put(
+    final Response response = await Repository.put(
       url: "$baseUrl/list/${task.id}",
       headers: {
         "Authorization": "Bearer Elesding",
@@ -79,14 +85,14 @@ class TaskRepository {
         "element": task.toMap(),
       }),
     );
-    if (response.status == 200) {
-      revision = jsonDecode(response.data)['revision'];
+    if (response.isSuccesful) {
+      revision = jsonDecode(response.body)['revision'];
     }
-    return response;
+    return ResponseData.response(response);
   }
 
   Future<ResponseData> deleteTask(Task task) async {
-    final ResponseData response = await Repository.delete(
+    final Response response = await Repository.delete(
       url: "$baseUrl/list/${task.id}",
       headers: {
         "Authorization": "Bearer Elesding",
@@ -95,8 +101,8 @@ class TaskRepository {
       },
     );
     if (response.isSuccesful) {
-      revision = jsonDecode(response.data)['revision'];
+      revision = jsonDecode(response.body)['revision'];
     }
-    return response;
+    return ResponseData.response(response);
   }
 }

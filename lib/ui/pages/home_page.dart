@@ -63,9 +63,9 @@ class _HomePageState extends State<HomePage> {
     print(tasks);
     tasks.addAll([]);
 
-    await TaskRepository().patchTasks(tasks);
+    print(await TaskRepository().patchTasks(tasks));
 
-    await getTasks();
+    //await getTasks();
   }
 
   Future<void> openBox() async {
