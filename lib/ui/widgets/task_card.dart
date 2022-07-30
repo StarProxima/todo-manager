@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_manager/ui/styles/app_theme.dart';
+import 'package:todo_manager/ui/widgets/task_checkbox.dart';
 
 class TaskCard extends StatefulWidget {
   const TaskCard({Key? key, required this.task}) : super(key: key);
@@ -18,23 +19,13 @@ class _TaskCardState extends State<TaskCard> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          color: isDebug ? Colors.amber : null,
-          child: SizedBox(
-            height: 48,
-            width: 48,
-            child: Checkbox(
-              fillColor: widget.task.done
-                  ? MaterialStateProperty.all(AppColors.green)
-                  : null,
-              value: widget.task.done,
-              onChanged: (value) {
-                setState(() {
-                  widget.task.edit(done: value == true);
-                });
-              },
-            ),
-          ),
+        TaskCheckbox(
+          task: widget.task,
+          onChanged: (value) {
+            setState(() {
+              widget.task.done = value;
+            });
+          },
         ),
         Expanded(
           child: Column(
