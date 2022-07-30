@@ -14,6 +14,7 @@ abstract class AppTheme {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(3),
       ),
+      splashRadius: 24,
     ),
     textTheme: _textTheme,
   );

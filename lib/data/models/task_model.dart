@@ -76,6 +76,12 @@ class Task {
       text: words[random.nextInt(words.length)],
       importance: Importance.values[random.nextInt(3)],
       done: random.nextBool(),
+      deadline: random.nextInt(100) < 60
+          ? DateTime.fromMillisecondsSinceEpoch(
+              DateTime.now().millisecondsSinceEpoch +
+                  random.nextInt(120) * 1000 * 60 * 60 * 24,
+            )
+          : null,
     );
   }
 
