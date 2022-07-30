@@ -1,22 +1,55 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 
+part 'task_model.g.dart';
+
+@HiveType(typeId: 0)
 class Task {
+  @HiveField(0)
   late final String id;
+
+  @HiveField(1)
   String text;
+
+  @HiveField(2)
   Importance importance;
+
+  @HiveField(3)
   bool done;
+
+  @HiveField(4)
   DateTime? deadline;
+
+  @HiveField(5)
   Color? color;
+
+  @HiveField(6)
   late final DateTime createdAt;
+
+  @HiveField(7)
   late DateTime changedAt;
+
+  @HiveField(8)
   late String lastUpdatedBy;
 
   static int _count = 0;
 
   Task({
+    required this.id,
+    required this.text,
+    required this.importance,
+    this.deadline,
+    required this.done,
+    this.color,
+    required this.createdAt,
+    required this.changedAt,
+    required this.lastUpdatedBy,
+  });
+
+  Task.create({
     required this.text,
     required this.importance,
     this.deadline,
@@ -30,29 +63,16 @@ class Task {
     lastUpdatedBy = 'Pacman';
   }
 
-  Task.full({
-    required this.id,
-    required this.text,
-    required this.importance,
-    this.deadline,
-    required this.done,
-    this.color,
-    required this.createdAt,
-    required this.changedAt,
-    required this.lastUpdatedBy,
-  });
-
   factory Task.random() {
     var random = Random();
-    String loremImpusText =
-        'ultricies leo integer malesuada nunc vel risus commodo viverra maecenas accumsan lacus vel facilisis volutpat est velit egestas dui id ornare arcu odio ut sem nulla pharetra diam sit amet nisl suscipit adipiscing bibendum est ultricies integer quis auctor elit sed vulputate mi sit amet mauris commodo quis imperdiet massa tincidunt nunc pulvinar sapien et ligula ullamcorper malesuada proin libero nunc consequat interdum varius sit amet mattis vulputate enim nulla aliquet porttitor lacus luctus accumsan tortor posuere ac ut consequat semper viverra nam libero justo laoreet sit amet cursus sit amet dictum sit amet justo donec enim diam vulputate ut';
-    String text = '';
-    List<String> words = loremImpusText.split(' ');
-    for (int i = 0; i < random.nextInt(300) + 1; i++) {
-      text += '${words[random.nextInt(100)]} ';
-    }
-    return Task(
-      text: text,
+
+    String tasks =
+        'Сходить на 10 спектаклей. Организовать семейный ужин. Стать донором крови. Провести месяц без алкоголя. Сходить в поход. Вести учет расходов. Запустить свой проект. Сходить в 10 новых музеев. Простить обиду близкому человеку. Провести отпуск с компанией друзей. Попробовать 5 новых видов спорта. Сходить на концерт любимой группы. Открыть накопительный счет. Пройти курс повышения квалификации. Прочитать 40 книг. Устроить совместную велопрогулку по городу на несколько часов с насыщенной программой. Сходить в баню с друзьями. Начать медитировать. Совершить автопутешествие. Накопить на путешествие мечты. Научиться делегировать задачи. Нарисовать картину. Сходить в театр всей семьей. Собрать друзей на домашний ужин. Принимать контрастный душ. Провести Новый год в экзотическом месте. Начать зарабатывать на своем проекте. Инициировать новый проект на работе. Взять уроки танца. Возродить семейную традицию. Сделать другу/подруге неожиданный подарок. Пройти курсы первой помощи. Прыгнуть с парашютом. Закрыть кредиты. Найти себе ментора. Избавиться от лишних вещей. Устроить семейную фотосессию. Стать волонтером. Подводить итоги недели. Подарить себе ЗРА - программу. Научиться инвестировать. Уходить с работы вовремя. Все законы будут унифицированы в рамках юридической системы мировых судов, использующих один и тот же кодекс законов, за исполнением которого будет следить полиция Единого Мирового Правительства, а объединённые вооружённые силы Единого Мира насильно внедрят законы во все бывшие страны, которые больше не будут разделяться границами. Система будет основана на базе благоденствующего государства; кто покорился и служит Единому Мировому Правительству, будет вознаграждён средствами к жизни; кто взбунтуется, будет просто заморен голодом или объявлен вне закона, став мишенью для каждого, кто захочет убить его. Сатанизм, люциферианство и чёрная магия будут признаны законными предметами обучения с запрещением частных или церковных школ. Все христианские церкви будут разрушены, а само христианство при Едином Мировом Правительстве отойдёт в прошлое. Сельское хозяйство будет исключительно в руках Комитета 300, а производство продуктов питания будет строго контролироваться. Квалифицированные рабочие будут перемещены в другие города, если город, где они живут, окажется перенаселённым. Прочие неквалифицированные рабочие будут отобраны наугад и посланы в неполностью заселённые города, чтобы заполнить их «квоты». Все информационные службы и средства печати будут находиться под контролем Мирового Правительства. Под видом «развлечений» будут устраиваться регулярные промывания мозгов, что уже практикуется в XXX, где это стало искусством. После уничтожения таких отраслей промышленности, как строительная, автомобильная, металлургическая, тяжёлое машиностроение, жилищное строительство будет ограничено, а сохранённые отрасли промышленности будут находиться под контролем натовского «Римского клуба», а также все научные и космические исследования, которые будут ограничены и всецело подчинены Комитету 300. Космическое оружие бывших стран будет уничтожено вместе с ядерным оружием.';
+
+    List<String> words = tasks.split('.');
+
+    return Task.create(
+      text: words[random.nextInt(words.length)],
       importance: Importance.values[random.nextInt(3)],
       done: random.nextBool(),
     );
@@ -69,7 +89,7 @@ class Task {
     DateTime? changedAt,
     String? lastUpdatedBy,
   }) {
-    return Task.full(
+    return Task(
       id: id ?? this.id,
       text: text ?? this.text,
       importance: importance ?? this.importance,
@@ -117,7 +137,7 @@ class Task {
   }
 
   factory Task.fromMap(Map<String, dynamic> map) {
-    return Task.full(
+    return Task(
       id: map['id'] as String,
       text: map['text'] as String,
       importance: (map['importance'] as String).toImportance(),
