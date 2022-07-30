@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_manager/data/models/task_model.dart';
@@ -16,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   late Box box;
   Future<void> getTasks() async {
     //tasks = await TaskRepository().getTasks();
-    tasks = [];
+
     tasks =
         ((await box.get('tasks')) as Iterable).map((e) => e as Task).toList();
 
@@ -31,38 +33,35 @@ class _HomePageState extends State<HomePage> {
 
     await box.put('tasks', tasks);
 
-    // var response = await TaskRepository().addTask(
-    //   task,
-    // );
-    // print(response);
+    var response = await TaskRepository().addTask(
+      task,
+    );
+    print(response);
     await getTasks();
   }
 
   void editTask() async {
     if (tasks.isNotEmpty) {
       tasks.last.edit(text: 'Edited text <3');
-      await box.put('tasks', tasks);
-      // var response = await TaskRepository().editTask(tasks.last);
-
-      // print(response);
+      log(tasks.last.toString());
+      var response = await TaskRepository().editTask(tasks.last);
       await getTasks();
+      print(response);
     }
   }
 
   void deleteTask() async {
     if (tasks.isNotEmpty) {
-      tasks.removeLast();
-      await box.put('tasks', tasks);
-      // var response = await TaskRepository().deleteTask(tasks.last);
-      //  print(response);
+      box.delete(tasks.last.id);
+      var response = await TaskRepository().deleteTask(tasks.last);
       await getTasks();
+      print(response);
     }
   }
 
   void patchTasks() async {
     print(tasks);
     tasks.addAll([]);
-
     await TaskRepository().patchTasks(tasks);
 
     await getTasks();
