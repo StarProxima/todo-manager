@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/data/repositories/task_repository.dart';
 import 'package:todo_manager/ui/widgets/task_card.dart';
@@ -14,18 +15,29 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Task> tasks = [];
+  late Box box;
   Future<void> getTasks() async {
-    tasks = await TaskRepository().getTasks();
+    //tasks = await TaskRepository().getTasks();
+
+    tasks =
+        ((await box.get('tasks')) as Iterable).map((e) => e as Task).toList();
+
     setState(() {});
-    print(tasks.toString());
+    print(tasks);
   }
 
   void addTask() async {
+    var task = Task.random();
+
+    tasks.add(task);
+
+    await box.put('tasks', tasks);
+
     var response = await TaskRepository().addTask(
-      Task.random(),
+      task,
     );
-    await getTasks();
     print(response);
+    await getTasks();
   }
 
   void editTask() async {
@@ -40,6 +52,7 @@ class _HomePageState extends State<HomePage> {
 
   void deleteTask() async {
     if (tasks.isNotEmpty) {
+      box.delete(tasks.last.id);
       var response = await TaskRepository().deleteTask(tasks.last);
       await getTasks();
       print(response);
@@ -52,6 +65,16 @@ class _HomePageState extends State<HomePage> {
     await TaskRepository().patchTasks(tasks);
 
     await getTasks();
+  }
+
+  Future<void> openBox() async {
+    box = await Hive.openBox('tasks');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    openBox();
   }
 
   @override
