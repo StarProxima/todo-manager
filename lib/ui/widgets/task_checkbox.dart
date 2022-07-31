@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/models/importance.dart';
 import 'package:todo_manager/data/models/task_model.dart';
@@ -19,7 +17,6 @@ class _TaskCheckboxState extends State<TaskCheckbox> {
   late bool value;
   @override
   Widget build(BuildContext context) {
-    log('message');
     value = widget.task.done;
     return GestureDetector(
       onTap: () {
@@ -30,16 +27,16 @@ class _TaskCheckboxState extends State<TaskCheckbox> {
         width: 48,
         color: Colors.transparent,
         child: Container(
-          color: widget.task.importance == Importance.important
+          color: !value && widget.task.importance == Importance.important
               ? AppColors.red.withOpacity(0.16)
-              : null,
+              : Theme.of(context).scaffoldBackgroundColor,
           margin: const EdgeInsets.all(17),
           child: Checkbox(
-            activeColor: value ? AppColors.green : null,
+            value: value,
+            activeColor: AppColors.green,
             fillColor: !value && widget.task.importance == Importance.important
                 ? MaterialStateProperty.all(AppColors.red)
                 : null,
-            value: value,
             onChanged: (_) {
               widget.onChanged(!value);
             },

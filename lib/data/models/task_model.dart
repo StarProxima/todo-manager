@@ -75,7 +75,7 @@ class Task {
     return Task.create(
       text: taskTextList[random.nextInt(taskTextList.length)].trim(),
       importance: Importance.values[random.nextInt(3)],
-      done: random.nextBool(),
+      done: random.nextInt(100) < 40,
       deadline: random.nextInt(100) < 60
           ? DateTime.fromMillisecondsSinceEpoch(
               DateTime.now().millisecondsSinceEpoch +

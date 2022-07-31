@@ -19,47 +19,50 @@ class TaskCard extends StatefulWidget {
 class _TaskCardState extends State<TaskCard> {
   bool isDebug = false;
 
-  GlobalKey<AppDismissBackgroundState> dismissStartToEndKey =
-      GlobalKey<AppDismissBackgroundState>();
+  GlobalKey<AppDismissIconState> dismissStartToEndKey = GlobalKey();
 
-  GlobalKey<AppDismissBackgroundState> dismissEndToStartKey =
-      GlobalKey<AppDismissBackgroundState>();
+  GlobalKey<AppDismissIconState> dismissEndToStartKey = GlobalKey();
+
+  void onUpdate(details) {
+    //Легко сказать — «мы должны были сделать вот так» уже после того, как всё закончилось.
+    //Однако никто не знает, чем обернётся твой выбор и сколькими жертвами,
+    //пока его не сделаешь. А ты должен его сделать!
+    if (details.direction == DismissDirection.startToEnd) {
+      dismissStartToEndKey.currentState?.setProgress(details.progress);
+    } else {
+      dismissEndToStartKey.currentState?.setProgress(details.progress);
+    }
+  }
+
+  void onDismissed(_) => widget.onDelete?.call();
+
+  Future<bool> confirmDismiss(direction) async {
+    switch (direction) {
+      case DismissDirection.endToStart:
+        return true;
+
+      case DismissDirection.startToEnd:
+        await Future.delayed(const Duration(milliseconds: 200));
+        setState(() {
+          widget.task.done = true;
+        });
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: ValueKey(widget.task.id),
-      onDismissed: (_) {
-        widget.onDelete?.call();
-      },
-      confirmDismiss: (direction) async {
-        switch (direction) {
-          case DismissDirection.endToStart:
-            return true;
-
-          case DismissDirection.startToEnd:
-            setState(() {
-              widget.task.done = true;
-            });
-            break;
-
-          default:
-            break;
-        }
-        return false;
-      },
-      onUpdate: (details) {
-        //Ужас, помогите
-        if (details.direction == DismissDirection.startToEnd) {
-          dismissStartToEndKey.currentState?.setProgress(details.progress);
-        } else {
-          dismissEndToStartKey.currentState?.setProgress(details.progress);
-        }
-      },
+      onUpdate: onUpdate,
+      onDismissed: onDismissed,
+      confirmDismiss: confirmDismiss,
       background: Container(
         color: AppColors.green,
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            AppDismissBackground(
+            AppDismissIcon(
               key: dismissStartToEndKey,
               direction: DismissDirection.startToEnd,
               icon: const Icon(Icons.check, color: Colors.white),
@@ -72,7 +75,7 @@ class _TaskCardState extends State<TaskCard> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            AppDismissBackground(
+            AppDismissIcon(
               key: dismissEndToStartKey,
               direction: DismissDirection.endToStart,
               icon: const Icon(Icons.delete, color: Colors.white),
@@ -100,6 +103,8 @@ class _TaskCardState extends State<TaskCard> {
                   child: Container(
                     color: isDebug ? Colors.amber : null,
                     child: RichText(
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                       text: TextSpan(
                         style: widget.task.done
                             ? AppTextStyle.crossedOut
@@ -123,14 +128,9 @@ class _TaskCardState extends State<TaskCard> {
                               : const TextSpan(),
                           TextSpan(
                             text: widget.task.text,
-                            style: widget.task.done
-                                ? AppTextStyle.crossedOut
-                                : Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
@@ -159,7 +159,6 @@ class _TaskCardState extends State<TaskCard> {
                   isDebug = !isDebug;
                 });
               },
-              splashRadius: 20,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               icon: Container(
@@ -177,8 +176,8 @@ class _TaskCardState extends State<TaskCard> {
   }
 }
 
-class AppDismissBackground extends StatefulWidget {
-  const AppDismissBackground({
+class AppDismissIcon extends StatefulWidget {
+  const AppDismissIcon({
     Key? key,
     required this.direction,
     required this.icon,
@@ -187,13 +186,13 @@ class AppDismissBackground extends StatefulWidget {
   final DismissDirection direction;
   final Widget icon;
   @override
-  State<AppDismissBackground> createState() => AppDismissBackgroundState();
+  State<AppDismissIcon> createState() => AppDismissIconState();
 }
 
-class AppDismissBackgroundState extends State<AppDismissBackground> {
+class AppDismissIconState extends State<AppDismissIcon> {
   void setProgress(double progress) {
     setState(() {
-      padding = MediaQuery.of(context).size.width * progress - 48;
+      padding = MediaQuery.of(context).size.width * progress - 47;
     });
   }
 
