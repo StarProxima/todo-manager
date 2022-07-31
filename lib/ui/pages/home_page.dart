@@ -112,7 +112,14 @@ class _HomePageState extends State<HomePage> {
             child: ListView.builder(
               itemCount: tasks.length,
               itemBuilder: (context, index) {
-                return TaskCard(task: tasks[index]);
+                return TaskCard(
+                  task: tasks[index],
+                  onDelete: () async {
+                    tasks.removeAt(index);
+                    await box.put('tasks', tasks);
+                    setState(() {});
+                  },
+                );
               },
             ),
           ),
