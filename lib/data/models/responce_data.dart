@@ -1,16 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:todo_manager/data/repositories/repository.dart';
 
 class ResponseData<T> {
-  final T? data;
-  final String message;
-  final int status;
   final bool isSuccesful;
+  final String? message;
+  final int? status;
+  final T? data;
 
   const ResponseData({
-    this.data,
-    required this.message,
-    required this.status,
     required this.isSuccesful,
+    this.message,
+    this.status,
+    this.data,
   });
 
   factory ResponseData.response(Response response, [T? data]) {
@@ -24,6 +25,6 @@ class ResponseData<T> {
 
   @override
   String toString() {
-    return 'ResponseData(data: $data, message: $message, status: $status, isSuccesful: $isSuccesful)';
+    return 'ResponseData(isSuccesful: $isSuccesful, message: $message, status: $status, data: $data)';
   }
 }
