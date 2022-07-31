@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/local/tasks_manager.dart';
 import 'package:todo_manager/data/models/task_model.dart';
-import 'package:todo_manager/data/repositories/task_repository.dart';
 import 'package:todo_manager/ui/widgets/task_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,8 +24,9 @@ class _HomePageState extends State<HomePage> {
 
   void addTask() async {
     var task = Task.random();
-
-    print(await TasksManager.addTask(task));
+    tasks.add(task);
+    setState(() {});
+    await TasksManager.addTask(task);
     await getTasks();
   }
 
@@ -43,6 +43,7 @@ class _HomePageState extends State<HomePage> {
   void deleteTask() async {
     if (tasks.isNotEmpty) {
       print(await TasksManager.deleteTask(tasks.last));
+
       await getTasks();
     }
   }
@@ -50,13 +51,21 @@ class _HomePageState extends State<HomePage> {
   void patchTasks() async {
     print(tasks);
     tasks.addAll([]);
+  }
 
-    print(await TaskRepository().patchTasks(tasks));
+  Future<void> firstGetTasks() async {
+    var responce = TasksManager.getLocalTasks();
+    tasks = responce.isSuccesful ? responce.data! : tasks;
+    setState(() {});
+    var responce2 = await TasksManager.getTasks();
+    print(responce2);
+    tasks = responce2.isSuccesful ? responce2.data! : tasks;
   }
 
   @override
   void initState() {
     super.initState();
+    firstGetTasks();
   }
 
   @override

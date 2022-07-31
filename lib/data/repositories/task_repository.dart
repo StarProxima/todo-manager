@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-import 'package:todo_manager/data/models/responce_data.dart';
+import 'package:todo_manager/data/models/response_data.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/data/repositories/repository.dart';
 
 class TaskRepository {
   static const String baseUrl = 'https://beta.mrdekk.ru/todobackend';
-  static int? revision = 0;
 
   Future<ResponseData<List<Task>>> getTasks() async {
     final Response response = await Repository.get(
@@ -17,7 +16,6 @@ class TaskRepository {
     );
 
     if (response.isSuccesful) {
-      revision = jsonDecode(response.body)['revision'];
       return ResponseData.response(
         response,
         (jsonDecode(response.body)['list'] as Iterable)
@@ -28,7 +26,10 @@ class TaskRepository {
     return ResponseData.response(response);
   }
 
-  Future<ResponseData<List<Task>>> patchTasks(List<Task> tasks) async {
+  Future<ResponseData<List<Task>>> patchTasks(
+    List<Task> tasks,
+    int revision,
+  ) async {
     final Response response = await Repository.patch(
       url: "$baseUrl/list",
       headers: {
@@ -43,7 +44,6 @@ class TaskRepository {
     );
 
     if (response.isSuccesful) {
-      revision = jsonDecode(response.body)['revision'];
       return ResponseData.response(
         response,
         (jsonDecode(response.body)['list'] as Iterable)
@@ -54,7 +54,7 @@ class TaskRepository {
     return ResponseData.response(response);
   }
 
-  Future<ResponseData> addTask(Task task) async {
+  Future<ResponseData> addTask(Task task, int revision) async {
     final Response response = await Repository.post(
       url: "$baseUrl/list",
       headers: {
@@ -67,13 +67,11 @@ class TaskRepository {
         "element": task.toMap(),
       }),
     );
-    if (response.isSuccesful) {
-      revision = jsonDecode(response.body)['revision'];
-    }
+
     return ResponseData.response(response);
   }
 
-  Future<ResponseData> editTask(Task task) async {
+  Future<ResponseData> editTask(Task task, int revision) async {
     final Response response = await Repository.put(
       url: "$baseUrl/list/${task.id}",
       headers: {
@@ -86,13 +84,11 @@ class TaskRepository {
         "element": task.toMap(),
       }),
     );
-    if (response.isSuccesful) {
-      revision = jsonDecode(response.body)['revision'];
-    }
+
     return ResponseData.response(response);
   }
 
-  Future<ResponseData> deleteTask(Task task) async {
+  Future<ResponseData> deleteTask(Task task, int revision) async {
     final Response response = await Repository.delete(
       url: "$baseUrl/list/${task.id}",
       headers: {
@@ -101,9 +97,7 @@ class TaskRepository {
         "X-Last-Known-Revision": "$revision",
       },
     );
-    if (response.isSuccesful) {
-      revision = jsonDecode(response.body)['revision'];
-    }
+
     return ResponseData.response(response);
   }
 }
