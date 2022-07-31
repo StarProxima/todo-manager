@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/models/importance.dart';
 import 'package:todo_manager/data/models/task_model.dart';
@@ -16,14 +14,15 @@ class TaskCheckbox extends StatefulWidget {
 }
 
 class _TaskCheckboxState extends State<TaskCheckbox> {
-  late bool value;
+  late bool value = widget.task.done;
   @override
   Widget build(BuildContext context) {
-    log('message');
-    value = widget.task.done;
     return GestureDetector(
       onTap: () {
         widget.onChanged(!value);
+        setState(() {
+          value = !value;
+        });
       },
       child: Container(
         height: 48,
@@ -42,6 +41,9 @@ class _TaskCheckboxState extends State<TaskCheckbox> {
             value: value,
             onChanged: (_) {
               widget.onChanged(!value);
+              setState(() {
+                value = !value;
+              });
             },
           ),
         ),

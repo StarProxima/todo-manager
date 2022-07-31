@@ -79,8 +79,7 @@ class Task {
       deadline: random.nextInt(100) < 60
           ? DateTime.fromMillisecondsSinceEpoch(
               DateTime.now().millisecondsSinceEpoch +
-                  random.nextInt(120) * 1000 * 60 * 60 * 24 +
-                  random.nextInt(24 * 60) * 1000 * 60,
+                  random.nextInt(120) * 1000 * 60 * 60 * 24,
             )
           : null,
     );
