@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manager/data/models/importance.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_manager/ui/styles/app_icons.dart';
 import 'package:todo_manager/ui/styles/app_theme.dart';
 import 'package:todo_manager/ui/widgets/task_checkbox.dart';
 
@@ -35,10 +37,37 @@ class _TaskCardState extends State<TaskCard> {
                 padding: const EdgeInsets.only(top: 15),
                 child: Container(
                   color: isDebug ? Colors.amber : null,
-                  child: Text(
-                    widget.task.text,
+                  child: RichText(
+                    text: TextSpan(
+                      style: widget.task.done
+                          ? AppTextStyle.crossedOut
+                          : Theme.of(context).textTheme.bodyMedium,
+                      children: [
+                        widget.task.importance != Importance.basic
+                            ? WidgetSpan(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 3),
+                                  child: AppSvgIcons(
+                                    widget.task.importance ==
+                                            Importance.important
+                                        ? AppSvgIcon.important
+                                        : AppSvgIcon.low,
+                                    color: widget.task.done
+                                        ? AppTextStyle.crossedOut.color
+                                        : null,
+                                  ),
+                                ),
+                              )
+                            : const TextSpan(),
+                        TextSpan(
+                          text: widget.task.text,
+                          style: widget.task.done
+                              ? AppTextStyle.crossedOut
+                              : Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
                     maxLines: 3,
-                    style: widget.task.done ? AppTextStyle.crossedOut : null,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
