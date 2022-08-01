@@ -31,24 +31,24 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
     await TasksManager.addTask(task);
 
-    getTasks();
+    await getTasks();
   }
 
   void editTask() async {
     if (tasks.isNotEmpty) {
       var task = tasks.last.copyWith();
       task.edit(text: 'Edited text <3');
-      print(await TasksManager.editTask(task));
+      await TasksManager.editTask(task);
 
-      getTasks();
+      await getTasks();
     }
   }
 
   void deleteTask() async {
     if (tasks.isNotEmpty) {
-      print(await TasksManager.deleteTask(tasks.last));
+      await TasksManager.deleteTask(tasks.last);
 
-      getTasks();
+      await getTasks();
     }
   }
 
@@ -108,6 +108,7 @@ class _HomePageState extends State<HomePage> {
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 return TaskCard(
+                  key: ValueKey(tasks[index].id),
                   task: tasks[index],
                   onDelete: () async {
                     await TasksManager.deleteTask(tasks[index]);

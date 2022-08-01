@@ -10,7 +10,7 @@ import 'package:todo_manager/data/models/importance.dart';
 part 'task_model.g.dart';
 
 @HiveType(typeId: 0)
-class Task {
+class Task implements Comparable {
   @HiveField(0)
   late final String id;
 
@@ -182,8 +182,10 @@ class Task {
         other.done == done &&
         other.deadline == deadline &&
         other.color == color &&
-        other.createdAt == createdAt &&
-        other.changedAt == changedAt &&
+        other.createdAt.millisecondsSinceEpoch ~/ 1000 ==
+            createdAt.millisecondsSinceEpoch ~/ 1000 &&
+        other.changedAt.millisecondsSinceEpoch ~/ 1000 ==
+            changedAt.millisecondsSinceEpoch ~/ 1000 &&
         other.lastUpdatedBy == lastUpdatedBy;
   }
 
@@ -198,5 +200,13 @@ class Task {
         createdAt.hashCode ^
         changedAt.hashCode ^
         lastUpdatedBy.hashCode;
+  }
+
+  @override
+  int compareTo(other) {
+    if (other is Task) {
+      return text.compareTo(other.text);
+    }
+    return 0;
   }
 }
