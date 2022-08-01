@@ -1,8 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+
 import 'package:todo_manager/data/models/importance.dart';
 
 part 'task_model.g.dart';
@@ -168,5 +170,33 @@ class Task {
   @override
   String toString() {
     return 'Task(id: $id, text: $text, importance: $importance, deadline: $deadline, done: $done, color: $color, created_at: $createdAt, changed_at: $changedAt, last_updated_by: $lastUpdatedBy)';
+  }
+
+  @override
+  bool operator ==(covariant Task other) {
+    if (identical(this, other)) return true;
+
+    return other.id == id &&
+        other.text == text &&
+        other.importance == importance &&
+        other.done == done &&
+        other.deadline == deadline &&
+        other.color == color &&
+        other.createdAt == createdAt &&
+        other.changedAt == changedAt &&
+        other.lastUpdatedBy == lastUpdatedBy;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        text.hashCode ^
+        importance.hashCode ^
+        done.hashCode ^
+        deadline.hashCode ^
+        color.hashCode ^
+        createdAt.hashCode ^
+        changedAt.hashCode ^
+        lastUpdatedBy.hashCode;
   }
 }

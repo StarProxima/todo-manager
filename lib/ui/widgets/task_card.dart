@@ -7,17 +7,22 @@ import 'package:todo_manager/ui/styles/app_theme.dart';
 import 'package:todo_manager/ui/widgets/task_checkbox.dart';
 
 class TaskCard extends StatefulWidget {
-  const TaskCard({Key? key, required this.task, this.onDelete})
-      : super(key: key);
+  const TaskCard({
+    Key? key,
+    required this.task,
+    required this.onDelete,
+    required this.onChangeDone,
+  }) : super(key: key);
 
-  final Function()? onDelete;
+  final Function() onDelete;
+  final Function(bool) onChangeDone;
   final Task task;
   @override
   State<TaskCard> createState() => _TaskCardState();
 }
 
 class _TaskCardState extends State<TaskCard> {
-  bool isDebug = false;
+  late bool done = widget.task.done;
 
   GlobalKey<AppDismissIconState> dismissStartToEndKey = GlobalKey();
 
@@ -34,7 +39,7 @@ class _TaskCardState extends State<TaskCard> {
     }
   }
 
-  void onDismissed(_) => widget.onDelete?.call();
+  void onDismissed(_) => widget.onDelete();
 
   Future<bool> confirmDismiss(direction) async {
     switch (direction) {
@@ -43,11 +48,16 @@ class _TaskCardState extends State<TaskCard> {
 
       case DismissDirection.startToEnd:
         await Future.delayed(const Duration(milliseconds: 200));
-        setState(() {
-          widget.task.done = true;
-        });
+        changeDone(true);
     }
     return false;
+  }
+
+  void changeDone(bool value) {
+    setState(() {
+      done = value;
+      widget.onChangeDone(done);
+    });
   }
 
   @override
@@ -87,12 +97,9 @@ class _TaskCardState extends State<TaskCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TaskCheckbox(
+            value: done,
             task: widget.task,
-            onChanged: (value) {
-              setState(() {
-                widget.task.done = value;
-              });
-            },
+            onChanged: changeDone,
           ),
           Expanded(
             child: Column(
@@ -100,51 +107,45 @@ class _TaskCardState extends State<TaskCard> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 15),
-                  child: Container(
-                    color: isDebug ? Colors.amber : null,
-                    child: RichText(
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      text: TextSpan(
-                        style: widget.task.done
-                            ? AppTextStyle.crossedOut
-                            : Theme.of(context).textTheme.bodyMedium,
-                        children: [
-                          widget.task.importance != Importance.basic
-                              ? WidgetSpan(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 3),
-                                    child: AppSvgIcons(
-                                      widget.task.importance ==
-                                              Importance.important
-                                          ? AppSvgIcon.important
-                                          : AppSvgIcon.low,
-                                      color: widget.task.done
-                                          ? AppTextStyle.crossedOut.color
-                                          : null,
-                                    ),
+                  child: RichText(
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      style: done
+                          ? AppTextStyle.crossedOut
+                          : Theme.of(context).textTheme.bodyMedium,
+                      children: [
+                        widget.task.importance != Importance.basic
+                            ? WidgetSpan(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 3),
+                                  child: AppSvgIcons(
+                                    widget.task.importance ==
+                                            Importance.important
+                                        ? AppSvgIcon.important
+                                        : AppSvgIcon.low,
+                                    color: done
+                                        ? AppTextStyle.crossedOut.color
+                                        : null,
                                   ),
-                                )
-                              : const TextSpan(),
-                          TextSpan(
-                            text: widget.task.text,
-                          ),
-                        ],
-                      ),
+                                ),
+                              )
+                            : const TextSpan(),
+                        TextSpan(
+                          text: widget.task.text,
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 widget.task.deadline != null
                     ? Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Container(
-                          color: isDebug ? Colors.amber : null,
-                          child: Text(
-                            DateFormat('dd.MM.yyyy hh:mm')
-                                .format(widget.task.deadline!),
-                            style: Theme.of(context).textTheme.labelSmall,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        child: Text(
+                          DateFormat('dd.MM.yyyy hh:mm')
+                              .format(widget.task.deadline!),
+                          style: Theme.of(context).textTheme.labelSmall,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       )
                     : const SizedBox(),
@@ -154,19 +155,12 @@ class _TaskCardState extends State<TaskCard> {
           Padding(
             padding: const EdgeInsets.only(top: 15, left: 14, right: 18),
             child: IconButton(
-              onPressed: () {
-                setState(() {
-                  isDebug = !isDebug;
-                });
-              },
+              onPressed: () {},
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon: Container(
-                color: isDebug ? Colors.amber : null,
-                child: const Icon(
-                  Icons.info_outline,
-                  color: Color(0x4d000000),
-                ),
+              icon: const Icon(
+                Icons.info_outline,
+                color: Color(0x4d000000),
               ),
             ),
           ),

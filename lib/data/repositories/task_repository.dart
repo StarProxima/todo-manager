@@ -54,7 +54,7 @@ class TaskRepository {
     return ResponseData.response(response);
   }
 
-  Future<ResponseData> addTask(Task task, int revision) async {
+  Future<ResponseData<Task>> addTask(Task task, int revision) async {
     final Response response = await Repository.post(
       url: "$baseUrl/list",
       headers: {
@@ -67,11 +67,17 @@ class TaskRepository {
         "element": task.toMap(),
       }),
     );
+    if (response.isSuccesful) {
+      return ResponseData.response(
+        response,
+        Task.fromMap(jsonDecode(response.body)['element']),
+      );
+    }
 
     return ResponseData.response(response);
   }
 
-  Future<ResponseData> editTask(Task task, int revision) async {
+  Future<ResponseData<Task>> editTask(Task task, int revision) async {
     final Response response = await Repository.put(
       url: "$baseUrl/list/${task.id}",
       headers: {
@@ -84,6 +90,13 @@ class TaskRepository {
         "element": task.toMap(),
       }),
     );
+
+    if (response.isSuccesful) {
+      return ResponseData.response(
+        response,
+        Task.fromMap(jsonDecode(response.body)['element']),
+      );
+    }
 
     return ResponseData.response(response);
   }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/local/tasks_manager.dart';
 import 'package:todo_manager/data/models/task_model.dart';
@@ -16,18 +18,20 @@ class _HomePageState extends State<HomePage> {
   Future<void> getTasks() async {
     //tasks = await TaskRepository().getTasks();
 
-    var responce = TasksManager.getLocalTasks();
-    tasks = responce.isSuccesful ? responce.data! : [];
+    var responce = await TasksManager.getTasks();
+    if (responce.isSuccesful) {
+      tasks = responce.data!;
+    }
 
     setState(() {});
   }
 
   void addTask() async {
     var task = Task.random();
-    tasks.add(task);
     setState(() {});
     await TasksManager.addTask(task);
-    await getTasks();
+
+    getTasks();
   }
 
   void editTask() async {
@@ -36,7 +40,7 @@ class _HomePageState extends State<HomePage> {
       task.edit(text: 'Edited text <3');
       print(await TasksManager.editTask(task));
 
-      await getTasks();
+      getTasks();
     }
   }
 
@@ -44,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     if (tasks.isNotEmpty) {
       print(await TasksManager.deleteTask(tasks.last));
 
-      await getTasks();
+      getTasks();
     }
   }
 
@@ -54,6 +58,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> firstGetTasks() async {
+    log('firstGetTasks');
     var responce = TasksManager.getLocalTasks();
     tasks = responce.isSuccesful ? responce.data! : tasks;
     setState(() {});
@@ -105,9 +110,14 @@ class _HomePageState extends State<HomePage> {
                 return TaskCard(
                   task: tasks[index],
                   onDelete: () async {
-                    tasks.removeAt(index);
-
-                    setState(() {});
+                    await TasksManager.deleteTask(tasks[index]);
+                    getTasks();
+                  },
+                  onChangeDone: (done) async {
+                    var task = tasks[index].copyWith();
+                    task.edit(done: done);
+                    await TasksManager.editTask(task);
+                    getTasks();
                   },
                 );
               },
