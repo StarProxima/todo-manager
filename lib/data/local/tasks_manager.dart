@@ -7,6 +7,8 @@ import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/data/repositories/task_repository.dart';
 
 abstract class TasksManager {
+  static TaskRepository repository = TaskRepository();
+
   static int _revision = 0;
 
   static int get revision => _revision;
@@ -16,59 +18,61 @@ abstract class TasksManager {
     }
   }
 
-  static TaskRepository repository = TaskRepository();
-
   static List<Task>? _tasks;
   static List<Task> get tasks {
-    return _tasks ??= _getLocalTasks();
+    return _tasks ?? _getLocalTasks();
   }
 
   static List<Task> _getLocalTasks() {
+    log(Hive.box('tasks').toString());
     return (Hive.box('tasks').get('tasks') as Iterable)
         .map((e) => e as Task)
         .toList();
   }
 
-  static Future<void> save() async {
-    await Hive.box('tasks').put('tasks', _tasks);
-  }
+  static bool checkLocalChanges(List<Task> serverTasks) {
+    bool localChanges = tasks.length != serverTasks.length;
 
-  static Future<void> checkRevision(ResponseData response) async {
-    if (response.isSuccesful) {
-      bool localChanges = tasks.length != response.data!.length;
-
-      if (!localChanges) {
-        for (int i = 0; i < tasks.length; i++) {
-          if (!tasks.contains(response.data![i])) {
-            localChanges = true;
-          }
+    if (!localChanges) {
+      for (int i = 0; i < tasks.length; i++) {
+        if (!tasks.contains(serverTasks[i])) {
+          localChanges = true;
         }
       }
+    }
+    log(localChanges ? 'unsync data' : 'sync data');
 
-      log(localChanges ? 'unsync data' : 'sync data');
+    return localChanges;
+  }
+
+  static Future<void> localSaveTasks() async {
+    await Hive.box('tasks').put('tasks', tasks);
+  }
+
+  static Future<ResponseData<List<Task>>> checkRevision(
+    ResponseData<List<Task>> response,
+  ) async {
+    if (response.isSuccesful) {
+      bool localChanges = checkLocalChanges(response.data!);
+
       if (!localChanges) {
         _tasks = response.data!;
-        save();
+        localSaveTasks();
         revision = jsonDecode(response.message!)['revision'];
+        return response.copyWith(data: _tasks);
       } else if (localChanges && repository.activeRequests == 0) {
         var patchResponce = await repository.patchTasks(tasks, revision);
 
         if (patchResponce.isSuccesful) {
-          localChanges = tasks.length != patchResponce.data!.length;
-          if (!localChanges) {
-            for (int i = 0; i < tasks.length; i++) {
-              if (!tasks.contains(patchResponce.data![i])) {
-                localChanges = true;
-              }
-            }
-          }
-          log(localChanges ? 'unsync data' : 'sync data');
           _tasks = patchResponce.data!;
-          save();
+          localSaveTasks();
           revision = jsonDecode(patchResponce.message!)['revision'];
+          localChanges = checkLocalChanges(response.data!);
+          return patchResponce.copyWith(data: _tasks);
         }
       }
     }
+    return response;
   }
 
   static ResponseData<List<Task>> getLocalTasks() {
@@ -80,15 +84,13 @@ abstract class TasksManager {
 
   static Future<ResponseData<List<Task>>> getTasks() async {
     var response = await repository.getTasks();
-    await checkRevision(response);
-
+    response = await checkRevision(response);
     return response.copyWith(data: tasks);
   }
 
   static Future<ResponseData> addTask(Task task) async {
     tasks.add(task);
-
-    save();
+    localSaveTasks();
 
     var response = await repository.addTask(task, revision);
 
@@ -98,8 +100,7 @@ abstract class TasksManager {
       var index = tasks.indexOf(t);
 
       tasks[index] = response.data!;
-
-      save();
+      localSaveTasks();
     }
 
     return const ResponseData(
@@ -110,15 +111,17 @@ abstract class TasksManager {
   static Future<ResponseData> editTask(Task task) async {
     var t = tasks.firstWhere((element) => element.id == task.id);
     var index = tasks.indexOf(t);
+
     tasks[index] = task.copyWith();
-    save();
+    localSaveTasks();
+
     var response = await repository.editTask(task, revision);
 
     if (response.isSuccesful) {
       revision = jsonDecode(response.message!)['revision'];
 
       tasks[index] = response.data!;
-      save();
+      localSaveTasks();
     }
 
     return const ResponseData(
@@ -127,19 +130,17 @@ abstract class TasksManager {
   }
 
   static Future<ResponseData> deleteTask(Task task) async {
-    var isSuccesful = tasks.remove(task);
-    if (isSuccesful) {
-      save();
+    var isSuccesRemove = tasks.remove(task);
+    localSaveTasks();
 
-      var response = await repository.deleteTask(task, revision);
+    var response = await repository.deleteTask(task, revision);
 
-      if (response.isSuccesful) {
-        revision = jsonDecode(response.message!)['revision'];
-      }
+    if (response.isSuccesful) {
+      revision = jsonDecode(response.message!)['revision'];
     }
 
     return ResponseData(
-      isSuccesful: isSuccesful,
+      isSuccesful: isSuccesRemove,
     );
   }
 }

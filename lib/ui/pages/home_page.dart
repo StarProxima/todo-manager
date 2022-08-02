@@ -19,10 +19,8 @@ class _HomePageState extends State<HomePage> {
     //tasks = await TaskRepository().getTasks();
 
     var responce = await TasksManager.getTasks();
-    if (responce.isSuccesful) {
-      tasks = responce.data!;
-    }
 
+    tasks = responce.data ?? tasks;
     setState(() {});
   }
 
@@ -31,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
     await TasksManager.addTask(task);
 
-    await getTasks();
+    getTasks();
   }
 
   void editTask() async {
@@ -40,7 +38,7 @@ class _HomePageState extends State<HomePage> {
       task.edit(text: 'Edited text <3');
       await TasksManager.editTask(task);
 
-      await getTasks();
+      getTasks();
     }
   }
 
@@ -48,23 +46,16 @@ class _HomePageState extends State<HomePage> {
     if (tasks.isNotEmpty) {
       await TasksManager.deleteTask(tasks.last);
 
-      await getTasks();
+      getTasks();
     }
-  }
-
-  void patchTasks() async {
-    print(tasks);
-    tasks.addAll([]);
   }
 
   Future<void> firstGetTasks() async {
     log('firstGetTasks');
     var responce = TasksManager.getLocalTasks();
-    tasks = responce.isSuccesful ? responce.data! : tasks;
+    tasks = responce.data ?? tasks;
     setState(() {});
-    var responce2 = await TasksManager.getTasks();
-    print(responce2);
-    tasks = responce2.isSuccesful ? responce2.data! : tasks;
+    getTasks();
   }
 
   @override
@@ -76,55 +67,53 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton(
-                onPressed: getTasks,
-                child: const Text('getTasks'),
-              ),
-              ElevatedButton(
-                onPressed: addTask,
-                child: const Text('addTask'),
-              ),
-              ElevatedButton(
-                onPressed: editTask,
-                child: const Text('editTask'),
-              ),
-              ElevatedButton(
-                onPressed: deleteTask,
-                child: const Text('deleteTask'),
-              ),
-              ElevatedButton(
-                onPressed: patchTasks,
-                child: const Text('patchTasks'),
-              ),
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                return TaskCard(
-                  key: ValueKey(tasks[index].id),
-                  task: tasks[index],
-                  onDelete: () async {
-                    await TasksManager.deleteTask(tasks[index]);
-                    getTasks();
-                  },
-                  onChangeDone: (done) async {
-                    var task = tasks[index].copyWith();
-                    task.edit(done: done);
-                    await TasksManager.editTask(task);
-                    getTasks();
-                  },
-                );
-              },
+      body: SafeArea(
+        child: Column(
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(
+                  onPressed: getTasks,
+                  child: const Text('get'),
+                ),
+                ElevatedButton(
+                  onPressed: addTask,
+                  child: const Text('add'),
+                ),
+                ElevatedButton(
+                  onPressed: editTask,
+                  child: const Text('edit'),
+                ),
+                ElevatedButton(
+                  onPressed: deleteTask,
+                  child: const Text('delete'),
+                ),
+              ],
             ),
-          ),
-        ],
+            Expanded(
+              child: ListView.builder(
+                itemCount: tasks.length,
+                itemBuilder: (context, index) {
+                  return TaskCard(
+                    key: ValueKey(tasks[index].id),
+                    task: tasks[index],
+                    onDelete: () async {
+                      await TasksManager.deleteTask(tasks[index]);
+                      getTasks();
+                    },
+                    onChangeDone: (done) async {
+                      var task = tasks[index].copyWith();
+                      task.edit(done: done);
+                      await TasksManager.editTask(task);
+                      getTasks();
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
