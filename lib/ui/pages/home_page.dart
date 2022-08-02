@@ -16,8 +16,6 @@ class _HomePageState extends State<HomePage> {
   List<Task> tasks = [];
 
   Future<void> getTasks() async {
-    //tasks = await TaskRepository().getTasks();
-
     var responce = await TasksManager.getTasks();
 
     tasks = responce.data ?? tasks;

@@ -10,10 +10,7 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(ImportanceAdapter());
-  // await (await Hive.openBox('tasks')).deleteFromDisk();
   (await Hive.openBox('tasks')).put('tasks', []);
-  (await Hive.openBox('tasks')).put('tasks', []);
-  // print(Hive.box<List<Task>>('tasks'));
 
   runApp(const MyApp());
 }
@@ -29,7 +26,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: AppTheme.themeData,
       home: const HomePage(),
     );
