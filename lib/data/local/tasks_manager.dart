@@ -6,34 +6,41 @@ import 'package:todo_manager/data/models/response_data.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/data/repositories/task_repository.dart';
 
-abstract class TasksManager {
-  static final TaskRepository _repository = TaskRepository();
+class TasksController {
+  static final TasksController _instance = TasksController._();
 
-  static int _revision = 0;
+  TasksController._();
 
-  static int get revision => _revision;
-  static set revision(int r) {
+  factory TasksController() {
+    return _instance;
+  }
+
+  final TaskRepository _repository = TaskRepository();
+
+  int _revision = 0;
+
+  int get revision => _revision;
+  set revision(int r) {
     if (r > _revision) {
       _revision = r;
     }
   }
 
-  static List<Task>? __tasks;
-  static set _tasks(List<Task> tasks) {
+  List<Task>? __tasks;
+  set _tasks(List<Task> tasks) {
     __tasks = tasks;
   }
 
-  static List<Task> get _tasks {
+  List<Task> get _tasks {
     if (__tasks == null) {
       _tasks = (Hive.box('tasks').get('tasks') as Iterable)
           .map((e) => e as Task)
           .toList();
     }
-
     return __tasks!;
   }
 
-  static bool checkLocalChanges(List<Task> serverTasks) {
+  bool checkLocalChanges(List<Task> serverTasks) {
     bool localChanges = _tasks.length != serverTasks.length;
 
     if (!localChanges) {
@@ -49,11 +56,11 @@ abstract class TasksManager {
     return localChanges;
   }
 
-  static Future<void> localSaveTasks() async {
+  Future<void> localSaveTasks() async {
     await Hive.box('tasks').put('tasks', _tasks);
   }
 
-  static Future<ResponseData<List<Task>>> checkRevision(
+  Future<ResponseData<List<Task>>> checkTasks(
     ResponseData<List<Task>> response,
   ) async {
     if (response.isSuccesful) {
@@ -66,7 +73,6 @@ abstract class TasksManager {
         return response.copyWith(data: _tasks);
       } else if (localChanges && _repository.activeRequests == 0) {
         var patchResponse = await _repository.patchTasks(_tasks, revision);
-
         if (patchResponse.isSuccesful) {
           _tasks = patchResponse.data!;
           localSaveTasks();
@@ -79,17 +85,17 @@ abstract class TasksManager {
     return response;
   }
 
-  static List<Task> getLocalTasks() {
+  List<Task> getLocalTasks() {
     return _tasks;
   }
 
-  static Future<ResponseData<List<Task>>> getTasks() async {
+  Future<ResponseData<List<Task>>> getTasks() async {
     var response = await _repository.getTasks();
-    response = await checkRevision(response);
+    response = await checkTasks(response);
     return response.copyWith(data: _tasks);
   }
 
-  static Future<ResponseData> addTask(Task task) async {
+  Future<ResponseData> addTask(Task task) async {
     _tasks.add(task);
     localSaveTasks();
 
@@ -109,7 +115,7 @@ abstract class TasksManager {
     );
   }
 
-  static Future<ResponseData> editTask(Task task) async {
+  Future<ResponseData> editTask(Task task) async {
     var t = _tasks.firstWhere((element) => element.id == task.id);
     var index = _tasks.indexOf(t);
 
@@ -130,7 +136,7 @@ abstract class TasksManager {
     );
   }
 
-  static Future<ResponseData> deleteTask(Task task) async {
+  Future<ResponseData> deleteTask(Task task) async {
     var isSuccesRemove = _tasks.remove(task);
     localSaveTasks();
 

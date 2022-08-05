@@ -14,7 +14,7 @@ class _HomePageState extends State<HomePage> {
   List<Task> tasks = [];
 
   Future<void> getTasks() async {
-    var responce = await TasksManager.getTasks();
+    var responce = await TasksController().getTasks();
     print(responce);
     tasks = responce.data ?? tasks;
     setState(() {});
@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
 
   void addTask() async {
     var task = Task.random();
-    var responce = await TasksManager.addTask(task);
+    var responce = await TasksController().addTask(task);
     print(responce);
     getTasks();
   }
@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
     if (tasks.isNotEmpty) {
       var task = tasks.last.copyWith(text: 'Edited text <3');
 
-      await TasksManager.editTask(task);
+      await TasksController().editTask(task);
 
       getTasks();
     }
@@ -39,14 +39,14 @@ class _HomePageState extends State<HomePage> {
 
   void deleteTask() async {
     if (tasks.isNotEmpty) {
-      await TasksManager.deleteTask(tasks.last);
+      await TasksController().deleteTask(tasks.last);
 
       getTasks();
     }
   }
 
   Future<void> firstGetTasks() async {
-    tasks = TasksManager.getLocalTasks();
+    tasks = TasksController().getLocalTasks();
 
     getTasks();
   }
@@ -92,13 +92,13 @@ class _HomePageState extends State<HomePage> {
                     key: ValueKey(tasks[index].id),
                     task: tasks[index],
                     onDelete: () async {
-                      await TasksManager.deleteTask(tasks[index]);
+                      await TasksController().deleteTask(tasks[index]);
                       getTasks();
                     },
                     onChangeDone: (done) async {
                       var task = tasks[index].copyWith(done: done);
 
-                      await TasksManager.editTask(task);
+                      await TasksController().editTask(task);
                       getTasks();
                     },
                   );
