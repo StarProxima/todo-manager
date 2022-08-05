@@ -47,9 +47,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> firstGetTasks() async {
-    var responce = TasksManager.getLocalTasks();
-    tasks = responce.data ?? tasks;
-    setState(() {});
+    tasks = TasksManager.getLocalTasks();
+
     getTasks();
   }
 
