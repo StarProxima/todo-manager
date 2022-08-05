@@ -22,7 +22,6 @@ class _HomePageState extends State<HomePage> {
 
   void addTask() async {
     var task = Task.random();
-    setState(() {});
     var responce = await TasksManager.addTask(task);
     print(responce);
     getTasks();

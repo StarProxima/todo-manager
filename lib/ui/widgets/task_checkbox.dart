@@ -29,11 +29,11 @@ class _TaskCheckboxState extends State<TaskCheckbox> {
         height: 48,
         width: 48,
         color: Colors.transparent,
-        child: Container(
+        padding: const EdgeInsets.all(17),
+        child: ColoredBox(
           color: !widget.value && widget.task.importance == Importance.important
               ? AppColors.red.withOpacity(0.16)
               : Theme.of(context).scaffoldBackgroundColor,
-          margin: const EdgeInsets.all(17),
           child: Checkbox(
             value: widget.value,
             activeColor: AppColors.green,
