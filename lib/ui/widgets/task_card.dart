@@ -24,18 +24,17 @@ class TaskCard extends StatefulWidget {
 class _TaskCardState extends State<TaskCard> {
   late bool done = widget.task.done;
 
-  GlobalKey<AppDismissIconState> dismissStartToEndKey = GlobalKey();
-
-  GlobalKey<AppDismissIconState> dismissEndToStartKey = GlobalKey();
+  ValueNotifier<double> startToEndNotifier = ValueNotifier<double>(0);
+  ValueNotifier<double> endToStartNotifier = ValueNotifier<double>(0);
 
   void onUpdate(details) {
     //Легко сказать — «мы должны были сделать вот так» уже после того, как всё закончилось.
     //Однако никто не знает, чем обернётся твой выбор и сколькими жертвами,
     //пока его не сделаешь. А ты должен его сделать!
     if (details.direction == DismissDirection.startToEnd) {
-      dismissStartToEndKey.currentState?.setProgress(details.progress);
+      startToEndNotifier.value = details.progress;
     } else {
-      dismissEndToStartKey.currentState?.setProgress(details.progress);
+      endToStartNotifier.value = details.progress;
     }
   }
 
@@ -72,10 +71,15 @@ class _TaskCardState extends State<TaskCard> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            AppDismissIcon(
-              key: dismissStartToEndKey,
-              direction: DismissDirection.startToEnd,
-              icon: const Icon(Icons.check, color: Colors.white),
+            ValueListenableBuilder(
+              valueListenable: startToEndNotifier,
+              builder: (BuildContext context, double value, Widget? child) {
+                return AppDismissIcon(
+                  direction: DismissDirection.startToEnd,
+                  progress: value,
+                  icon: const Icon(Icons.check, color: Colors.white),
+                );
+              },
             ),
           ],
         ),
@@ -85,10 +89,15 @@ class _TaskCardState extends State<TaskCard> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            AppDismissIcon(
-              key: dismissEndToStartKey,
-              direction: DismissDirection.endToStart,
-              icon: const Icon(Icons.delete, color: Colors.white),
+            ValueListenableBuilder(
+              valueListenable: endToStartNotifier,
+              builder: (BuildContext context, double value, Widget? child) {
+                return AppDismissIcon(
+                  direction: DismissDirection.endToStart,
+                  progress: value,
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                );
+              },
             ),
           ],
         ),
@@ -174,26 +183,21 @@ class AppDismissIcon extends StatefulWidget {
   const AppDismissIcon({
     Key? key,
     required this.direction,
+    required this.progress,
     required this.icon,
   }) : super(key: key);
 
   final DismissDirection direction;
+  final double progress;
   final Widget icon;
   @override
   State<AppDismissIcon> createState() => AppDismissIconState();
 }
 
 class AppDismissIconState extends State<AppDismissIcon> {
-  void setProgress(double progress) {
-    setState(() {
-      padding = MediaQuery.of(context).size.width * progress - 47;
-    });
-  }
-
-  double padding = 0;
-
   @override
   Widget build(BuildContext context) {
+    var padding = MediaQuery.of(context).size.width * widget.progress - 47;
     return Padding(
       padding: EdgeInsets.only(
         left: widget.direction == DismissDirection.startToEnd

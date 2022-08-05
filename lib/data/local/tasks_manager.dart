@@ -24,7 +24,6 @@ abstract class TasksManager {
   }
 
   static List<Task> _getLocalTasks() {
-    log(Hive.box('tasks').toString());
     return (Hive.box('tasks').get('tasks') as Iterable)
         .map((e) => e as Task)
         .toList();

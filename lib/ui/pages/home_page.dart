@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/local/tasks_manager.dart';
 import 'package:todo_manager/data/models/task_model.dart';
@@ -49,7 +47,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> firstGetTasks() async {
-    log('firstGetTasks');
     var responce = TasksManager.getLocalTasks();
     tasks = responce.data ?? tasks;
     setState(() {});
