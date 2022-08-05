@@ -30,8 +30,8 @@ class _HomePageState extends State<HomePage> {
 
   void editTask() async {
     if (tasks.isNotEmpty) {
-      var task = tasks.last.copyWith();
-      task.edit(text: 'Edited text <3');
+      var task = tasks.last.copyWith(text: 'Edited text <3');
+
       await TasksManager.editTask(task);
 
       getTasks();
@@ -98,8 +98,8 @@ class _HomePageState extends State<HomePage> {
                       getTasks();
                     },
                     onChangeDone: (done) async {
-                      var task = tasks[index].copyWith();
-                      task.edit(done: done);
+                      var task = tasks[index].copyWith(done: done);
+
                       await TasksManager.editTask(task);
                       getTasks();
                     },

@@ -15,28 +15,28 @@ class Task implements Comparable {
   late final String id;
 
   @HiveField(1)
-  String text;
+  final String text;
 
   @HiveField(2)
-  Importance importance;
+  final Importance importance;
 
   @HiveField(3)
-  bool done;
+  final bool done;
 
   @HiveField(4)
-  DateTime? deadline;
+  final DateTime? deadline;
 
   @HiveField(5)
-  Color? color;
+  final Color? color;
 
   @HiveField(6)
   late final DateTime createdAt;
 
   @HiveField(7)
-  late DateTime changedAt;
+  late final DateTime changedAt;
 
   @HiveField(8)
-  late String lastUpdatedBy;
+  late final String lastUpdatedBy;
 
   static int _count = 0;
 
@@ -89,47 +89,23 @@ class Task implements Comparable {
   }
 
   Task copyWith({
-    String? id,
     String? text,
     Importance? importance,
     bool? done,
     DateTime? deadline,
     Color? color,
-    DateTime? createdAt,
-    DateTime? changedAt,
-    String? lastUpdatedBy,
   }) {
     return Task(
-      id: id ?? this.id,
+      id: id,
       text: text ?? this.text,
       importance: importance ?? this.importance,
       done: done ?? this.done,
       deadline: deadline ?? this.deadline,
       color: color ?? this.color,
-      createdAt: createdAt ?? this.createdAt,
-      changedAt: changedAt ?? this.changedAt,
-      lastUpdatedBy: lastUpdatedBy ?? this.lastUpdatedBy,
+      createdAt: createdAt,
+      changedAt: DateTime.now(),
+      lastUpdatedBy: 'Pacman',
     );
-  }
-
-  //Вот тут не уверен, как лучше обновлять сопутствующие данные в модели при
-  //изменении её полей. Засунуть обработку в сеттеры - больше кода, меньше читаемость,
-  //не совсем ожидаемое поведение, на зато всё всегда обновлять будет.
-  //Сделать все поля final и зануть обновление в copyWith - тоже такое себе.
-  void edit({
-    String? text,
-    Importance? importance,
-    bool? done,
-    DateTime? deadline,
-    Color? color,
-  }) {
-    this.text = text ?? this.text;
-    this.importance = importance ?? this.importance;
-    this.done = done ?? this.done;
-    this.deadline = deadline ?? this.deadline;
-    this.color = color ?? this.color;
-    changedAt = DateTime.now();
-    lastUpdatedBy = 'Pacman';
   }
 
   Map<String, dynamic> toMap() {
