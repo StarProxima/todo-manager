@@ -15,7 +15,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> getTasks() async {
     var responce = await TasksManager.getTasks();
-
+    print(responce);
     tasks = responce.data ?? tasks;
     setState(() {});
   }
@@ -23,8 +23,8 @@ class _HomePageState extends State<HomePage> {
   void addTask() async {
     var task = Task.random();
     setState(() {});
-    await TasksManager.addTask(task);
-
+    var responce = await TasksManager.addTask(task);
+    print(responce);
     getTasks();
   }
 

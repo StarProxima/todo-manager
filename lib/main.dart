@@ -10,8 +10,13 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(ImportanceAdapter());
-  (await Hive.openBox('tasks')).put('tasks', []);
+  // await (await Hive.openBox('tasks')).deleteFromDisk();
 
+  await Hive.openBox('tasks');
+  var tasks = Hive.box('tasks').get('tasks');
+  if (tasks == null) {
+    Hive.box('tasks').put('tasks', []);
+  }
   runApp(const MyApp());
 }
 

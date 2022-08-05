@@ -20,13 +20,15 @@ abstract class TasksManager {
 
   static List<Task>? _tasks;
   static List<Task> get tasks {
-    return _tasks ?? _getLocalTasks();
+    _tasks ??= _getLocalTasks();
+    return _tasks!;
   }
 
   static List<Task> _getLocalTasks() {
-    return (Hive.box('tasks').get('tasks') as Iterable)
+    _tasks = (Hive.box('tasks').get('tasks') as Iterable)
         .map((e) => e as Task)
         .toList();
+    return _tasks!;
   }
 
   static bool checkLocalChanges(List<Task> serverTasks) {
