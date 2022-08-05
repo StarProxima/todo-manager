@@ -11,7 +11,8 @@ void main() async {
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(ImportanceAdapter());
   // await (await Hive.openBox('tasks')).deleteFromDisk();
-
+  //debugPaintLayerBordersEnabled = true;
+  //debugPaintSizeEnabled = true;
   await Hive.openBox('tasks');
   var tasks = Hive.box('tasks').get('tasks');
   if (tasks == null) {

@@ -32,11 +32,9 @@ class TasksController {
   }
 
   List<Task> get _tasks {
-    if (__tasks == null) {
-      _tasks = (Hive.box('tasks').get('tasks') as Iterable)
-          .map((e) => e as Task)
-          .toList();
-    }
+    __tasks ??= (Hive.box('tasks').get('tasks') as Iterable)
+        .map((e) => e as Task)
+        .toList();
     return __tasks!;
   }
 
