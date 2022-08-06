@@ -55,8 +55,8 @@ class Task implements Comparable {
   Task.create({
     required this.text,
     required this.importance,
-    this.deadline,
     required this.done,
+    this.deadline,
     this.color,
   }) {
     var now = DateTime.now();

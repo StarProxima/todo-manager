@@ -5,6 +5,7 @@ import 'package:todo_manager/data/local/tasks_manager.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/ui/widgets/home_page_header_delegate.dart';
 
+import '../widgets/add_task_card.dart';
 import '../widgets/task_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -68,6 +69,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     log('message');
+
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -105,14 +107,12 @@ class _HomePageState extends State<HomePage> {
                   itemCount: tasks.length + 1,
                   itemBuilder: (context, index) {
                     if (index == tasks.length) {
-                      return TextField(
-                        focusNode: FocusNode(),
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.only(left: 52),
-                          hintText: 'Новое',
-                          border: InputBorder.none,
-                        ),
+                      return AddTaskCard(
+                        onAddTask: (task) async {
+                          await TasksController().addTask(task);
+
+                          getTasks();
+                        },
                       );
                     }
                     if (isd && tasks[index].done) {
