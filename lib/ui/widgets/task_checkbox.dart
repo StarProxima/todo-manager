@@ -33,7 +33,7 @@ class _TaskCheckboxState extends State<TaskCheckbox> {
         child: ColoredBox(
           color: !widget.value && widget.task.importance == Importance.important
               ? AppColors.red.withOpacity(0.16)
-              : Theme.of(context).scaffoldBackgroundColor,
+              : Colors.transparent,
           child: Checkbox(
             value: widget.value,
             activeColor: AppColors.green,

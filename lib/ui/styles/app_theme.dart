@@ -62,6 +62,13 @@ abstract class AppTheme {
         fontWeight: FontWeight.w400,
       ),
     ),
+    bodySmall: GoogleFonts.roboto(
+      textStyle: const TextStyle(
+        color: _AppLightColors.textLabelTertiary,
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+      ),
+    ),
     labelMedium: GoogleFonts.roboto(
       textStyle: const TextStyle(
         color: _AppLightColors.textLabelPrimary,

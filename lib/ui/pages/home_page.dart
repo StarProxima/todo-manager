@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/local/tasks_manager.dart';
 import 'package:todo_manager/data/models/task_model.dart';
+import 'package:todo_manager/ui/widgets/home_page_header_delegate.dart';
 
 import '../widgets/task_card.dart';
 
@@ -62,11 +63,17 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: ElevatedButton(
-                onPressed: addTask,
-                child: const Text('add'),
+            // SliverToBoxAdapter(
+            //   child: ElevatedButton(
+            //     onPressed: addTask,
+            //     child: const Text('add'),
+            //   ),
+            // ),
+            SliverPersistentHeader(
+              delegate: HomePageHeaderDelegate(
+                completedTaskCount: 5,
               ),
+              pinned: true,
             ),
             SliverToBoxAdapter(
               child: Container(
@@ -86,6 +93,7 @@ class _HomePageState extends State<HomePage> {
                 clipBehavior: Clip.antiAlias,
                 child: ListView.builder(
                   shrinkWrap: true,
+                  primary: false,
                   itemCount: tasks.length + 1,
                   itemBuilder: (context, index) {
                     if (index == tasks.length) {
@@ -118,6 +126,13 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: addTask,
+        child: const Icon(
+          Icons.add,
+          size: 35,
         ),
       ),
     );
