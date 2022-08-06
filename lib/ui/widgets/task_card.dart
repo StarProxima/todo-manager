@@ -66,7 +66,7 @@ class _TaskCardState extends State<TaskCard> {
       MaterialPageRoute(
         builder: (context) => TaskDetailsPage(
           task: widget.task,
-          onEdit: widget.onEdit,
+          onSave: widget.onEdit,
           onDelete: widget.onDelete,
         ),
       ),
@@ -75,49 +75,49 @@ class _TaskCardState extends State<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: ValueKey(widget.task.id),
-      onUpdate: onUpdate,
-      onDismissed: onDismissed,
-      confirmDismiss: confirmDismiss,
-      background: Container(
-        color: AppColors.green,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            ValueListenableBuilder(
-              valueListenable: startToEndNotifier,
-              builder: (BuildContext context, double value, Widget? child) {
-                return AppDismissIcon(
-                  direction: DismissDirection.startToEnd,
-                  progress: value,
-                  icon: const Icon(Icons.check, color: Colors.white),
-                );
-              },
-            ),
-          ],
+    return GestureDetector(
+      onTap: toDetailsPage,
+      child: Dismissible(
+        key: ValueKey(widget.task.id),
+        onUpdate: onUpdate,
+        onDismissed: onDismissed,
+        confirmDismiss: confirmDismiss,
+        background: Container(
+          color: AppColors.green,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              ValueListenableBuilder(
+                valueListenable: startToEndNotifier,
+                builder: (BuildContext context, double value, Widget? child) {
+                  return AppDismissIcon(
+                    direction: DismissDirection.startToEnd,
+                    progress: value,
+                    icon: const Icon(Icons.check, color: Colors.white),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      secondaryBackground: Container(
-        color: AppColors.red,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ValueListenableBuilder(
-              valueListenable: endToStartNotifier,
-              builder: (BuildContext context, double value, Widget? child) {
-                return AppDismissIcon(
-                  direction: DismissDirection.endToStart,
-                  progress: value,
-                  icon: const Icon(Icons.delete, color: Colors.white),
-                );
-              },
-            ),
-          ],
+        secondaryBackground: Container(
+          color: AppColors.red,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ValueListenableBuilder(
+                valueListenable: endToStartNotifier,
+                builder: (BuildContext context, double value, Widget? child) {
+                  return AppDismissIcon(
+                    direction: DismissDirection.endToStart,
+                    progress: value,
+                    icon: const Icon(Icons.delete, color: Colors.white),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      child: GestureDetector(
-        onTap: toDetailsPage,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -53,9 +53,9 @@ class Task implements Comparable {
   });
 
   Task.create({
-    required this.text,
-    required this.importance,
-    required this.done,
+    this.text = '',
+    this.importance = Importance.basic,
+    this.done = false,
     this.deadline,
     this.color,
   }) {

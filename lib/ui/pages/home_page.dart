@@ -3,6 +3,7 @@ import 'package:todo_manager/data/local/tasks_manager.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/ui/widgets/home_page_header_delegate.dart';
 
+import '../task_details_page/task_details_page.dart';
 import '../widgets/add_task_card.dart';
 import '../widgets/task_card.dart';
 
@@ -48,6 +49,20 @@ class _HomePageState extends State<HomePage> {
 
       getTasks();
     }
+  }
+
+  void toDetailsPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TaskDetailsPage(
+          onSave: (task) async {
+            var responce = await TasksController().addTask(task);
+            getTasks();
+          },
+        ),
+      ),
+    );
   }
 
   Future<void> firstGetTasks() async {
@@ -134,12 +149,29 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: addTask,
-        child: const Icon(
-          Icons.add,
-          size: 35,
-        ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: null,
+            onPressed: addTask,
+            child: const Icon(
+              Icons.casino_outlined,
+              size: 35,
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          FloatingActionButton(
+            heroTag: null,
+            onPressed: toDetailsPage,
+            child: const Icon(
+              Icons.add,
+              size: 35,
+            ),
+          ),
+        ],
       ),
     );
   }

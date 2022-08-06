@@ -9,21 +9,22 @@ import 'widgets/task_details_text_field.dart';
 class TaskDetailsPage extends StatefulWidget {
   const TaskDetailsPage({
     Key? key,
-    required this.task,
-    required this.onEdit,
-    required this.onDelete,
+    this.task,
+    required this.onSave,
+    this.onDelete,
   }) : super(key: key);
 
-  final Task task;
+  final Task? task;
 
-  final Function(Task) onEdit;
-  final Function(Task) onDelete;
+  final void Function(Task) onSave;
+  final void Function(Task)? onDelete;
   @override
   State<TaskDetailsPage> createState() => _TaskDetailsPageState();
 }
 
 class _TaskDetailsPageState extends State<TaskDetailsPage> {
-  late Task task = widget.task.copyWith();
+  late Task task =
+      widget.task != null ? widget.task!.copyWith() : Task.create();
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -49,7 +50,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
             padding: const EdgeInsets.only(right: 8),
             child: TextButton(
               onPressed: () {
-                widget.onEdit(task);
+                widget.onSave(task);
                 Navigator.pop(context);
               },
               style: TextButton.styleFrom(
@@ -72,7 +73,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           child: Column(
             children: [
               TaskDetailsTextField(
-                text: widget.task.text,
+                text: task.text,
                 onChanged: (text) {
                   task = task.editAndCopyWith(text: text);
                 },
@@ -83,14 +84,14 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: ImportanceDropdownButton(
-                  value: widget.task.importance,
+                  value: task.importance,
                   onChanged: (value) {
                     task = task.editAndCopyWith(importance: value);
                   },
                 ),
               ),
               TaskDetailsDeadline(
-                value: widget.task.deadline,
+                value: task.deadline,
                 onChanged: (deadline) {
                   if (deadline == null) {
                     task = task.editAndCopyWith(deleteDeadline: true);
@@ -107,10 +108,12 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   style: TextButton.styleFrom(
                     primary: AppColors.red,
                   ),
-                  onPressed: () {
-                    widget.onDelete(widget.task);
-                    Navigator.pop(context);
-                  },
+                  onPressed: widget.task != null
+                      ? () {
+                          widget.onDelete?.call(widget.task!);
+                          Navigator.pop(context);
+                        }
+                      : null,
                 ),
               ),
             ],
