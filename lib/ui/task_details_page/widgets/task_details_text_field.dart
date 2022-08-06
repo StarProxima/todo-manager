@@ -11,7 +11,6 @@ class TaskDetailsTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    var textTheme = Theme.of(context).textTheme;
 
     return DecoratedBox(
       decoration: BoxDecoration(

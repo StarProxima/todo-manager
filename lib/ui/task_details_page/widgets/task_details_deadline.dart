@@ -55,7 +55,7 @@ class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
                 if (active)
                   Text(
                     value != null
-                        ? DateFormat('dd.MM.yyyy hh:mm').format(value!)
+                        ? DateFormat('dd MMMM yyyy', 'ru_RU').format(value!)
                         : 'Не задано',
                     style: textTheme.bodyMedium!.copyWith(
                       color: value != null

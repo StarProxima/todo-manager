@@ -4,8 +4,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_manager/data/models/importance.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/ui/pages/home_page.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 // ignore: unused_import
-import 'package:flutter/rendering.dart';
 import 'ui/styles/app_theme.dart';
 
 void main() async {
@@ -31,6 +31,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('ru')],
       theme: AppTheme.themeData,
       home: const HomePage(),
     );

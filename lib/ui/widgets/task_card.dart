@@ -165,7 +165,7 @@ class _TaskCardState extends State<TaskCard> {
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        DateFormat('dd.MM.yyyy hh:mm')
+                        DateFormat('dd MMMM yyyy', 'ru_RU')
                             .format(widget.task.deadline!),
                         style: Theme.of(context).textTheme.labelSmall,
                         overflow: TextOverflow.ellipsis,
