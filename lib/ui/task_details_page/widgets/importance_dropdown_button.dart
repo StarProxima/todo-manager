@@ -35,6 +35,7 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
           width: 164,
           child: ButtonTheme(
             // alignedDropdown: true,
+
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Importance>(
                 value: value,

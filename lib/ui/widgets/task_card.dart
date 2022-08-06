@@ -60,6 +60,19 @@ class _TaskCardState extends State<TaskCard> {
     });
   }
 
+  void toDetailsPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TaskDetailsPage(
+          task: widget.task,
+          onEdit: widget.onEdit,
+          onDelete: widget.onDelete,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -103,88 +116,78 @@ class _TaskCardState extends State<TaskCard> {
           ],
         ),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TaskCheckbox(
-            value: done,
-            task: widget.task,
-            onChanged: changeDone,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 15),
-                  child: RichText(
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(
-                      style: done
-                          ? AppTextStyle.crossedOut
-                          : Theme.of(context).textTheme.bodyMedium,
-                      children: [
-                        widget.task.importance != Importance.basic
-                            ? WidgetSpan(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 3),
-                                  child: AppSvgIcons(
-                                    widget.task.importance ==
-                                            Importance.important
-                                        ? AppSvgIcon.important
-                                        : AppSvgIcon.low,
-                                    color: done
-                                        ? AppTextStyle.crossedOut.color
-                                        : null,
-                                  ),
-                                ),
-                              )
-                            : const TextSpan(),
-                        TextSpan(
-                          text: widget.task.text,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                widget.task.deadline != null
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          DateFormat('dd.MM.yyyy hh:mm')
-                              .format(widget.task.deadline!),
-                          style: Theme.of(context).textTheme.labelSmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      )
-                    : const SizedBox(),
-              ],
+      child: GestureDetector(
+        onTap: toDetailsPage,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TaskCheckbox(
+              value: done,
+              task: widget.task,
+              onChanged: changeDone,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15, left: 14, right: 18),
-            child: IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TaskDetailsPage(
-                      task: widget.task,
-                      onEdit: widget.onEdit,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: RichText(
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      text: TextSpan(
+                        style: done
+                            ? AppTextStyle.crossedOut
+                            : Theme.of(context).textTheme.bodyMedium,
+                        children: [
+                          if (widget.task.importance != Importance.basic)
+                            WidgetSpan(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 3),
+                                child: AppSvgIcons(
+                                  widget.task.importance == Importance.important
+                                      ? AppSvgIcon.important
+                                      : AppSvgIcon.low,
+                                  color: done
+                                      ? AppTextStyle.crossedOut.color
+                                      : null,
+                                ),
+                              ),
+                            ),
+                          TextSpan(
+                            text: widget.task.text,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                );
-              },
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              icon: const Icon(
-                Icons.info_outline,
-                color: Color(0x4d000000),
+                  if (widget.task.deadline != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        DateFormat('dd.MM.yyyy hh:mm')
+                            .format(widget.task.deadline!),
+                        style: Theme.of(context).textTheme.labelSmall,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                ],
               ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(top: 15, left: 14, right: 18),
+              child: IconButton(
+                onPressed: toDetailsPage,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(
+                  Icons.info_outline,
+                  color: Color(0x4d000000),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

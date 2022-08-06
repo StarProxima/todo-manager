@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                       onDelete: (task) async {
                         await TasksController().deleteTask(task);
 
-                        getTasks(setState: false);
+                        getTasks();
                       },
                       onEdit: (task) async {
                         await TasksController().editTask(task);

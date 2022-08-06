@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manager/ui/styles/app_theme.dart';
 import 'package:todo_manager/ui/task_details_page/widgets/task_details_deadline.dart';
 
 import '../../data/models/task_model.dart';
@@ -10,11 +11,13 @@ class TaskDetailsPage extends StatefulWidget {
     Key? key,
     required this.task,
     required this.onEdit,
+    required this.onDelete,
   }) : super(key: key);
 
   final Task task;
 
   final Function(Task) onEdit;
+  final Function(Task) onDelete;
   @override
   State<TaskDetailsPage> createState() => _TaskDetailsPageState();
 }
@@ -95,7 +98,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                     task = task.editAndCopyWith(deadline: deadline);
                   }
                 },
-              )
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Удалить'),
+                  style: TextButton.styleFrom(
+                    primary: AppColors.red,
+                  ),
+                  onPressed: () {
+                    widget.onDelete(widget.task);
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
             ],
           ),
         ),
