@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/task_model.dart';
+import 'widgets/importance_dropdown_button.dart';
 import 'widgets/task_details_text_field.dart';
 
 class TaskDetailsPage extends StatelessWidget {
@@ -49,7 +50,21 @@ class TaskDetailsPage extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
-          child: TaskDetailsTextField(),
+          child: Column(
+            children: [
+              TaskDetailsTextField(),
+              const SizedBox(
+                height: 28,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: ImportanceDropdownButton(
+                  value: task.importance,
+                  onChanged: (value) {},
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
