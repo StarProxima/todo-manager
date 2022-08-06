@@ -11,11 +11,11 @@ class TaskCard extends StatefulWidget {
     Key? key,
     required this.task,
     required this.onDelete,
-    required this.onChangeDone,
+    required this.changeDone,
   }) : super(key: key);
 
-  final Function() onDelete;
-  final Function(bool) onChangeDone;
+  final Function(Task) onDelete;
+  final Function(Task) changeDone;
   final Task task;
   @override
   State<TaskCard> createState() => _TaskCardState();
@@ -38,7 +38,7 @@ class _TaskCardState extends State<TaskCard> {
     }
   }
 
-  void onDismissed(_) => widget.onDelete();
+  void onDismissed(_) => widget.onDelete(widget.task);
 
   Future<bool> confirmDismiss(direction) async {
     switch (direction) {
@@ -55,7 +55,7 @@ class _TaskCardState extends State<TaskCard> {
   void changeDone(bool value) {
     setState(() {
       done = value;
-      widget.onChangeDone(done);
+      widget.changeDone(widget.task.copyWith(done: value));
     });
   }
 

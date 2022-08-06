@@ -64,8 +64,12 @@ class TasksController {
     return localChanges;
   }
 
+  int count = 0;
+
   Future<void> localSaveTasks() async {
+    count++;
     await Hive.box('tasks').put('tasks', _tasks);
+    count--;
   }
 
   Future<ResponseData<List<Task>>> checkTasks(
@@ -75,13 +79,15 @@ class TasksController {
       bool localChanges = checkLocalChanges(response.data!);
 
       if (!localChanges) {
-        _tasks = response.data!;
-        localSaveTasks();
         revision = jsonDecode(response.message!)['revision'];
         return response.copyWith(data: _tasks);
-      } else if (localChanges && _repository.activeRequests == 0) {
+      } else if (localChanges &&
+          _repository.activeRequests == 0 &&
+          count == 0) {
         var patchResponse = await _repository.patchTasks(_tasks, revision);
-        if (patchResponse.isSuccesful) {
+        if (patchResponse.isSuccesful &&
+            _repository.activeRequests == 0 &&
+            count == 0) {
           _tasks = patchResponse.data!;
           localSaveTasks();
           revision = jsonDecode(patchResponse.message!)['revision'];
@@ -146,6 +152,7 @@ class TasksController {
 
   Future<ResponseData> deleteTask(Task task) async {
     var isSuccesRemove = _tasks.remove(task);
+    print(task);
     localSaveTasks();
 
     var response = await _repository.deleteTask(task, revision);

@@ -17,10 +17,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Task> tasks = [];
 
-  Future<void> getTasks() async {
+  Future<void> getTasks({bool setState = true}) async {
     var responce = await TasksController().getTasks();
     tasks = responce.data ?? tasks;
-    //setState(() {});
+    if (setState) {
+      this.setState(() {});
+    } else {
+      //  print(tasks.length);
+    }
   }
 
   void addTask() async {
@@ -117,15 +121,14 @@ class _HomePageState extends State<HomePage> {
                     return TaskCard(
                       key: ValueKey(tasks[index].id),
                       task: tasks[index],
-                      onDelete: () async {
-                        await TasksController().deleteTask(tasks[index]);
-                        getTasks();
-                      },
-                      onChangeDone: (done) async {
-                        var task = tasks[index].copyWith(done: done);
+                      onDelete: (task) async {
+                        await TasksController().deleteTask(task);
 
+                        getTasks(setState: false);
+                      },
+                      changeDone: (task) async {
                         await TasksController().editTask(task);
-                        getTasks();
+                        getTasks(setState: false);
                       },
                     );
                   },
