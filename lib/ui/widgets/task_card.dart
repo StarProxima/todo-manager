@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_manager/data/models/importance.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_manager/ui/task_details_page/task_details_page.dart';
 import 'package:todo_manager/ui/styles/app_icons.dart';
 import 'package:todo_manager/ui/styles/app_theme.dart';
 import 'package:todo_manager/ui/widgets/task_checkbox.dart';
@@ -164,7 +165,14 @@ class _TaskCardState extends State<TaskCard> {
           Padding(
             padding: const EdgeInsets.only(top: 15, left: 14, right: 18),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TaskDetailsPage(task: widget.task),
+                  ),
+                );
+              },
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               icon: const Icon(

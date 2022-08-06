@@ -6,6 +6,21 @@ import 'package:google_fonts/google_fonts.dart';
 abstract class AppTheme {
   static final ThemeData _lightTheme = ThemeData(
     primaryColor: _AppLightColors.blue,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: _AppLightColors.backPrimary,
+      iconTheme: IconThemeData(
+        color: _AppLightColors.textLabelPrimary,
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      hintStyle: GoogleFonts.roboto(
+        textStyle: const TextStyle(
+          color: _AppLightColors.textLabelTertiary,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+    ),
     scaffoldBackgroundColor: _AppLightColors.backPrimary,
     checkboxTheme: CheckboxThemeData(
       fillColor: MaterialStateProperty.all(
@@ -30,8 +45,8 @@ abstract class AppTheme {
     titleMedium: GoogleFonts.roboto(
       textStyle: const TextStyle(
         color: _AppLightColors.textLabelPrimary,
-        fontSize: 32,
-        fontWeight: FontWeight.w500,
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
       ),
     ),
     headlineLarge: GoogleFonts.roboto(

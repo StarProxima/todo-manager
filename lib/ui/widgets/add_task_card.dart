@@ -31,11 +31,10 @@ class AddTaskCard extends StatelessWidget {
       textInputAction: TextInputAction.done,
       onEditingComplete: onEditingComplete,
       style: textTheme.bodyMedium,
-      decoration: InputDecoration(
+      decoration: const InputDecoration(
         contentPadding:
-            const EdgeInsets.only(top: 14, bottom: 14, left: 52, right: 16),
+            EdgeInsets.only(top: 14, bottom: 14, left: 52, right: 16),
         hintText: 'Новое',
-        hintStyle: textTheme.bodySmall,
         border: InputBorder.none,
       ),
     );
