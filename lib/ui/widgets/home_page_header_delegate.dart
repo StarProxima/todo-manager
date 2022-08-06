@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
   HomePageHeaderDelegate({
     required this.completedTaskCount,
+    required this.onChangeVisibilityCompletedTask,
   });
-  static const double expandedHeight = 200;
 
   final int completedTaskCount;
+
+  final Function(bool) onChangeVisibilityCompletedTask;
+
+  static const double expandedHeight = 200;
 
   @override
   Widget build(
@@ -17,7 +21,6 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
     double diff = expandedHeight - kToolbarHeight;
     double t = (diff - shrinkOffset) / diff;
     double percentOfShrinkOffset = t > 0 ? t : 0;
-
     var theme = Theme.of(context);
     var textTheme = Theme.of(context).textTheme;
     return Material(
@@ -68,16 +71,11 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                   ],
                 ),
                 const Spacer(),
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.visibility,
-                    ),
-                  ),
+                VisibilityButton(
+                  value: false,
+                  onChangeVisibilityCompletedTask: (value) {
+                    onChangeVisibilityCompletedTask(value);
+                  },
                 ),
                 SizedBox(
                   height: 16 + 2 * percentOfShrinkOffset,
@@ -98,4 +96,49 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
+}
+
+class VisibilityButton extends StatefulWidget {
+  const VisibilityButton({
+    Key? key,
+    required this.value,
+    required this.onChangeVisibilityCompletedTask,
+  }) : super(key: key);
+
+  final bool value;
+  final Function(bool) onChangeVisibilityCompletedTask;
+  @override
+  State<VisibilityButton> createState() => _VisibilityButtonState();
+}
+
+class _VisibilityButtonState extends State<VisibilityButton> {
+  late bool value = widget.value;
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        splashRadius: 28,
+        onPressed: () {
+          value = !value;
+          widget.onChangeVisibilityCompletedTask(value);
+          setState(() {});
+        },
+        icon: value
+            ? Icon(
+                Icons.visibility,
+                size: 24,
+                color: theme.primaryColor,
+              )
+            : Icon(
+                Icons.visibility_off,
+                size: 24,
+                color: theme.primaryColor,
+              ),
+      ),
+    );
+  }
 }

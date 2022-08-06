@@ -38,6 +38,16 @@ class TasksController {
     return __tasks!;
   }
 
+  int getCompletedTaskCount() {
+    int count = 0;
+    for (var task in _tasks) {
+      if (task.done) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   bool checkLocalChanges(List<Task> serverTasks) {
     bool localChanges = _tasks.length != serverTasks.length;
 

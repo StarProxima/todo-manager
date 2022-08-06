@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/local/tasks_manager.dart';
 import 'package:todo_manager/data/models/task_model.dart';
@@ -18,7 +20,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> getTasks() async {
     var responce = await TasksController().getTasks();
     tasks = responce.data ?? tasks;
-    setState(() {});
+    //setState(() {});
   }
 
   void addTask() async {
@@ -57,21 +59,23 @@ class _HomePageState extends State<HomePage> {
     firstGetTasks();
   }
 
+  bool isd = false;
+
   @override
   Widget build(BuildContext context) {
+    log('message');
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // SliverToBoxAdapter(
-            //   child: ElevatedButton(
-            //     onPressed: addTask,
-            //     child: const Text('add'),
-            //   ),
-            // ),
             SliverPersistentHeader(
               delegate: HomePageHeaderDelegate(
-                completedTaskCount: 5,
+                completedTaskCount: TasksController().getCompletedTaskCount(),
+                onChangeVisibilityCompletedTask: (value) {
+                  setState(() {
+                    isd = value;
+                  });
+                },
               ),
               pinned: true,
             ),
@@ -106,6 +110,9 @@ class _HomePageState extends State<HomePage> {
                           border: InputBorder.none,
                         ),
                       );
+                    }
+                    if (isd && tasks[index].done) {
+                      return const SizedBox();
                     }
                     return TaskCard(
                       key: ValueKey(tasks[index].id),
