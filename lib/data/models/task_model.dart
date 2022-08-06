@@ -88,23 +88,49 @@ class Task implements Comparable {
     );
   }
 
-  Task copyWith({
+  Task editAndCopyWith({
     String? text,
     Importance? importance,
     bool? done,
     DateTime? deadline,
     Color? color,
+    // Я не придумал, как по-другому
+    bool? deleteDeadline,
   }) {
     return Task(
       id: id,
       text: text ?? this.text,
       importance: importance ?? this.importance,
       done: done ?? this.done,
-      deadline: deadline ?? this.deadline,
+      deadline: deleteDeadline ?? false ? null : deadline ?? this.deadline,
       color: color ?? this.color,
       createdAt: createdAt,
       changedAt: DateTime.now(),
       lastUpdatedBy: 'Pacman',
+    );
+  }
+
+  Task copyWith({
+    String? id,
+    String? text,
+    Importance? importance,
+    bool? done,
+    DateTime? deadline,
+    Color? color,
+    DateTime? createdAt,
+    DateTime? changedAt,
+    String? lastUpdatedBy,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      text: text ?? this.text,
+      importance: importance ?? this.importance,
+      done: done ?? this.done,
+      deadline: deadline ?? this.deadline,
+      color: color ?? this.color,
+      createdAt: createdAt ?? this.createdAt,
+      changedAt: changedAt ?? this.changedAt,
+      lastUpdatedBy: lastUpdatedBy ?? this.lastUpdatedBy,
     );
   }
 

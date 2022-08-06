@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 
 class TaskDetailsTextField extends StatelessWidget {
-  TaskDetailsTextField({Key? key}) : super(key: key);
+  TaskDetailsTextField({Key? key, this.text, required this.onChanged})
+      : super(key: key);
 
-  final TextEditingController controller = TextEditingController();
+  final String? text;
+  late final TextEditingController controller = TextEditingController()
+    ..text = text ?? '';
+  final Function(String) onChanged;
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     var textTheme = Theme.of(context).textTheme;
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.cardColor,
@@ -26,6 +31,7 @@ class TaskDetailsTextField extends StatelessWidget {
           controller: controller,
           minLines: 4,
           maxLines: null,
+          onChanged: onChanged,
           decoration: const InputDecoration(
             contentPadding: EdgeInsets.zero,
             hintText: "Что надо сделать...",

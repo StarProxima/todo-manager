@@ -133,7 +133,7 @@ class TasksController {
     var t = _tasks.firstWhere((element) => element.id == task.id);
     var index = _tasks.indexOf(t);
 
-    _tasks[index] = task.copyWith();
+    _tasks[index] = task.editAndCopyWith();
     localSaveTasks();
 
     var response = await _repository.editTask(task, revision);

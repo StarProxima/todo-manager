@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/local/tasks_manager.dart';
 import 'package:todo_manager/data/models/task_model.dart';
@@ -36,7 +34,7 @@ class _HomePageState extends State<HomePage> {
 
   void editTask() async {
     if (tasks.isNotEmpty) {
-      var task = tasks.last.copyWith(text: 'Edited text <3');
+      var task = tasks.last.editAndCopyWith(text: 'Edited text <3');
 
       await TasksController().editTask(task);
 
@@ -68,8 +66,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    log('message');
-
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -126,9 +122,9 @@ class _HomePageState extends State<HomePage> {
 
                         getTasks(setState: false);
                       },
-                      changeDone: (task) async {
+                      onEdit: (task) async {
                         await TasksController().editTask(task);
-                        getTasks(setState: false);
+                        getTasks();
                       },
                     );
                   },

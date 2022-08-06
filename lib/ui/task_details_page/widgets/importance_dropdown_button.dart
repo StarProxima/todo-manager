@@ -58,7 +58,7 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
                   DropdownMenuItem<Importance>(
                     value: Importance.important,
                     child: Text(
-                      "!!Высокий",
+                      "!! Высокий",
                       style: textTheme.bodyMedium!.copyWith(
                         color: AppColors.red,
                       ),

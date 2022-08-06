@@ -12,11 +12,11 @@ class TaskCard extends StatefulWidget {
     Key? key,
     required this.task,
     required this.onDelete,
-    required this.changeDone,
+    required this.onEdit,
   }) : super(key: key);
 
   final Function(Task) onDelete;
-  final Function(Task) changeDone;
+  final Function(Task) onEdit;
   final Task task;
   @override
   State<TaskCard> createState() => _TaskCardState();
@@ -56,7 +56,7 @@ class _TaskCardState extends State<TaskCard> {
   void changeDone(bool value) {
     setState(() {
       done = value;
-      widget.changeDone(widget.task.copyWith(done: value));
+      widget.onEdit(widget.task.editAndCopyWith(done: value));
     });
   }
 
@@ -169,7 +169,10 @@ class _TaskCardState extends State<TaskCard> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TaskDetailsPage(task: widget.task),
+                    builder: (context) => TaskDetailsPage(
+                      task: widget.task,
+                      onEdit: widget.onEdit,
+                    ),
                   ),
                 );
               },
