@@ -25,6 +25,15 @@ class TaskDetailsPage extends StatefulWidget {
 class _TaskDetailsPageState extends State<TaskDetailsPage> {
   late Task task =
       widget.task != null ? widget.task!.copyWith() : Task.create();
+
+  late TextEditingController controller = TextEditingController()
+    ..text = widget.task?.text ?? '';
+
+  void saveTask() {
+    widget.onSave(task.editAndCopyWith(text: controller.text));
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -49,10 +58,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           Padding(
             padding: const EdgeInsets.only(right: 8),
             child: TextButton(
-              onPressed: () {
-                widget.onSave(task);
-                Navigator.pop(context);
-              },
+              onPressed: saveTask,
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
               ),
@@ -73,10 +79,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           child: Column(
             children: [
               TaskDetailsTextField(
-                text: task.text,
-                onChanged: (text) {
-                  task = task.editAndCopyWith(text: text);
-                },
+                controller: controller,
               ),
               const SizedBox(
                 height: 28,

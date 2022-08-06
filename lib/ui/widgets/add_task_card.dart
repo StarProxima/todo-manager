@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/data/models/importance.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 
 class AddTaskCard extends StatelessWidget {
@@ -14,8 +13,6 @@ class AddTaskCard extends StatelessWidget {
     if (controller.text.isNotEmpty) {
       Task task = Task.create(
         text: controller.text,
-        importance: Importance.basic,
-        done: false,
       );
       onAddTask(task);
     }

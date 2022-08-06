@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class TaskDetailsTextField extends StatelessWidget {
-  TaskDetailsTextField({Key? key, this.text, required this.onChanged})
-      : super(key: key);
+  const TaskDetailsTextField({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
 
-  final String? text;
-  late final TextEditingController controller = TextEditingController()
-    ..text = text ?? '';
-  final Function(String) onChanged;
+  final TextEditingController controller;
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -31,7 +31,6 @@ class TaskDetailsTextField extends StatelessWidget {
           controller: controller,
           minLines: 4,
           maxLines: null,
-          onChanged: onChanged,
           decoration: const InputDecoration(
             contentPadding: EdgeInsets.zero,
             hintText: "Что надо сделать...",
