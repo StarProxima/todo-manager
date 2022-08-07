@@ -9,6 +9,7 @@ import 'models/importance.dart';
 import 'models/task_model.dart';
 import 'styles/app_theme.dart';
 import 'support/error_handler.dart';
+import 'support/firebase.dart';
 import 'support/logger.dart';
 import 'ui/home_page/home_page.dart';
 
@@ -16,6 +17,7 @@ void main() async {
   runZonedGuarded(
     () async {
       ErrorHandler.init();
+      initFirebase();
       await Hive.initFlutter();
       Hive.registerAdapter(TaskAdapter());
       Hive.registerAdapter(ImportanceAdapter());
