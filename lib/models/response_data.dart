@@ -24,7 +24,7 @@ class ResponseData<T> {
 
   @override
   String toString() {
-    return 'ResponseData(isSuccesful: $isSuccesful, ${isSuccesful ? 'message: $message, ' : ''}status: $status, data: $data)';
+    return 'ResponseData(isSuccesful: $isSuccesful, ${!isSuccesful ? 'message: $message, ' : ''}status: $status, data: $data)';
   }
 
   ResponseData<T> copyWith({

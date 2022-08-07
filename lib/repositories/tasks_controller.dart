@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_manager/repositories/task_repository.dart';
@@ -59,11 +60,7 @@ class TasksController {
         }
       }
     }
-    if (localChanges) {
-      logger.w('unsync data');
-    } else {
-      logger.i('sync data');
-    }
+    log(localChanges ? 'unsync data' : 'sync data');
 
     return localChanges;
   }
@@ -161,7 +158,7 @@ class TasksController {
 
   Future<ResponseData> deleteTask(Task task) async {
     var isSuccesRemove = _tasks.remove(task);
-    print(task);
+
     localSaveTasks();
 
     var response = await _repository.deleteTask(task, revision);
