@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manager/ui/home_page/widgets/add_task_card.dart';
 
 import '../../models/task_model.dart';
 import '../../repositories/tasks_controller.dart';
-import '../../support/logger.dart';
-import 'widgets/add_task_card.dart';
 import 'widgets/floating_action_panel.dart';
 import 'widgets/home_page_header_delegate.dart';
 import 'widgets/task_card.dart';
@@ -16,8 +15,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Task> tasks = [];
-
   ValueNotifier notifier = ValueNotifier(
     TasksController().getCompletedTaskCount(),
   );
@@ -35,8 +32,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> firstGetTasks() async {
-    tasks = TasksController().getLocalTasks();
-    logger.i(tasks);
     TasksController().getTasks();
   }
 
@@ -84,6 +79,7 @@ class _HomePageState extends State<HomePage> {
                 child: ValueListenableBuilder(
                   valueListenable: TasksController().getListenableTasksBox(),
                   builder: (context, value, child) {
+                    List<Task> tasks = TasksController().tasks;
                     return ListView.builder(
                       shrinkWrap: true,
                       primary: false,
@@ -97,12 +93,12 @@ class _HomePageState extends State<HomePage> {
                         }
                         if (!visibilityCompletedTasks && tasks[index].done) {
                           return SizedBox(
-                            key: ValueKey(tasks[index].id),
+                            key: UniqueKey(),
                           );
                         }
                         return TaskCard(
                           key: ValueKey(tasks[index].id),
-                          task: tasks[index],
+                          task: TasksController().tasks[index],
                           onDeleteTask: onDeleteTask,
                           onEditTask: onEditTask,
                         );

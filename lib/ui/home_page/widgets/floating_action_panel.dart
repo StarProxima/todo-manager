@@ -32,35 +32,19 @@ class FloatingActionPanel extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         if (kDebugMode)
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: FloatingActionButton(
-                  heroTag: null,
-                  mini: true,
-                  onPressed: () {
-                    throw Exception('Test crash by button in HomePage');
-                  },
-                  child: const Icon(
-                    Icons.warning,
-                    size: 25,
-                  ),
-                ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: FloatingActionButton(
+              heroTag: null,
+              mini: true,
+              onPressed: () {
+                throw Exception('Test crash by button in HomePage');
+              },
+              child: const Icon(
+                Icons.warning,
+                size: 25,
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 5),
-                child: FloatingActionButton(
-                  heroTag: null,
-                  mini: true,
-                  onPressed: addRandomTask,
-                  child: const Icon(
-                    Icons.casino_outlined,
-                    size: 25,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         FloatingActionButton(
           heroTag: null,

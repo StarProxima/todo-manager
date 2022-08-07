@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/styles/app_theme.dart';
 import 'package:todo_manager/support/logger.dart';
 import 'package:todo_manager/ui/task_details_page/widgets/task_details_deadline.dart';
 
@@ -120,7 +119,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   icon: const Icon(Icons.delete),
                   label: Text(S.of(context).deleteTaskButton),
                   style: TextButton.styleFrom(
-                    primary: AppColors.red,
+                    primary: theme.errorColor,
                   ),
                   onPressed: widget.task != null
                       ? () {

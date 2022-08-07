@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 abstract class AppTheme {
   static final ThemeData _lightTheme = ThemeData(
     primaryColor: _AppLightColors.blue,
+    errorColor: _AppLightColors.red,
     appBarTheme: const AppBarTheme(
       backgroundColor: _AppLightColors.backPrimary,
       iconTheme: IconThemeData(

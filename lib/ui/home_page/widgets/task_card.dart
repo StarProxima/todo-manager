@@ -24,8 +24,6 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
-  late bool done = widget.task.done;
-
   ValueNotifier<double> startToEndNotifier = ValueNotifier<double>(0);
   ValueNotifier<double> endToStartNotifier = ValueNotifier<double>(0);
 
@@ -40,7 +38,9 @@ class _TaskCardState extends State<TaskCard> {
     }
   }
 
-  void onDismissed(_) => widget.onDeleteTask(widget.task);
+  void onDismissed(_) {
+    widget.onDeleteTask(widget.task);
+  }
 
   Future<bool> confirmDismiss(direction) async {
     switch (direction) {
@@ -55,10 +55,7 @@ class _TaskCardState extends State<TaskCard> {
   }
 
   void changeDone(bool value) {
-    setState(() {
-      done = value;
-      widget.onEditTask(widget.task.editAndCopyWith(done: value));
-    });
+    widget.onEditTask(widget.task.editAndCopyWith(done: value));
   }
 
   void toDetailsPage() {
@@ -76,6 +73,7 @@ class _TaskCardState extends State<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
     return GestureDetector(
       onTap: toDetailsPage,
       child: Dismissible(
@@ -102,7 +100,7 @@ class _TaskCardState extends State<TaskCard> {
           ),
         ),
         secondaryBackground: Container(
-          color: AppColors.red,
+          color: theme.errorColor,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -123,7 +121,7 @@ class _TaskCardState extends State<TaskCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TaskCheckbox(
-              value: done,
+              value: widget.task.done,
               task: widget.task,
               onChanged: changeDone,
             ),
@@ -137,7 +135,7 @@ class _TaskCardState extends State<TaskCard> {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       text: TextSpan(
-                        style: done
+                        style: widget.task.done
                             ? AppTextStyle.crossedOut
                             : Theme.of(context).textTheme.bodyMedium,
                         children: [
@@ -147,7 +145,7 @@ class _TaskCardState extends State<TaskCard> {
                                 padding: const EdgeInsets.only(right: 3),
                                 child: AppSvgIcons(
                                   AppSvgIcon.important,
-                                  color: done
+                                  color: widget.task.done
                                       ? AppTextStyle.crossedOut.color
                                       : AppColors.red,
                                 ),
