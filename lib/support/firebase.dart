@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:todo_manager/support/logger.dart';
 
@@ -9,7 +8,6 @@ import '../firebase_options.dart';
 final remoteConfig = FirebaseRemoteConfig.instance;
 
 Future<void> initFirebase() async {
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -29,4 +27,5 @@ Future<void> initFirebase() async {
   } catch (e) {
     logger.e('fetchAndActivate - set importanceColor error', e);
   }
+  logger.i('initFirebase');
 }

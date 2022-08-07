@@ -6,7 +6,7 @@ import 'logger.dart';
 
 void initErrorHandler() {
   FlutterError.onError = ErrorHandler._recordFlutterError;
-  logger.i('ErrorHandler init');
+  logger.i('initErrorHandler');
 }
 
 class ErrorHandler {

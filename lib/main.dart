@@ -16,6 +16,7 @@ import 'ui/home_page/home_page.dart';
 void main() async {
   runZonedGuarded(
     () async {
+      WidgetsFlutterBinding.ensureInitialized();
       await initHive();
       await initFirebase();
       initErrorHandler();

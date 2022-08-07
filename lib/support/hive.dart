@@ -1,5 +1,4 @@
 import 'package:hive_flutter/adapters.dart';
-import 'package:todo_manager/support/logger.dart';
 
 import '../models/importance.dart';
 import '../models/task_model.dart';
@@ -18,5 +17,4 @@ Future<void> initHive() async {
   if (tasks == null) {
     Hive.box('tasks').put('tasks', []);
   }
-  logger.i('initHive');
 }
