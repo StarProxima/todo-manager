@@ -12,12 +12,12 @@ class TaskCard extends StatefulWidget {
   const TaskCard({
     Key? key,
     required this.task,
-    required this.onDelete,
-    required this.onEdit,
+    required this.onDeleteTask,
+    required this.onEditTask,
   }) : super(key: key);
 
-  final void Function(Task) onDelete;
-  final void Function(Task) onEdit;
+  final void Function(Task) onDeleteTask;
+  final void Function(Task) onEditTask;
   final Task task;
   @override
   State<TaskCard> createState() => _TaskCardState();
@@ -40,7 +40,7 @@ class _TaskCardState extends State<TaskCard> {
     }
   }
 
-  void onDismissed(_) => widget.onDelete(widget.task);
+  void onDismissed(_) => widget.onDeleteTask(widget.task);
 
   Future<bool> confirmDismiss(direction) async {
     switch (direction) {
@@ -57,7 +57,7 @@ class _TaskCardState extends State<TaskCard> {
   void changeDone(bool value) {
     setState(() {
       done = value;
-      widget.onEdit(widget.task.editAndCopyWith(done: value));
+      widget.onEditTask(widget.task.editAndCopyWith(done: value));
     });
   }
 
@@ -67,8 +67,8 @@ class _TaskCardState extends State<TaskCard> {
       MaterialPageRoute(
         builder: (context) => TaskDetailsPage(
           task: widget.task,
-          onSave: widget.onEdit,
-          onDelete: widget.onDelete,
+          onSave: widget.onEditTask,
+          onDelete: widget.onDeleteTask,
         ),
       ),
     );

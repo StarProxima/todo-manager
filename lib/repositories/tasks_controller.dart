@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_manager/repositories/task_repository.dart';
 import '../models/response_data.dart';
@@ -47,6 +48,10 @@ class TasksController {
       }
     }
     return count;
+  }
+
+  ValueListenable<Box> getListenableTasksBox() {
+    return Hive.box('tasks').listenable();
   }
 
   bool checkLocalChanges(List<Task> serverTasks) {

@@ -1,12 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_manager/support/logger.dart';
-import 'package:todo_manager/ui/home_page/widgets/home_page_header_delegate.dart';
 
 import '../../models/task_model.dart';
 import '../../repositories/tasks_controller.dart';
-import '../task_details_page/task_details_page.dart';
+import '../../support/logger.dart';
 import 'widgets/add_task_card.dart';
+import 'widgets/floating_action_panel.dart';
+import 'widgets/home_page_header_delegate.dart';
 import 'widgets/task_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,59 +18,26 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Task> tasks = [];
 
-  Future<void> getTasks({bool setState = true}) async {
-    var responce = await TasksController().getTasks();
-    tasks = responce.data ?? tasks;
+  ValueNotifier notifier = ValueNotifier(
+    TasksController().getCompletedTaskCount(),
+  );
 
-    if (setState) {
-      this.setState(() {});
-    } else {
-      //  print(tasks.length);
-    }
+  void onEditTask(task) async {
+    await TasksController().editTask(task);
   }
 
-  void addTask() async {
-    var task = Task.random();
-    var responce = await TasksController().addTask(task);
-    getTasks();
+  void onDeleteTask(task) async {
+    await TasksController().deleteTask(task);
   }
 
-  void editTask() async {
-    if (tasks.isNotEmpty) {
-      var task = tasks.last.editAndCopyWith(text: 'Edited text <3');
-
-      await TasksController().editTask(task);
-
-      getTasks();
-    }
-  }
-
-  void deleteTask() async {
-    if (tasks.isNotEmpty) {
-      await TasksController().deleteTask(tasks.last);
-
-      getTasks();
-    }
-  }
-
-  void toDetailsPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TaskDetailsPage(
-          onSave: (task) async {
-            var responce = await TasksController().addTask(task);
-            getTasks();
-          },
-        ),
-      ),
-    );
+  void onAddTask(task) async {
+    await TasksController().addTask(task);
   }
 
   Future<void> firstGetTasks() async {
     tasks = TasksController().getLocalTasks();
     logger.i(tasks);
-    getTasks();
+    TasksController().getTasks();
   }
 
   @override
@@ -80,7 +46,7 @@ class _HomePageState extends State<HomePage> {
     firstGetTasks();
   }
 
-  bool isd = false;
+  bool visibilityCompletedTasks = true;
 
   @override
   Widget build(BuildContext context) {
@@ -89,15 +55,15 @@ class _HomePageState extends State<HomePage> {
         child: CustomScrollView(
           slivers: [
             SliverPersistentHeader(
+              pinned: true,
               delegate: HomePageHeaderDelegate(
-                completedTaskCount: TasksController().getCompletedTaskCount(),
+                visibilityCompletedTask: visibilityCompletedTasks,
                 onChangeVisibilityCompletedTask: (value) {
                   setState(() {
-                    isd = value;
+                    visibilityCompletedTasks = value;
                   });
                 },
               ),
-              pinned: true,
             ),
             SliverToBoxAdapter(
               child: Container(
@@ -115,33 +81,31 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  primary: false,
-                  itemCount: tasks.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == tasks.length) {
-                      return AddTaskCard(
-                        onAddTask: (task) async {
-                          await TasksController().addTask(task);
-
-                          getTasks();
-                        },
-                      );
-                    }
-                    if (isd && tasks[index].done) {
-                      return const SizedBox();
-                    }
-                    return TaskCard(
-                      key: ValueKey(tasks[index].id),
-                      task: tasks[index],
-                      onDelete: (task) async {
-                        await TasksController().deleteTask(task);
-                        getTasks();
-                      },
-                      onEdit: (task) async {
-                        await TasksController().editTask(task);
-                        getTasks();
+                child: ValueListenableBuilder(
+                  valueListenable: TasksController().getListenableTasksBox(),
+                  builder: (context, value, child) {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      primary: false,
+                      itemCount: tasks.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == tasks.length) {
+                          return AddTaskCard(
+                            key: UniqueKey(),
+                            onAddTask: onAddTask,
+                          );
+                        }
+                        if (!visibilityCompletedTasks && tasks[index].done) {
+                          return SizedBox(
+                            key: ValueKey(tasks[index].id),
+                          );
+                        }
+                        return TaskCard(
+                          key: ValueKey(tasks[index].id),
+                          task: tasks[index],
+                          onDeleteTask: onDeleteTask,
+                          onEditTask: onEditTask,
+                        );
                       },
                     );
                   },
@@ -151,50 +115,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          if (kDebugMode)
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 5),
-                  child: FloatingActionButton(
-                    heroTag: null,
-                    mini: true,
-                    onPressed: () {
-                      throw Exception('Test crash by button in HomePage');
-                    },
-                    child: const Icon(
-                      Icons.warning,
-                      size: 25,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 5),
-                  child: FloatingActionButton(
-                    heroTag: null,
-                    mini: true,
-                    onPressed: addTask,
-                    child: const Icon(
-                      Icons.casino_outlined,
-                      size: 25,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          FloatingActionButton(
-            heroTag: null,
-            onPressed: toDetailsPage,
-            child: const Icon(
-              Icons.add,
-              size: 35,
-            ),
-          ),
-        ],
-      ),
+      floatingActionButton: const FloatingActionPanel(),
     );
   }
 }

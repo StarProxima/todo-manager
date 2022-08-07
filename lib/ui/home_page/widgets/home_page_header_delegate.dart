@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manager/repositories/tasks_controller.dart';
 
 import '../../../generated/l10n.dart';
 
 class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
   HomePageHeaderDelegate({
-    required this.completedTaskCount,
+    required this.visibilityCompletedTask,
     required this.onChangeVisibilityCompletedTask,
   });
 
-  final int completedTaskCount;
-
+  final bool visibilityCompletedTask;
   final Function(bool) onChangeVisibilityCompletedTask;
 
   static const double expandedHeight = 200;
@@ -62,11 +62,19 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                             EdgeInsets.only(top: 6 * percentOfShrinkOffset),
                         child: Opacity(
                           opacity: percentOfShrinkOffset,
-                          child: Text(
-                            S.of(context).homePageSubTitle(completedTaskCount),
-                            style: textTheme.bodySmall!.copyWith(
-                              fontSize: 20 * percentOfShrinkOffset,
-                            ),
+                          child: ValueListenableBuilder(
+                            valueListenable:
+                                TasksController().getListenableTasksBox(),
+                            builder: (context, value, child) {
+                              return Text(
+                                S.of(context).homePageSubTitle(
+                                      TasksController().getCompletedTaskCount(),
+                                    ),
+                                style: textTheme.bodySmall!.copyWith(
+                                  fontSize: 20 * percentOfShrinkOffset,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -74,7 +82,7 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                 ),
                 const Spacer(),
                 VisibilityButton(
-                  value: false,
+                  value: visibilityCompletedTask,
                   onChangeVisibilityCompletedTask: (value) {
                     onChangeVisibilityCompletedTask(value);
                   },
@@ -131,12 +139,12 @@ class _VisibilityButtonState extends State<VisibilityButton> {
         },
         icon: value
             ? Icon(
-                Icons.visibility,
+                Icons.visibility_off,
                 size: 24,
                 color: theme.primaryColor,
               )
             : Icon(
-                Icons.visibility_off,
+                Icons.visibility,
                 size: 24,
                 color: theme.primaryColor,
               ),
