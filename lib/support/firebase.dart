@@ -1,12 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:todo_manager/support/logger.dart';
 
 import '../firebase_options.dart';
 
 final remoteConfig = FirebaseRemoteConfig.instance;
 
-void initFirebase() async {
+Future<void> initFirebase() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -18,5 +20,13 @@ void initFirebase() async {
       minimumFetchInterval: const Duration(seconds: 10),
     ),
   );
-  await remoteConfig.fetchAndActivate();
+  try {
+    await remoteConfig.fetchAndActivate();
+    int importanceColor = remoteConfig.getInt("importanceColor");
+    if (importanceColor != 0) {
+      Hive.box<int>('support').put('importanceColor', importanceColor);
+    }
+  } catch (e) {
+    logger.e('fetchAndActivate - set importanceColor error', e);
+  }
 }

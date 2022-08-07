@@ -152,31 +152,29 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.end,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
           if (kDebugMode)
-            Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: FloatingActionButton(
-                      heroTag: null,
-                      mini: true,
-                      onPressed: () {
-                        throw Exception('Test crash by button in HomePage');
-                      },
-                      child: const Icon(
-                        Icons.warning,
-                        size: 25,
-                      ),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: FloatingActionButton(
+                    heroTag: null,
+                    mini: true,
+                    onPressed: () {
+                      throw Exception('Test crash by button in HomePage');
+                    },
+                    child: const Icon(
+                      Icons.warning,
+                      size: 25,
                     ),
                   ),
-                  FloatingActionButton(
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  child: FloatingActionButton(
                     heroTag: null,
                     mini: true,
                     onPressed: addTask,
@@ -185,8 +183,8 @@ class _HomePageState extends State<HomePage> {
                       size: 25,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           FloatingActionButton(
             heroTag: null,

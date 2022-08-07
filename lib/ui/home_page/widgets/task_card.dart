@@ -141,17 +141,25 @@ class _TaskCardState extends State<TaskCard> {
                             ? AppTextStyle.crossedOut
                             : Theme.of(context).textTheme.bodyMedium,
                         children: [
-                          if (widget.task.importance != Importance.basic)
+                          if (widget.task.importance == Importance.important)
                             WidgetSpan(
                               child: Padding(
                                 padding: const EdgeInsets.only(right: 3),
                                 child: AppSvgIcons(
-                                  widget.task.importance == Importance.important
-                                      ? AppSvgIcon.important
-                                      : AppSvgIcon.low,
+                                  AppSvgIcon.important,
                                   color: done
                                       ? AppTextStyle.crossedOut.color
-                                      : null,
+                                      : AppColors.red,
+                                ),
+                              ),
+                            ),
+                          if (widget.task.importance == Importance.low)
+                            WidgetSpan(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 3),
+                                child: AppSvgIcons(
+                                  AppSvgIcon.low,
+                                  color: AppTextStyle.crossedOut.color,
                                 ),
                               ),
                             ),

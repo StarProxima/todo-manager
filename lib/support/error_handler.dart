@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 
 import 'logger.dart';
 
-class ErrorHandler {
-  static void init() {
-    FlutterError.onError = _recordFlutterError;
-    logger.i('ErrorHandler init');
-  }
+void initErrorHandler() {
+  FlutterError.onError = ErrorHandler._recordFlutterError;
+  logger.i('ErrorHandler init');
+}
 
+class ErrorHandler {
   static void recordError(Object error, StackTrace stackTrace) {
     FirebaseCrashlytics.instance.recordError(error, stackTrace);
     logger.e(error, error, stackTrace);

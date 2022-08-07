@@ -103,9 +103,9 @@ abstract class AppTheme {
 }
 
 abstract class AppColors {
-  static const Color red = Color(0xFFFF3B30);
-  static const Color green = Color(0xFF34C759);
-  static const Color blue = Color(0xFF007AFF);
+  static Color red = const Color.fromARGB(255, 207, 10, 161);
+  static Color green = const Color(0xFF34C759);
+  static Color blue = const Color(0xFF007AFF);
 }
 
 abstract class AppTextStyle {
