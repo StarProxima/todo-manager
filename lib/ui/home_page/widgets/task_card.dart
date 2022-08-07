@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/data/models/importance.dart';
-import 'package:todo_manager/data/models/task_model.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_manager/ui/task_details_page/task_details_page.dart';
-import 'package:todo_manager/ui/styles/app_icons.dart';
-import 'package:todo_manager/ui/styles/app_theme.dart';
-import 'package:todo_manager/ui/widgets/task_checkbox.dart';
+import 'package:todo_manager/styles/app_icons.dart';
+import 'package:todo_manager/styles/app_theme.dart';
+import 'package:todo_manager/ui/home_page/widgets/task_checkbox.dart';
+
+import '../../../models/importance.dart';
+import '../../../models/task_model.dart';
 
 class TaskCard extends StatefulWidget {
   const TaskCard({
@@ -15,8 +16,8 @@ class TaskCard extends StatefulWidget {
     required this.onEdit,
   }) : super(key: key);
 
-  final Function(Task) onDelete;
-  final Function(Task) onEdit;
+  final void Function(Task) onDelete;
+  final void Function(Task) onEdit;
   final Task task;
   @override
   State<TaskCard> createState() => _TaskCardState();
@@ -165,7 +166,7 @@ class _TaskCardState extends State<TaskCard> {
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        DateFormat('dd MMMM yyyy')
+                        DateFormat('dd MMMM yyyy', 'ru_RU')
                             .format(widget.task.deadline!),
                         style: Theme.of(context).textTheme.labelSmall,
                         overflow: TextOverflow.ellipsis,

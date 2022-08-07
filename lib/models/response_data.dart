@@ -1,5 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:todo_manager/data/repositories/repository.dart';
+import '../repositories/repository.dart';
 
 class ResponseData<T> {
   final bool isSuccesful;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/ui/styles/app_theme.dart';
+import 'package:todo_manager/styles/app_theme.dart';
 
-import '../../../data/models/importance.dart';
 import '../../../generated/l10n.dart';
+import '../../../models/importance.dart';
 
 class ImportanceDropdownButton extends StatefulWidget {
   const ImportanceDropdownButton({

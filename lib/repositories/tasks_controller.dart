@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:todo_manager/data/models/response_data.dart';
-import 'package:todo_manager/data/models/task_model.dart';
-import 'package:todo_manager/data/repositories/task_repository.dart';
+import 'package:todo_manager/repositories/task_repository.dart';
+import '../models/response_data.dart';
+import '../models/task_model.dart';
 
 class TasksController {
   static final TasksController _instance = TasksController._();

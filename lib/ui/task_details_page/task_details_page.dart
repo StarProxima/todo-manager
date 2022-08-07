@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/ui/styles/app_theme.dart';
+import 'package:todo_manager/styles/app_theme.dart';
 import 'package:todo_manager/ui/task_details_page/widgets/task_details_deadline.dart';
 
-import '../../data/models/task_model.dart';
+import '../../models/task_model.dart';
 import 'widgets/importance_dropdown_button.dart';
 import 'widgets/task_details_text_field.dart';
 

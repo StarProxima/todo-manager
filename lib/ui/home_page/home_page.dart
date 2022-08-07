@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/data/local/tasks_manager.dart';
-import 'package:todo_manager/data/models/task_model.dart';
-import 'package:todo_manager/ui/widgets/home_page_header_delegate.dart';
+import 'package:todo_manager/ui/home_page/widgets/home_page_header_delegate.dart';
 
+import '../../models/task_model.dart';
+import '../../repositories/tasks_controller.dart';
 import '../task_details_page/task_details_page.dart';
-import '../widgets/add_task_card.dart';
-import '../widgets/task_card.dart';
+import 'widgets/add_task_card.dart';
+import 'widgets/task_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/data/models/task_model.dart';
 
-import '../../generated/l10n.dart';
+import '../../../generated/l10n.dart';
+import '../../../models/task_model.dart';
 
 class AddTaskCard extends StatelessWidget {
   AddTaskCard({Key? key, required this.onAddTask}) : super(key: key);

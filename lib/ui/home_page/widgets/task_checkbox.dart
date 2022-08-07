@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/data/models/importance.dart';
-import 'package:todo_manager/data/models/task_model.dart';
-import 'package:todo_manager/ui/styles/app_theme.dart';
+import 'package:todo_manager/styles/app_theme.dart';
+
+import '../../../models/importance.dart';
+import '../../../models/task_model.dart';
 
 class TaskCheckbox extends StatefulWidget {
   const TaskCheckbox({

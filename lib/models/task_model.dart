@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-import 'package:todo_manager/data/models/importance.dart';
+import 'importance.dart';
 
 part 'task_model.g.dart';
 

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:todo_manager/data/models/response_data.dart';
-import 'package:todo_manager/data/models/task_model.dart';
-import 'package:todo_manager/data/repositories/repository.dart';
+import '../../models/response_data.dart';
+import '../../models/task_model.dart';
+import 'repository.dart';
 
 class TaskRepository {
   static const String baseUrl = 'https://beta.mrdekk.ru/todobackend';
