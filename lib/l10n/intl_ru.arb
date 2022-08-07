@@ -1,0 +1,16 @@
+{
+    "homePageTitle": "Мои дела",
+    "homePageSubTitle": "Выполнено - {completedTaskCount}",
+    "addTaskCardHint": "Новое",
+    "taskDetailsSave": "СОХРАНИТЬ",
+    "deadlineTitle": "Сделать до",
+    "deadlineNotSet": "Не задано",
+    "deleteTaskButton": "Удалить",
+    "importance": "Важность",
+    "importanceBasic": "Нет",
+    "importanceImportant": "!! Высокий",
+    "importanceLow": "Низкий",
+    "no": "Нет",
+    "yes": "Да",
+    "taskDetailsTextFieldHint": "Что надо сделать..."
+}

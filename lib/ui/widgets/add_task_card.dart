@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 
+import '../../generated/l10n.dart';
+
 class AddTaskCard extends StatelessWidget {
   AddTaskCard({Key? key, required this.onAddTask}) : super(key: key);
 
@@ -28,10 +30,10 @@ class AddTaskCard extends StatelessWidget {
       textInputAction: TextInputAction.done,
       onEditingComplete: onEditingComplete,
       style: textTheme.bodyMedium,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         contentPadding:
-            EdgeInsets.only(top: 14, bottom: 14, left: 52, right: 16),
-        hintText: 'Новое',
+            const EdgeInsets.only(top: 14, bottom: 14, left: 52, right: 16),
+        hintText: S.of(context).addTaskCardHint,
         border: InputBorder.none,
       ),
     );

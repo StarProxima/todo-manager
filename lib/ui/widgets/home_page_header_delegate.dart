@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../generated/l10n.dart';
+
 class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
   HomePageHeaderDelegate({
     required this.completedTaskCount,
@@ -49,7 +51,7 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Мои дела",
+                      S.of(context).homePageTitle,
                       style: textTheme.headlineLarge!.copyWith(
                         fontSize: 20 + 12 * percentOfShrinkOffset,
                       ),
@@ -61,7 +63,7 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                         child: Opacity(
                           opacity: percentOfShrinkOffset,
                           child: Text(
-                            "Выполнено - $completedTaskCount",
+                            S.of(context).homePageSubTitle(completedTaskCount),
                             style: textTheme.bodySmall!.copyWith(
                               fontSize: 20 * percentOfShrinkOffset,
                             ),

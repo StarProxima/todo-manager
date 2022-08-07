@@ -6,6 +6,8 @@ import '../../data/models/task_model.dart';
 import 'widgets/importance_dropdown_button.dart';
 import 'widgets/task_details_text_field.dart';
 
+import '../../generated/l10n.dart';
+
 class TaskDetailsPage extends StatefulWidget {
   const TaskDetailsPage({
     Key? key,
@@ -63,7 +65,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
               ),
               child: Text(
-                "СОХРАНИТЬ",
+                S.of(context).taskDetailsSave,
                 style: textTheme.labelSmall!.copyWith(
                   fontWeight: FontWeight.w600,
                   color: theme.primaryColor,
@@ -107,7 +109,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
                   icon: const Icon(Icons.delete),
-                  label: const Text('Удалить'),
+                  label: Text(S.of(context).deleteTaskButton),
                   style: TextButton.styleFrom(
                     primary: AppColors.red,
                   ),

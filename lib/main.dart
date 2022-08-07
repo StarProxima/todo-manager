@@ -5,7 +5,7 @@ import 'package:todo_manager/data/models/importance.dart';
 import 'package:todo_manager/data/models/task_model.dart';
 import 'package:todo_manager/ui/pages/home_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-// ignore: unused_import
+import 'generated/l10n.dart';
 import 'ui/styles/app_theme.dart';
 
 void main() async {
@@ -32,11 +32,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       localizationsDelegates: const [
+        S.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('ru')],
+      supportedLocales: S.delegate.supportedLocales,
       theme: AppTheme.themeData,
       home: const HomePage(),
     );

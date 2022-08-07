@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../generated/l10n.dart';
+
 class TaskDetailsTextField extends StatelessWidget {
   const TaskDetailsTextField({
     Key? key,
@@ -30,9 +32,9 @@ class TaskDetailsTextField extends StatelessWidget {
           controller: controller,
           minLines: 4,
           maxLines: null,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             contentPadding: EdgeInsets.zero,
-            hintText: "Что надо сделать...",
+            hintText: S.of(context).taskDetailsTextFieldHint,
             border: InputBorder.none,
           ),
         ),

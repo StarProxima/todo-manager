@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_manager/ui/styles/app_theme.dart';
 
 import '../../../data/models/importance.dart';
+import '../../../generated/l10n.dart';
 
 class ImportanceDropdownButton extends StatefulWidget {
   const ImportanceDropdownButton({
@@ -28,8 +29,8 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Важность",
+        Text(
+          S.of(context).importance,
         ),
         SizedBox(
           width: 164,
@@ -46,20 +47,20 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
                   DropdownMenuItem<Importance>(
                     value: Importance.basic,
                     child: Text(
-                      "Нет",
+                      S.of(context).importanceBasic,
                       style: textTheme.bodySmall,
                     ),
                   ),
-                  const DropdownMenuItem<Importance>(
+                  DropdownMenuItem<Importance>(
                     value: Importance.low,
                     child: Text(
-                      "Низкий",
+                      S.of(context).importanceLow,
                     ),
                   ),
                   DropdownMenuItem<Importance>(
                     value: Importance.important,
                     child: Text(
-                      "!! Высокий",
+                      S.of(context).importanceImportant,
                       style: textTheme.bodyMedium!.copyWith(
                         color: AppColors.red,
                       ),

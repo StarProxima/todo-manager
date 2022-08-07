@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../../generated/l10n.dart';
+
 class TaskDetailsDeadline extends StatefulWidget {
   const TaskDetailsDeadline({
     Key? key,
@@ -49,14 +51,14 @@ class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'Сделать до',
+                Text(
+                  S.of(context).deadlineTitle,
                 ),
                 if (active)
                   Text(
                     value != null
-                        ? DateFormat('dd MMMM yyyy', 'ru_RU').format(value!)
-                        : 'Не задано',
+                        ? DateFormat('dd MMMM yyyy').format(value!)
+                        : S.of(context).deadlineNotSet,
                     style: textTheme.bodyMedium!.copyWith(
                       color: value != null
                           ? theme.primaryColor
