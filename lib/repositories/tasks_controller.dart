@@ -1,10 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_manager/repositories/task_repository.dart';
 import '../models/response_data.dart';
 import '../models/task_model.dart';
+import '../support/logger.dart';
 
 class TasksController {
   static final TasksController _instance = TasksController._();
@@ -59,7 +59,11 @@ class TasksController {
         }
       }
     }
-    log(localChanges ? 'unsync data' : 'sync data');
+    if (localChanges) {
+      logger.w('unsync data');
+    } else {
+      logger.i('sync data');
+    }
 
     return localChanges;
   }
@@ -91,7 +95,7 @@ class TasksController {
           _tasks = patchResponse.data!;
           localSaveTasks();
           revision = jsonDecode(patchResponse.message!)['revision'];
-          localChanges = checkLocalChanges(response.data!);
+          checkLocalChanges(response.data!);
           return patchResponse.copyWith(data: _tasks);
         }
       }
@@ -106,6 +110,7 @@ class TasksController {
   Future<ResponseData<List<Task>>> getTasks() async {
     var response = await _repository.getTasks();
     response = await checkTasks(response);
+    // logger.d(response.data);
     return response.copyWith(data: _tasks);
   }
 
@@ -121,9 +126,11 @@ class TasksController {
       var index = _tasks.indexOf(t);
 
       _tasks[index] = response.data!;
+      logger.v(response.data);
       localSaveTasks();
+    } else {
+      logger.w(response);
     }
-
     return const ResponseData(
       isSuccesful: true,
     );
@@ -142,9 +149,11 @@ class TasksController {
       revision = jsonDecode(response.message!)['revision'];
 
       _tasks[index] = response.data!;
+      logger.v(response.data);
       localSaveTasks();
+    } else {
+      logger.w(response);
     }
-
     return const ResponseData(
       isSuccesful: true,
     );
@@ -160,7 +169,7 @@ class TasksController {
     if (response.isSuccesful) {
       revision = jsonDecode(response.message!)['revision'];
     }
-
+    logger.i(response);
     return ResponseData(
       isSuccesful: isSuccesRemove,
     );

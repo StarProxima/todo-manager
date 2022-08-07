@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:todo_manager/ui/home_page/home_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'generated/l10n.dart';
 import 'models/importance.dart';
 import 'models/task_model.dart';
 import 'styles/app_theme.dart';
+import 'support/logger.dart';
+import 'ui/home_page/home_page.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -22,6 +23,7 @@ void main() async {
   if (tasks == null) {
     Hive.box('tasks').put('tasks', []);
   }
+  logger.i('Hive init');
   runApp(const MyApp());
 }
 

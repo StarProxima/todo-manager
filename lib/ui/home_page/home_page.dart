@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_manager/support/logger.dart';
 import 'package:todo_manager/ui/home_page/widgets/home_page_header_delegate.dart';
 
 import '../../models/task_model.dart';
@@ -20,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> getTasks({bool setState = true}) async {
     var responce = await TasksController().getTasks();
     tasks = responce.data ?? tasks;
+
     if (setState) {
       this.setState(() {});
     } else {
@@ -67,7 +70,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> firstGetTasks() async {
     tasks = TasksController().getLocalTasks();
-    print(tasks);
+    logger.i(tasks);
     getTasks();
   }
 
@@ -152,17 +155,18 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(
-            heroTag: null,
-            onPressed: addTask,
-            child: const Icon(
-              Icons.casino_outlined,
-              size: 35,
+          if (kDebugMode)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: FloatingActionButton(
+                heroTag: null,
+                onPressed: addTask,
+                child: const Icon(
+                  Icons.casino_outlined,
+                  size: 35,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
           FloatingActionButton(
             heroTag: null,
             onPressed: toDetailsPage,

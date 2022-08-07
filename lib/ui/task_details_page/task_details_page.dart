@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_manager/styles/app_theme.dart';
+import 'package:todo_manager/support/logger.dart';
 import 'package:todo_manager/ui/task_details_page/widgets/task_details_deadline.dart';
 
 import '../../models/task_model.dart';
@@ -32,8 +33,16 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     ..text = widget.task?.text ?? '';
 
   void saveTask() {
-    widget.onSave(task.editAndCopyWith(text: controller.text));
+    var editTask = task.editAndCopyWith(text: controller.text);
+    widget.onSave(editTask);
+    logger.i(editTask);
     Navigator.pop(context);
+  }
+
+  @override
+  void initState() {
+    logger.i(widget.task);
+    super.initState();
   }
 
   @override
