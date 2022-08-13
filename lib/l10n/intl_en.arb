@@ -1,0 +1,16 @@
+{
+    "homePageTitle": "My business",
+    "homePageSubTitle": "Completed - {completedTaskCount}",
+    "addTaskCardHint": "New",
+    "taskDetailsSave": "SAVE",
+    "deadlineTitle": "Do before",
+    "deadlineNotSet": "Not set",
+    "deleteTaskButton": "Delete",
+    "importance": "Importance",
+    "importanceBasic": "No",
+    "importanceImportant": "!! High",
+    "importanceLow": "Low",
+    "no": "No",
+    "yes": "Yes",
+    "taskDetailsTextFieldHint": "What needs to be done..."
+}
