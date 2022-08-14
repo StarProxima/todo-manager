@@ -85,7 +85,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                       itemBuilder: (context, index) {
                         if (index == tasks.length) {
                           return AddTaskCard(
-                            key: UniqueKey(),
                             onAddTask: onAddTask,
                           );
                         }

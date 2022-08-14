@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:todo_manager/ui/task_details_page/task_details_page.dart';
 import 'package:todo_manager/styles/app_icons.dart';
@@ -8,9 +9,9 @@ import 'package:todo_manager/ui/home_page/widgets/task_checkbox.dart';
 import '../../../models/importance.dart';
 import '../../../models/task_model.dart';
 
-class TaskCard extends StatefulWidget {
+class TaskCard extends ConsumerStatefulWidget {
   const TaskCard({
-    Key? key,
+    required Key key,
     required this.task,
     required this.onDeleteTask,
     required this.onEditTask,
@@ -20,21 +21,27 @@ class TaskCard extends StatefulWidget {
   final void Function(Task) onEditTask;
   final Task task;
   @override
-  State<TaskCard> createState() => _TaskCardState();
+  ConsumerState<TaskCard> createState() => _TaskCardState();
 }
 
-class _TaskCardState extends State<TaskCard> {
-  ValueNotifier<double> startToEndNotifier = ValueNotifier<double>(0);
-  ValueNotifier<double> endToStartNotifier = ValueNotifier<double>(0);
+class _TaskCardState extends ConsumerState<TaskCard> {
+  //Легко сказать — «мы должны были сделать вот так» уже после того, как всё закончилось.
+  //Однако никто не знает, чем обернётся твой выбор и сколькими жертвами,
+  //пока его не сделаешь. А ты должен его сделать!
+  final dismissProgress =
+      StateProvider.autoDispose.family<double, DismissDirection>(
+    (ref, direction) {
+      return 0;
+    },
+  );
 
-  void onUpdate(details) {
-    //Легко сказать — «мы должны были сделать вот так» уже после того, как всё закончилось.
-    //Однако никто не знает, чем обернётся твой выбор и сколькими жертвами,
-    //пока его не сделаешь. А ты должен его сделать!
+  void onUpdate(DismissUpdateDetails details) {
     if (details.direction == DismissDirection.startToEnd) {
-      startToEndNotifier.value = details.progress;
+      ref.read(dismissProgress(DismissDirection.startToEnd).notifier).state =
+          details.progress;
     } else {
-      endToStartNotifier.value = details.progress;
+      ref.read(dismissProgress(DismissDirection.endToStart).notifier).state =
+          details.progress;
     }
   }
 
@@ -74,49 +81,50 @@ class _TaskCardState extends State<TaskCard> {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    return GestureDetector(
-      onTap: toDetailsPage,
-      child: Dismissible(
-        key: ValueKey(widget.task.id),
-        onUpdate: onUpdate,
-        onDismissed: onDismissed,
-        confirmDismiss: confirmDismiss,
-        background: Container(
-          color: AppColors.green,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              ValueListenableBuilder(
-                valueListenable: startToEndNotifier,
-                builder: (BuildContext context, double value, Widget? child) {
-                  return AppDismissIcon(
-                    direction: DismissDirection.startToEnd,
-                    progress: value,
-                    icon: const Icon(Icons.check, color: Colors.white),
-                  );
-                },
-              ),
-            ],
-          ),
+    return Dismissible(
+      key: widget.key!,
+      onUpdate: onUpdate,
+      onDismissed: onDismissed,
+      confirmDismiss: confirmDismiss,
+      background: Container(
+        color: AppColors.green,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Consumer(
+              builder: (context, ref, child) {
+                return AppDismissIcon(
+                  direction: DismissDirection.startToEnd,
+                  progress:
+                      ref.watch(dismissProgress(DismissDirection.startToEnd)),
+                  icon: const Icon(Icons.check, color: Colors.white),
+                );
+              },
+            ),
+          ],
         ),
-        secondaryBackground: Container(
-          color: theme.errorColor,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              ValueListenableBuilder(
-                valueListenable: endToStartNotifier,
-                builder: (BuildContext context, double value, Widget? child) {
-                  return AppDismissIcon(
-                    direction: DismissDirection.endToStart,
-                    progress: value,
-                    icon: const Icon(Icons.delete, color: Colors.white),
-                  );
-                },
-              ),
-            ],
-          ),
+      ),
+      secondaryBackground: Container(
+        color: theme.errorColor,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Consumer(
+              builder: (context, ref, child) {
+                return AppDismissIcon(
+                  direction: DismissDirection.endToStart,
+                  progress:
+                      ref.watch(dismissProgress(DismissDirection.endToStart)),
+                  icon: const Icon(Icons.delete, color: Colors.white),
+                );
+              },
+            ),
+          ],
         ),
+      ),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: toDetailsPage,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -200,7 +208,7 @@ class _TaskCardState extends State<TaskCard> {
   }
 }
 
-class AppDismissIcon extends StatefulWidget {
+class AppDismissIcon extends StatelessWidget {
   const AppDismissIcon({
     Key? key,
     required this.direction,
@@ -210,29 +218,24 @@ class AppDismissIcon extends StatefulWidget {
 
   final DismissDirection direction;
   final double progress;
-  final Widget icon;
-  @override
-  State<AppDismissIcon> createState() => AppDismissIconState();
-}
-
-class AppDismissIconState extends State<AppDismissIcon> {
+  final Icon icon;
   @override
   Widget build(BuildContext context) {
-    var padding = MediaQuery.of(context).size.width * widget.progress - 47;
+    var padding = MediaQuery.of(context).size.width * progress - 47;
     return Padding(
       padding: EdgeInsets.only(
-        left: widget.direction == DismissDirection.startToEnd
+        left: direction == DismissDirection.startToEnd
             ? padding > 24
                 ? padding
                 : 24
             : 0,
-        right: widget.direction == DismissDirection.endToStart
+        right: direction == DismissDirection.endToStart
             ? padding > 24
                 ? padding
                 : 24
             : 0,
       ),
-      child: widget.icon,
+      child: icon,
     );
   }
 }
