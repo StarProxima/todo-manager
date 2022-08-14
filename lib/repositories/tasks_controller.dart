@@ -53,11 +53,15 @@ class TaskList extends StateNotifier<List<Task>> {
   }
 
   void remove(Task task) {
+    state = state.where((element) => element.id != task.id).toList();
+    _TaskController().deleteTask(task);
+  }
+
+  void removeWithoutNotifying(Task task) {
     // TODO: Возможно, найти лучшее решение.
     //Это нужно, чтобы ListView в HomePage не обновлялся при удалении,
     //иначе ломается Dismissible и нельзя удалить несколько тасков одновременно.
     state.remove(task);
-    // state = state.where((element) => element.id != task.id).toList();
     _TaskController().deleteTask(task);
   }
 }
@@ -208,7 +212,7 @@ class _TaskController {
     var t = tasks.firstWhere((element) => element.id == task.id);
     var index = tasks.indexOf(t);
 
-    tasks[index] = task.editAndCopyWith();
+    tasks[index] = task.edit();
     localSaveTasks();
 
     var response = await _repository.editTask(task, revision);

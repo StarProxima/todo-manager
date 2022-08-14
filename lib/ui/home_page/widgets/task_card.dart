@@ -5,6 +5,7 @@ import 'package:todo_manager/repositories/tasks_controller.dart';
 import 'package:todo_manager/styles/app_icons.dart';
 import 'package:todo_manager/styles/app_theme.dart';
 import 'package:todo_manager/ui/home_page/widgets/task_checkbox.dart';
+import 'package:todo_manager/ui/task_details_page/task_details_page.dart';
 
 import '../../../models/importance.dart';
 import '../../../models/task_model.dart';
@@ -41,13 +42,13 @@ class TaskCard extends ConsumerWidget {
     Future<void> removeTaskAsync() async {
       final tasksList = ref.read(taskList.notifier);
       await Future.delayed(resizeDuration);
-      tasksList.remove(task);
+      tasksList.removeWithoutNotifying(task);
     }
 
     Future<void> editTaskAsync() async {
       final tasksList = ref.read(taskList.notifier);
       await Future.delayed(movementDuration);
-      tasksList.edit(task.editAndCopyWith(done: true));
+      tasksList.edit(task.edit(done: true));
     }
 
     return Dismissible(
@@ -132,6 +133,18 @@ class _TaskCard extends ConsumerWidget {
     final task = ref.watch(_currentTask);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return TaskDetailsPage(
+                task: task,
+              );
+            },
+          ),
+        );
+      },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -139,9 +152,7 @@ class _TaskCard extends ConsumerWidget {
             value: task.done,
             task: task,
             onChanged: (value) {
-              ref
-                  .read(taskList.notifier)
-                  .edit(task.editAndCopyWith(done: value));
+              ref.read(taskList.notifier).edit(task.edit(done: value));
             },
           ),
           Expanded(
@@ -200,13 +211,13 @@ class _TaskCard extends ConsumerWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 15, left: 14, right: 18),
+          const Padding(
+            padding: EdgeInsets.only(top: 15, left: 14, right: 18),
             child: IconButton(
-              onPressed: () {},
+              onPressed: null,
               padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              icon: const Icon(
+              constraints: BoxConstraints(),
+              icon: Icon(
                 Icons.info_outline,
                 color: Color(0x4d000000),
               ),

@@ -51,11 +51,7 @@ class FloatingActionPanel extends ConsumerWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TaskDetailsPage(
-                  onSave: (task) {
-                    ref.watch(taskList.notifier).add(task);
-                  },
-                ),
+                builder: (context) => const TaskDetailsPage(),
               ),
             );
           },

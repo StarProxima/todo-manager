@@ -88,7 +88,7 @@ class Task implements Comparable {
     );
   }
 
-  Task editAndCopyWith({
+  Task edit({
     String? text,
     Importance? importance,
     bool? done,

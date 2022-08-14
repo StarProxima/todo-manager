@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/support/logger.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:todo_manager/repositories/tasks_controller.dart';
 import 'package:todo_manager/ui/task_details_page/widgets/task_details_deadline.dart';
 
 import '../../models/task_model.dart';
@@ -8,40 +9,37 @@ import 'widgets/task_details_text_field.dart';
 
 import '../../generated/l10n.dart';
 
-class TaskDetailsPage extends StatefulWidget {
+class TaskDetailsPage extends ConsumerStatefulWidget {
   const TaskDetailsPage({
     Key? key,
     this.task,
-    required this.onSave,
-    this.onDelete,
   }) : super(key: key);
 
   final Task? task;
 
-  final void Function(Task) onSave;
-  final void Function(Task)? onDelete;
   @override
-  State<TaskDetailsPage> createState() => _TaskDetailsPageState();
+  ConsumerState<TaskDetailsPage> createState() => _TaskDetailsPageState();
 }
 
-class _TaskDetailsPageState extends State<TaskDetailsPage> {
-  late Task task =
-      widget.task != null ? widget.task!.copyWith() : Task.create();
+class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
+  late Task task = widget.task?.copyWith() ?? Task.create();
 
   late TextEditingController controller = TextEditingController()
     ..text = widget.task?.text ?? '';
 
   void saveTask() {
-    var editTask = task.editAndCopyWith(text: controller.text);
-    widget.onSave(editTask);
-    logger.i(editTask);
+    final editTask = task.edit(text: controller.text);
+    if (widget.task != null) {
+      ref.read(taskList.notifier).edit(editTask);
+    } else {
+      ref.read(taskList.notifier).add(editTask);
+    }
     Navigator.pop(context);
   }
 
-  @override
-  void initState() {
-    logger.i(widget.task);
-    super.initState();
+  void deleteTask() {
+    ref.read(taskList.notifier).remove(task);
+    Navigator.pop(context);
   }
 
   @override
@@ -99,7 +97,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 child: ImportanceDropdownButton(
                   value: task.importance,
                   onChanged: (value) {
-                    task = task.editAndCopyWith(importance: value);
+                    task = task.edit(importance: value);
                   },
                 ),
               ),
@@ -107,9 +105,9 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 value: task.deadline,
                 onChanged: (deadline) {
                   if (deadline == null) {
-                    task = task.editAndCopyWith(deleteDeadline: true);
+                    task = task.edit(deleteDeadline: true);
                   } else {
-                    task = task.editAndCopyWith(deadline: deadline);
+                    task = task.edit(deadline: deadline);
                   }
                 },
               ),
@@ -121,12 +119,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   style: TextButton.styleFrom(
                     primary: theme.errorColor,
                   ),
-                  onPressed: widget.task != null
-                      ? () {
-                          widget.onDelete?.call(widget.task!);
-                          Navigator.pop(context);
-                        }
-                      : null,
+                  onPressed: widget.task != null ? deleteTask : null,
                 ),
               ),
             ],
