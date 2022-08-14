@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_manager/ui/task_details_page/task_details_page.dart';
+import 'package:todo_manager/repositories/tasks_controller.dart';
 import 'package:todo_manager/styles/app_icons.dart';
 import 'package:todo_manager/styles/app_theme.dart';
 import 'package:todo_manager/ui/home_page/widgets/task_checkbox.dart';
@@ -13,12 +13,8 @@ class TaskCard extends ConsumerStatefulWidget {
   const TaskCard({
     required Key key,
     required this.task,
-    required this.onDeleteTask,
-    required this.onEditTask,
   }) : super(key: key);
 
-  final void Function(Task) onDeleteTask;
-  final void Function(Task) onEditTask;
   final Task task;
   @override
   ConsumerState<TaskCard> createState() => _TaskCardState();
@@ -46,7 +42,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   }
 
   void onDismissed(_) {
-    widget.onDeleteTask(widget.task);
+    ref.read(taskList.notifier).remove(widget.task);
   }
 
   Future<bool> confirmDismiss(direction) async {
@@ -62,20 +58,20 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   }
 
   void changeDone(bool value) {
-    widget.onEditTask(widget.task.editAndCopyWith(done: value));
+    ref.read(taskList.notifier).edit(widget.task.editAndCopyWith(done: value));
   }
 
   void toDetailsPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TaskDetailsPage(
-          task: widget.task,
-          onSave: widget.onEditTask,
-          onDelete: widget.onDeleteTask,
-        ),
-      ),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => TaskDetailsPage(
+    //       task: widget.task,
+    //       onSave: widget.onEditTask,
+    //       onDelete: widget.onDeleteTask,
+    //     ),
+    //   ),
+    // );
   }
 
   @override

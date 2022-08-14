@@ -23,7 +23,6 @@ class FloatingActionPanel extends ConsumerWidget {
               onPressed: () {
                 var task = Task.random();
                 ref.watch(taskList.notifier).add(task);
-                TasksController().addTask(task);
               },
               child: const Icon(
                 Icons.casino,
@@ -55,7 +54,6 @@ class FloatingActionPanel extends ConsumerWidget {
                 builder: (context) => TaskDetailsPage(
                   onSave: (task) {
                     ref.watch(taskList.notifier).add(task);
-                    TasksController().addTask(task);
                   },
                 ),
               ),

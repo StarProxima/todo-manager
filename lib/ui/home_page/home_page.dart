@@ -18,34 +18,16 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  ValueNotifier notifier = ValueNotifier(
-    TasksController().getCompletedTaskCount(),
-  );
-
   void onEditTask(task) async {
     ref.read(taskList.notifier).edit(task);
-    await TasksController().editTask(task);
   }
 
   void onDeleteTask(task) async {
     ref.read(taskList.notifier).remove(task);
-    await TasksController().deleteTask(task);
   }
 
   void onAddTask(task) async {
     ref.read(taskList.notifier).add(task);
-    await TasksController().addTask(task);
-  }
-
-  Future<void> firstGetTasks() async {
-    TasksController().getTasks();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    firstGetTasks();
   }
 
   @override
@@ -94,8 +76,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                         return TaskCard(
                           key: ValueKey(task.id),
                           task: task,
-                          onDeleteTask: onDeleteTask,
-                          onEditTask: onEditTask,
                         );
                       },
                     );

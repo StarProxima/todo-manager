@@ -13,7 +13,7 @@ import '../support/logger.dart';
 final taskFilter = StateProvider<TaskFilter>((ref) => TaskFilter.all);
 
 final taskList = StateNotifierProvider<TaskList, List<Task>>((ref) {
-  return TaskList(TasksController().getLocalTasks());
+  return TaskList(_TaskController().getLocalTasks());
 });
 
 final filteredTaskList = Provider<List<Task>>((ref) {
@@ -41,6 +41,7 @@ class TaskList extends StateNotifier<List<Task>> {
       ...state,
       task,
     ];
+    _TaskController().addTask(task);
   }
 
   void edit(Task task) {
@@ -48,19 +49,21 @@ class TaskList extends StateNotifier<List<Task>> {
       for (final element in state)
         if (element.id == task.id) task else element,
     ];
+    _TaskController().editTask(task);
   }
 
   void remove(Task task) {
     state = state.where((element) => element.id != task.id).toList();
+    _TaskController().deleteTask(task);
   }
 }
 
-class TasksController {
-  static final TasksController _instance = TasksController._();
+class _TaskController {
+  static final _TaskController _instance = _TaskController._();
 
-  TasksController._();
+  _TaskController._();
 
-  factory TasksController() {
+  factory _TaskController() {
     return _instance;
   }
 
@@ -163,6 +166,7 @@ class TasksController {
   }
 
   List<Task> getLocalTasks() {
+    getTasks();
     return tasks;
   }
 
