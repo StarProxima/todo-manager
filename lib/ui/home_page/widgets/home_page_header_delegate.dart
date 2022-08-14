@@ -2,18 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:todo_manager/models/task_filter.dart';
 import 'package:todo_manager/repositories/tasks_controller.dart';
 
 import '../../../generated/l10n.dart';
 
 class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
-  HomePageHeaderDelegate({
-    required this.visibilityCompletedTask,
-    required this.onChangeVisibilityCompletedTask,
-  });
-
-  final bool visibilityCompletedTask;
-  final Function(bool) onChangeVisibilityCompletedTask;
+  HomePageHeaderDelegate();
 
   static const double expandedHeight = 200;
 
@@ -81,12 +76,7 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                   ],
                 ),
                 const Spacer(),
-                VisibilityButton(
-                  value: visibilityCompletedTask,
-                  onChangeVisibilityCompletedTask: (value) {
-                    onChangeVisibilityCompletedTask(value);
-                  },
-                ),
+                const VisibilityButton(),
                 SizedBox(
                   height: 16 + 2 * percentOfShrinkOffset,
                 ),
@@ -108,23 +98,13 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
 }
 
-class VisibilityButton extends StatefulWidget {
+class VisibilityButton extends ConsumerWidget {
   const VisibilityButton({
     Key? key,
-    required this.value,
-    required this.onChangeVisibilityCompletedTask,
   }) : super(key: key);
 
-  final bool value;
-  final Function(bool) onChangeVisibilityCompletedTask;
   @override
-  State<VisibilityButton> createState() => _VisibilityButtonState();
-}
-
-class _VisibilityButtonState extends State<VisibilityButton> {
-  late bool value = widget.value;
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var theme = Theme.of(context);
     return SizedBox(
       width: 24,
@@ -133,11 +113,13 @@ class _VisibilityButtonState extends State<VisibilityButton> {
         padding: EdgeInsets.zero,
         splashRadius: 28,
         onPressed: () {
-          value = !value;
-          widget.onChangeVisibilityCompletedTask(value);
-          setState(() {});
+          ref.read(taskFilter.notifier).update(
+                (state) => state == TaskFilter.all
+                    ? TaskFilter.uncompleted
+                    : TaskFilter.all,
+              );
         },
-        icon: value
+        icon: ref.watch(taskFilter) == TaskFilter.all
             ? Icon(
                 Icons.visibility_off,
                 size: 24,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_manager/ui/home_page/widgets/add_task_card.dart';
@@ -26,10 +28,12 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void onDeleteTask(task) async {
+    ref.read(taskList.notifier).remove(task);
     await TasksController().deleteTask(task);
   }
 
   void onAddTask(task) async {
+    ref.read(taskList.notifier).add(task);
     await TasksController().addTask(task);
   }
 
@@ -44,24 +48,16 @@ class _HomePageState extends ConsumerState<HomePage> {
     firstGetTasks();
   }
 
-  bool visibilityCompletedTasks = true;
-
   @override
   Widget build(BuildContext context) {
+    log('HomePage');
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
             SliverPersistentHeader(
               pinned: true,
-              delegate: HomePageHeaderDelegate(
-                visibilityCompletedTask: visibilityCompletedTasks,
-                onChangeVisibilityCompletedTask: (value) {
-                  setState(() {
-                    visibilityCompletedTasks = value;
-                  });
-                },
-              ),
+              delegate: HomePageHeaderDelegate(),
             ),
             SliverToBoxAdapter(
               child: Container(
@@ -79,10 +75,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ],
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: ValueListenableBuilder(
-                  valueListenable: TasksController().getListenableTasksBox(),
-                  builder: (context, value, child) {
-                    List<Task> tasks = TasksController().tasks;
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    List<Task> tasks = ref.watch(filteredTaskList);
                     return ListView.builder(
                       shrinkWrap: true,
                       primary: false,
@@ -94,14 +89,12 @@ class _HomePageState extends ConsumerState<HomePage> {
                             onAddTask: onAddTask,
                           );
                         }
-                        if (!visibilityCompletedTasks && tasks[index].done) {
-                          return SizedBox(
-                            key: UniqueKey(),
-                          );
-                        }
+
+                        final task = tasks[index];
+
                         return TaskCard(
-                          key: ValueKey(tasks[index].id),
-                          task: TasksController().tasks[index],
+                          key: ValueKey(task.id),
+                          task: task,
                           onDeleteTask: onDeleteTask,
                           onEditTask: onEditTask,
                         );

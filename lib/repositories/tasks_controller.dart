@@ -6,14 +6,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_manager/repositories/task_repository.dart';
 import '../models/response_data.dart';
+import '../models/task_filter.dart';
 import '../models/task_model.dart';
 import '../support/logger.dart';
+
+final taskFilter = StateProvider<TaskFilter>((ref) => TaskFilter.all);
 
 final taskList = StateNotifierProvider<TaskList, List<Task>>((ref) {
   return TaskList(TasksController().getLocalTasks());
 });
 
+final filteredTaskList = Provider<List<Task>>((ref) {
+  final filter = ref.watch(taskFilter);
+  final tasks = ref.watch(taskList);
+
+  switch (filter) {
+    case TaskFilter.all:
+      return tasks;
+    case TaskFilter.uncompleted:
+      return tasks.where((element) => !element.done).toList();
+  }
+});
+
 final completedTaskCount = Provider<int>((ref) {
+  log('completedTaskCount');
   return ref.watch(taskList).where((task) => task.done).length;
 });
 
@@ -193,7 +209,7 @@ class TasksController {
       revision = jsonDecode(response.message!)['revision'];
 
       tasks[index] = response.data!;
-      logger.v(response.data);
+      //logger.v(response.data);
       localSaveTasks();
     } else {
       logger.w(response);
