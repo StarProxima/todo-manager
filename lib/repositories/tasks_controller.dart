@@ -2,11 +2,42 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo_manager/repositories/task_repository.dart';
 import '../models/response_data.dart';
 import '../models/task_model.dart';
 import '../support/logger.dart';
+
+final taskList = StateNotifierProvider<TaskList, List<Task>>((ref) {
+  return TaskList(TasksController().getLocalTasks());
+});
+
+final completedTaskCount = Provider<int>((ref) {
+  return ref.watch(taskList).where((task) => task.done).length;
+});
+
+class TaskList extends StateNotifier<List<Task>> {
+  TaskList(super.state);
+
+  void add(Task task) {
+    state = [
+      ...state,
+      task,
+    ];
+  }
+
+  void edit(Task task) {
+    state = [
+      for (final element in state)
+        if (element.id == task.id) task else element,
+    ];
+  }
+
+  void remove(Task task) {
+    state = state.where((element) => element.id != task.id).toList();
+  }
+}
 
 class TasksController {
   static final TasksController _instance = TasksController._();

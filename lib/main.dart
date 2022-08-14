@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_manager/support/hive.dart';
 import 'package:todo_manager/support/settings.dart';
 import 'generated/l10n.dart';
@@ -13,7 +14,7 @@ import 'ui/home_page/home_page.dart';
 
 //4294916912
 //4286135512
-void main() async {
+void main() {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +24,7 @@ void main() async {
 
       applySupportSettings();
 
-      runApp(const MyApp());
+      runApp(const ProviderScope(child: MyApp()));
     },
     ErrorHandler.recordError,
   );

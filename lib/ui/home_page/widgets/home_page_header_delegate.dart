@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_manager/repositories/tasks_controller.dart';
 
 import '../../../generated/l10n.dart';
@@ -25,6 +28,7 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
     double percentOfShrinkOffset = t > 0 ? t : 0;
     var theme = Theme.of(context);
     var textTheme = Theme.of(context).textTheme;
+    log('HomePageHeaderDelegate');
     return Material(
       color: theme.scaffoldBackgroundColor,
       elevation:
@@ -62,19 +66,15 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                             EdgeInsets.only(top: 6 * percentOfShrinkOffset),
                         child: Opacity(
                           opacity: percentOfShrinkOffset,
-                          child: ValueListenableBuilder(
-                            valueListenable:
-                                TasksController().getListenableTasksBox(),
-                            builder: (context, value, child) {
-                              return Text(
-                                S.of(context).homePageSubTitle(
-                                      TasksController().getCompletedTaskCount(),
-                                    ),
-                                style: textTheme.bodySmall!.copyWith(
-                                  fontSize: 20 * percentOfShrinkOffset,
-                                ),
-                              );
-                            },
+                          child: Consumer(
+                            builder: (context, ref, child) => Text(
+                              S.of(context).homePageSubTitle(
+                                    ref.watch(completedTaskCount),
+                                  ),
+                              style: textTheme.bodySmall!.copyWith(
+                                fontSize: 20 * percentOfShrinkOffset,
+                              ),
+                            ),
                           ),
                         ),
                       ),

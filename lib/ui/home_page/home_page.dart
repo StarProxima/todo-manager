@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_manager/ui/home_page/widgets/add_task_card.dart';
 
 import '../../models/task_model.dart';
@@ -7,19 +8,20 @@ import 'widgets/floating_action_panel.dart';
 import 'widgets/home_page_header_delegate.dart';
 import 'widgets/task_card.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   ValueNotifier notifier = ValueNotifier(
     TasksController().getCompletedTaskCount(),
   );
 
   void onEditTask(task) async {
+    ref.read(taskList.notifier).edit(task);
     await TasksController().editTask(task);
   }
 
@@ -38,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
     firstGetTasks();
   }
 
