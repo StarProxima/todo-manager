@@ -9,18 +9,18 @@ import 'package:todo_manager/ui/home_page/widgets/task_checkbox.dart';
 import '../../../models/importance.dart';
 import '../../../models/task_model.dart';
 
-class TaskCard extends ConsumerStatefulWidget {
-  const TaskCard({
+final _currentTask = Provider<Task>((ref) {
+  throw UnimplementedError();
+});
+
+class TaskCard extends ConsumerWidget {
+  TaskCard({
     required Key key,
     required this.task,
   }) : super(key: key);
 
   final Task task;
-  @override
-  ConsumerState<TaskCard> createState() => _TaskCardState();
-}
 
-class _TaskCardState extends ConsumerState<TaskCard> {
   //Легко сказать — «мы должны были сделать вот так» уже после того, как всё закончилось.
   //Однако никто не знает, чем обернётся твой выбор и сколькими жертвами,
   //пока его не сделаешь. А ты должен его сделать!
@@ -31,57 +31,52 @@ class _TaskCardState extends ConsumerState<TaskCard> {
     },
   );
 
-  void onUpdate(DismissUpdateDetails details) {
-    if (details.direction == DismissDirection.startToEnd) {
-      ref.read(dismissProgress(DismissDirection.startToEnd).notifier).state =
-          details.progress;
-    } else {
-      ref.read(dismissProgress(DismissDirection.endToStart).notifier).state =
-          details.progress;
-    }
-  }
-
-  void onDismissed(_) {
-    ref.read(taskList.notifier).remove(widget.task);
-  }
-
-  Future<bool> confirmDismiss(direction) async {
-    switch (direction) {
-      case DismissDirection.endToStart:
-        return true;
-
-      case DismissDirection.startToEnd:
-        await Future.delayed(const Duration(milliseconds: 200));
-        changeDone(true);
-    }
-    return false;
-  }
-
-  void changeDone(bool value) {
-    ref.read(taskList.notifier).edit(widget.task.editAndCopyWith(done: value));
-  }
-
-  void toDetailsPage() {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => TaskDetailsPage(
-    //       task: widget.task,
-    //       onSave: widget.onEditTask,
-    //       onDelete: widget.onDeleteTask,
-    //     ),
-    //   ),
-    // );
-  }
+  final resizeDuration = const Duration(milliseconds: 300);
+  final movementDuration = const Duration(milliseconds: 300);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var theme = Theme.of(context);
+
+    Future<void> removeTaskAsync() async {
+      final tasksList = ref.read(taskList.notifier);
+      await Future.delayed(resizeDuration);
+      tasksList.remove(task);
+    }
+
+    Future<void> editTaskAsync() async {
+      final tasksList = ref.read(taskList.notifier);
+      await Future.delayed(movementDuration);
+      tasksList.edit(task.editAndCopyWith(done: true));
+    }
+
     return Dismissible(
-      key: widget.key!,
-      onUpdate: onUpdate,
-      onDismissed: onDismissed,
-      confirmDismiss: confirmDismiss,
+      key: key!,
+      resizeDuration: resizeDuration,
+      movementDuration: movementDuration,
+      onUpdate: (DismissUpdateDetails details) {
+        if (details.direction == DismissDirection.startToEnd) {
+          ref
+              .read(dismissProgress(DismissDirection.startToEnd).notifier)
+              .state = details.progress;
+        } else {
+          ref
+              .read(dismissProgress(DismissDirection.endToStart).notifier)
+              .state = details.progress;
+        }
+      },
+      confirmDismiss: (DismissDirection direction) async {
+        switch (direction) {
+          case DismissDirection.endToStart:
+            removeTaskAsync();
+            return true;
+          case DismissDirection.startToEnd:
+            editTaskAsync();
+            return false;
+          default:
+            return false;
+        }
+      },
       background: Container(
         color: AppColors.green,
         child: Row(
@@ -118,87 +113,106 @@ class _TaskCardState extends ConsumerState<TaskCard> {
           ],
         ),
       ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: toDetailsPage,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TaskCheckbox(
-              value: widget.task.done,
-              task: widget.task,
-              onChanged: changeDone,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: RichText(
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      text: TextSpan(
-                        style: widget.task.done
-                            ? AppTextStyle.crossedOut
-                            : Theme.of(context).textTheme.bodyMedium,
-                        children: [
-                          if (widget.task.importance == Importance.important)
-                            WidgetSpan(
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 3),
-                                child: AppSvgIcons(
-                                  AppSvgIcon.important,
-                                  color: widget.task.done
-                                      ? AppTextStyle.crossedOut.color
-                                      : AppColors.red,
-                                ),
+      child: ProviderScope(
+        //Riverpod принял ислам
+        overrides: [
+          _currentTask.overrideWithValue(task),
+        ],
+        child: const _TaskCard(),
+      ),
+    );
+  }
+}
+
+class _TaskCard extends ConsumerWidget {
+  const _TaskCard({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final task = ref.watch(_currentTask);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TaskCheckbox(
+            value: task.done,
+            task: task,
+            onChanged: (value) {
+              ref
+                  .read(taskList.notifier)
+                  .edit(task.editAndCopyWith(done: value));
+            },
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 15),
+                  child: RichText(
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      style: task.done
+                          ? AppTextStyle.crossedOut
+                          : Theme.of(context).textTheme.bodyMedium,
+                      children: [
+                        if (task.importance == Importance.important)
+                          WidgetSpan(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 3),
+                              child: AppSvgIcons(
+                                AppSvgIcon.important,
+                                color: task.done
+                                    ? AppTextStyle.crossedOut.color
+                                    : AppColors.red,
                               ),
                             ),
-                          if (widget.task.importance == Importance.low)
-                            WidgetSpan(
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 3),
-                                child: AppSvgIcons(
-                                  AppSvgIcon.low,
-                                  color: AppTextStyle.crossedOut.color,
-                                ),
-                              ),
-                            ),
-                          TextSpan(
-                            text: widget.task.text,
                           ),
-                        ],
-                      ),
+                        if (task.importance == Importance.low)
+                          WidgetSpan(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 3),
+                              child: AppSvgIcons(
+                                AppSvgIcon.low,
+                                color: AppTextStyle.crossedOut.color,
+                              ),
+                            ),
+                          ),
+                        TextSpan(
+                          text: task.text,
+                        ),
+                      ],
                     ),
                   ),
-                  if (widget.task.deadline != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        DateFormat('dd MMMM yyyy', 'ru_RU')
-                            .format(widget.task.deadline!),
-                        style: Theme.of(context).textTheme.labelSmall,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    )
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 15, left: 14, right: 18),
-              child: IconButton(
-                onPressed: toDetailsPage,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                icon: const Icon(
-                  Icons.info_outline,
-                  color: Color(0x4d000000),
                 ),
+                if (task.deadline != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      DateFormat('dd MMMM yyyy', 'ru_RU')
+                          .format(task.deadline!),
+                      style: Theme.of(context).textTheme.labelSmall,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 15, left: 14, right: 18),
+            child: IconButton(
+              onPressed: () {},
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: const Icon(
+                Icons.info_outline,
+                color: Color(0x4d000000),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
