@@ -1,36 +1,36 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../models/task_model.dart';
 import '../../../repositories/tasks_controller.dart';
 import '../../task_details_page/task_details_page.dart';
 
-class FloatingActionPanel extends StatelessWidget {
+class FloatingActionPanel extends ConsumerWidget {
   const FloatingActionPanel({Key? key}) : super(key: key);
 
-  void addRandomTask() async {
-    var task = Task.random();
-    await TasksController().addTask(task);
-  }
-
-  void toDetailsPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TaskDetailsPage(
-          onSave: (task) async {
-            await TasksController().addTask(task);
-          },
-        ),
-      ),
-    );
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        if (kDebugMode)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: FloatingActionButton(
+              heroTag: null,
+              mini: true,
+              onPressed: () {
+                var task = Task.random();
+                ref.watch(taskList.notifier).add(task);
+                TasksController().addTask(task);
+              },
+              child: const Icon(
+                Icons.casino,
+                size: 25,
+              ),
+            ),
+          ),
         if (kDebugMode)
           Padding(
             padding: const EdgeInsets.only(bottom: 5),
@@ -48,7 +48,19 @@ class FloatingActionPanel extends StatelessWidget {
           ),
         FloatingActionButton(
           heroTag: null,
-          onPressed: () => toDetailsPage(context),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TaskDetailsPage(
+                  onSave: (task) {
+                    ref.watch(taskList.notifier).add(task);
+                    TasksController().addTask(task);
+                  },
+                ),
+              ),
+            );
+          },
           child: const Icon(
             Icons.add,
             size: 35,
