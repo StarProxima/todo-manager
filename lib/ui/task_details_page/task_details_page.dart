@@ -27,8 +27,12 @@ class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
   late TextEditingController controller = TextEditingController()
     ..text = widget.task?.text ?? '';
 
+  late final currentTask = StateProvider<Task>((ref) {
+    return task;
+  });
+
   void saveTask() {
-    final editTask = task.edit(text: controller.text);
+    final editTask = ref.read(currentTask).edit(text: controller.text);
     if (widget.task != null) {
       ref.read(taskList.notifier).edit(editTask);
     } else {
@@ -94,21 +98,39 @@ class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
               ),
               Align(
                 alignment: Alignment.centerLeft,
-                child: ImportanceDropdownButton(
-                  value: task.importance,
-                  onChanged: (value) {
-                    task = task.edit(importance: value);
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    return ImportanceDropdownButton(
+                      value: ref.watch(
+                        currentTask.select((value) => value.importance),
+                      ),
+                      onChanged: (value) {
+                        ref
+                            .read(currentTask.notifier)
+                            .update((state) => state.edit(importance: value));
+                      },
+                    );
                   },
                 ),
               ),
-              TaskDetailsDeadline(
-                value: task.deadline,
-                onChanged: (deadline) {
-                  if (deadline == null) {
-                    task = task.edit(deleteDeadline: true);
-                  } else {
-                    task = task.edit(deadline: deadline);
-                  }
+              Consumer(
+                builder: (context, ref, child) {
+                  return TaskDetailsDeadline(
+                    value: ref.watch(
+                      currentTask.select((value) => value.deadline),
+                    ),
+                    onChanged: (deadline) {
+                      ref.read(currentTask.notifier).update(
+                        (state) {
+                          if (deadline == null) {
+                            return state.edit(deleteDeadline: true);
+                          } else {
+                            return state.edit(deadline: deadline);
+                          }
+                        },
+                      );
+                    },
+                  );
                 },
               ),
               Align(

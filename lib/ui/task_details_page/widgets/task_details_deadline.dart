@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../generated/l10n.dart';
 
-class TaskDetailsDeadline extends StatefulWidget {
+class TaskDetailsDeadline extends ConsumerStatefulWidget {
   const TaskDetailsDeadline({
     Key? key,
     this.value,
@@ -14,17 +15,24 @@ class TaskDetailsDeadline extends StatefulWidget {
 
   final Function(DateTime?) onChanged;
   @override
-  State<TaskDetailsDeadline> createState() => _TaskDetailsDeadlineState();
+  ConsumerState<TaskDetailsDeadline> createState() =>
+      _TaskDetailsDeadlineState();
 }
 
-class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
-  late DateTime? value = widget.value;
+class _TaskDetailsDeadlineState extends ConsumerState<TaskDetailsDeadline> {
+  DateTime? savedDeadline;
 
-  late bool active = widget.value != null;
+  late final activeProvider = StateProvider<bool>((ref) {
+    return widget.value != null;
+  });
+
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
-    var textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = Theme.of(context).textTheme;
+    final deadline = widget.value ?? savedDeadline;
+    final active = ref.watch(activeProvider);
+    savedDeadline ??= widget.value;
     return Row(
       children: [
         InkWell(
@@ -33,15 +41,13 @@ class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
               ? () async {
                   var date = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: deadline ?? DateTime.now(),
                     firstDate: DateTime.now(),
                     lastDate: DateTime(2100),
                   );
                   if (date != null) {
-                    setState(() {
-                      value = date;
-                      widget.onChanged(value);
-                    });
+                    savedDeadline = date;
+                    widget.onChanged(date);
                   }
                 }
               : null,
@@ -56,11 +62,11 @@ class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
                 ),
                 if (active)
                   Text(
-                    value != null
-                        ? DateFormat('dd MMMM yyyy').format(value!)
+                    deadline != null
+                        ? DateFormat('dd MMMM yyyy').format(deadline)
                         : S.of(context).deadlineNotSet,
                     style: textTheme.bodyMedium!.copyWith(
-                      color: value != null
+                      color: deadline != null
                           ? theme.primaryColor
                           : textTheme.bodySmall!.color,
                     ),
@@ -73,12 +79,9 @@ class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
         Switch(
           value: active,
           onChanged: (value) {
-            setState(() {
-              active = value;
-            });
-
+            ref.read(activeProvider.notifier).state = value;
             if (value) {
-              widget.onChanged(this.value);
+              widget.onChanged(deadline);
             } else {
               widget.onChanged(null);
             }

@@ -12,7 +12,7 @@ class ImportanceDropdownButton extends StatefulWidget {
   }) : super(key: key);
 
   final Importance value;
-  final Function(Importance) onChanged;
+  final void Function(Importance) onChanged;
 
   @override
   State<ImportanceDropdownButton> createState() =>
@@ -20,11 +20,10 @@ class ImportanceDropdownButton extends StatefulWidget {
 }
 
 class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
-  late Importance value = widget.value;
-
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +38,7 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
 
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Importance>(
-                value: value,
+                value: widget.value,
                 icon: const SizedBox(),
                 borderRadius: const BorderRadius.all(Radius.circular(2)),
                 elevation: 3,
@@ -69,10 +68,7 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
                 ],
                 onChanged: (Importance? value) {
                   if (value != null) {
-                    setState(() {
-                      this.value = value;
-                      widget.onChanged(value);
-                    });
+                    widget.onChanged(value);
                   }
                 },
               ),
