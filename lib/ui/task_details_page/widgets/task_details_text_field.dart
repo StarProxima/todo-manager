@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../../generated/l10n.dart';
+part of '../task_details_page.dart';
 
 class TaskDetailsTextField extends StatelessWidget {
   const TaskDetailsTextField({

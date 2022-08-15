@@ -1,28 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:todo_manager/styles/app_theme.dart';
+part of '../task_details_page.dart';
 
-import '../../../generated/l10n.dart';
-import '../../../models/importance.dart';
-
-class ImportanceDropdownButton extends StatefulWidget {
+class ImportanceDropdownButton extends ConsumerWidget {
   const ImportanceDropdownButton({
     Key? key,
-    required this.value,
-    required this.onChanged,
   }) : super(key: key);
 
-  final Importance value;
-  final void Function(Importance) onChanged;
-
   @override
-  State<ImportanceDropdownButton> createState() =>
-      _ImportanceDropdownButtonState();
-}
-
-class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
+
+    final importance =
+        ref.watch(_currentTask.select((value) => value.importance));
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -38,7 +26,7 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
 
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Importance>(
-                value: widget.value,
+                value: importance,
                 icon: const SizedBox(),
                 borderRadius: const BorderRadius.all(Radius.circular(2)),
                 elevation: 3,
@@ -67,9 +55,9 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
                   ),
                 ],
                 onChanged: (Importance? value) {
-                  if (value != null) {
-                    widget.onChanged(value);
-                  }
+                  ref
+                      .read(_currentTask.notifier)
+                      .update((state) => state.edit(importance: value));
                 },
               ),
             ),

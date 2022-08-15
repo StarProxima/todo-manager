@@ -1,19 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-
-import '../../../generated/l10n.dart';
+part of '../task_details_page.dart';
 
 class TaskDetailsDeadline extends ConsumerStatefulWidget {
   const TaskDetailsDeadline({
     Key? key,
-    this.value,
-    required this.onChanged,
   }) : super(key: key);
 
-  final DateTime? value;
-
-  final Function(DateTime?) onChanged;
   @override
   ConsumerState<TaskDetailsDeadline> createState() =>
       _TaskDetailsDeadlineState();
@@ -23,16 +14,19 @@ class _TaskDetailsDeadlineState extends ConsumerState<TaskDetailsDeadline> {
   DateTime? savedDeadline;
 
   late final activeProvider = StateProvider<bool>((ref) {
-    return widget.value != null;
+    return false;
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = Theme.of(context).textTheme;
-    final deadline = widget.value ?? savedDeadline;
-    final active = ref.watch(activeProvider);
-    savedDeadline ??= widget.value;
+    final deadline =
+        ref.watch(_currentTask.select((value) => value.deadline)) ??
+            savedDeadline;
+    final active =
+        ref.watch(_currentTask.select((value) => value.deadline)) != null;
+    savedDeadline ??= deadline;
     return Row(
       children: [
         InkWell(
@@ -47,7 +41,9 @@ class _TaskDetailsDeadlineState extends ConsumerState<TaskDetailsDeadline> {
                   );
                   if (date != null) {
                     savedDeadline = date;
-                    widget.onChanged(date);
+                    ref
+                        .read(_currentTask.notifier)
+                        .update((state) => state.edit(deadline: date));
                   }
                 }
               : null,
@@ -79,11 +75,14 @@ class _TaskDetailsDeadlineState extends ConsumerState<TaskDetailsDeadline> {
         Switch(
           value: active,
           onChanged: (value) {
-            ref.read(activeProvider.notifier).state = value;
             if (value) {
-              widget.onChanged(deadline);
+              ref
+                  .read(_currentTask.notifier)
+                  .update((state) => state.edit(deadline: deadline));
             } else {
-              widget.onChanged(null);
+              ref
+                  .read(_currentTask.notifier)
+                  .update((state) => state.edit(deleteDeadline: null));
             }
           },
         ),
