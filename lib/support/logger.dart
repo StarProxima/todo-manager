@@ -2,6 +2,9 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:logger/logger.dart';
 
 final logger = Logger(
+  printer: PrettyPrinter(
+    methodCount: 8,
+  ),
   output: MyLogOutput(),
 );
 

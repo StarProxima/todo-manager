@@ -4,7 +4,6 @@ import 'dart:developer';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_manager/repositories/task_local_repository.dart';
 import 'package:todo_manager/repositories/task_remote_repository.dart';
-import '../models/response_data.dart';
 import '../models/task_filter.dart';
 import '../models/task_model.dart';
 import '../support/logger.dart';
@@ -33,17 +32,15 @@ final completedTaskCount = Provider<int>((ref) {
 
 class TaskList extends StateNotifier<List<Task>> {
   TaskList(super.state) {
-    _controller = _TaskController();
-    state = _controller.getLocalTasks();
     _init();
   }
+
   late final _TaskController _controller;
 
   Future<void> _init() async {
-    final tasks = await _controller.getRemoteTasks();
-    if (tasks != null) {
-      state = tasks;
-    }
+    _controller = _TaskController();
+    state = _controller.getLocalTasks();
+    state = await _controller.getTasks() ?? state;
   }
 
   Future<void> add(Task task) async {
@@ -51,15 +48,7 @@ class TaskList extends StateNotifier<List<Task>> {
       ...state,
       task,
     ];
-    final tasks = await _controller.addTask(task);
-    if (tasks != null) {
-      for (final task in state) {
-        if (!tasks.contains(task)) {
-          logger.e('DELETE TASK IN PATH REQUEST', 'ALERT');
-        }
-      }
-      state = tasks;
-    }
+    state = await _controller.addTask(task) ?? state;
   }
 
   Future<void> edit(Task task) async {
@@ -67,19 +56,13 @@ class TaskList extends StateNotifier<List<Task>> {
       for (final element in state)
         if (element.id == task.id) task else element,
     ];
-    final tasks = await _controller.editTask(task);
-    if (tasks != null) {
-      state = tasks;
-    }
+    state = await _controller.editTask(task) ?? state;
   }
 
   Future<void> remove(Task task) async {
     state = state.where((element) => element.id != task.id).toList();
 
-    final tasks = await _controller.deleteTask(task);
-    if (tasks != null) {
-      state = tasks;
-    }
+    state = await _controller.deleteTask(task) ?? state;
   }
 
   void removeWithoutNotifying(Task task) {
@@ -95,97 +78,95 @@ class _TaskController {
   final TaskRemoteRepository _remoteRepository = TaskRemoteRepository();
   final TaskLocalRepository _localRepository = TaskLocalRepository();
 
-  bool checkLocalChanges(List<Task> serverTasks) {
-    final tasks = _localRepository.getTasks();
-    bool localChanges = tasks.length != serverTasks.length;
+  bool checkChanges(List<Task> localTasks, List<Task> serverTasks) {
+    bool changes = localTasks.length != serverTasks.length;
 
-    if (!localChanges) {
-      for (int i = 0; i < tasks.length; i++) {
-        if (!tasks.contains(serverTasks[i])) {
-          localChanges = true;
+    if (!changes) {
+      for (int i = 0; i < localTasks.length; i++) {
+        if (!localTasks.contains(serverTasks[i])) {
+          changes = true;
           break;
         }
       }
     }
-    log(localChanges ? 'unsync data' : 'sync data');
+    log(changes ? 'unsync data' : 'sync data');
 
-    for (int i = 0; i < tasks.length; i++) {
-      for (int j = i + 1; j < tasks.length; j++) {
-        if (tasks[i].id == tasks[j].id) {
-          logger.e([tasks[i], tasks[j]]);
+    for (int i = 0; i < localTasks.length; i++) {
+      for (int j = i + 1; j < localTasks.length; j++) {
+        if (localTasks[i].id == localTasks[j].id) {
+          logger.e([localTasks[i], localTasks[j]]);
         }
       }
     }
 
-    return localChanges;
+    return changes;
   }
 
-  Future<ResponseData<List<Task>>> checkTasks(
-    ResponseData<List<Task>> response,
+  Future<List<Task>?> checkTasks(
+    List<Task> remoteTasks,
+    int revision,
   ) async {
-    if (response.isSuccesful) {
-      final tasks = _localRepository.getTasks();
-      bool localChanges = checkLocalChanges(response.data!);
+    final tasks = _localRepository.getTasks();
 
-      if (!localChanges) {
+    List<Task> noChanges() {
+      log('noChanges');
+      _localRepository.saveRevision(revision);
+      return remoteTasks;
+    }
+
+    List<Task> remoteChanges() {
+      log('remoteChanges');
+      _localRepository.saveTasks(remoteTasks);
+      _localRepository.saveRevision(revision);
+      checkChanges(tasks, remoteTasks);
+      logger.wtf(remoteTasks);
+      return remoteTasks;
+    }
+
+    Future<List<Task>?> localChanges() async {
+      log('localChanges');
+      var response = await _remoteRepository.patchTasks(
+        tasks,
+        _localRepository.getRevision(),
+      );
+      if (response.isSuccesful && _remoteRepository.activeRequests == 0) {
+        _localRepository.saveTasks(response.data!);
         _localRepository.saveRevision(
           jsonDecode(response.message!)['revision'],
         );
+        checkChanges(tasks, response.data!);
+        logger.e(tasks);
+        return response.data!;
+      }
+      return null;
+    }
 
-        return response.copyWith(data: tasks);
+    if (!checkChanges(tasks, remoteTasks)) {
+      return noChanges();
+    } else {
+      if (_remoteRepository.activeRequests == 0 &&
+          _localRepository.getRevision() < revision) {
+        return remoteChanges();
       } else {
-        log(
-          _remoteRepository.activeRequests.toString() +
-              (_localRepository.getRevision() <
-                      jsonDecode(response.message!)['revision'])
-                  .toString(),
-        );
-        if (_remoteRepository.activeRequests == 0 &&
-            _localRepository.getRevision() <
-                jsonDecode(response.message!)['revision']) {
-          _localRepository.saveTasks(response.data!);
-
-          _localRepository.saveRevision(
-            jsonDecode(response.message!)['revision'],
-          );
-          checkLocalChanges(response.data!);
-          logger.wtf(response.data!);
-          return response;
-        } else {
-          var patchResponse = await _remoteRepository.patchTasks(
-            tasks,
-            _localRepository.getRevision(),
-          );
-          if (patchResponse.isSuccesful &&
-              _remoteRepository.activeRequests == 0) {
-            _localRepository.saveTasks(patchResponse.data!);
-            logger.e(tasks);
-
-            _localRepository.saveRevision(
-              jsonDecode(patchResponse.message!)['revision'],
-            );
-            checkLocalChanges(patchResponse.data!);
-            return patchResponse.copyWith(data: tasks);
-          }
-        }
+        return localChanges();
       }
     }
-    return response.copyWith(isSuccesful: false);
   }
 
   List<Task> getLocalTasks() {
     return _localRepository.getTasks();
   }
 
-  Future<List<Task>?> getRemoteTasks() async {
+  Future<List<Task>?> getTasks() async {
     var response = await _remoteRepository.getTasks();
-    response = await checkTasks(response);
-    // logger.d(response.data);
     if (response.isSuccesful) {
-      return response.data!;
-    } else {
-      return null;
+      return await checkTasks(
+        response.data!,
+        jsonDecode(response.message!)['revision'],
+      );
     }
+
+    return null;
   }
 
   Future<List<Task>?> addTask(Task task) async {
@@ -202,7 +183,7 @@ class _TaskController {
       );
     } else if (response.status == 400) {
       logger.w(response);
-      return await getRemoteTasks();
+      return await getTasks();
     }
     return _localRepository.getTasks();
   }
@@ -221,7 +202,7 @@ class _TaskController {
       );
     } else if (response.status == 400) {
       logger.w(response);
-      return await getRemoteTasks();
+      return await getTasks();
     }
     return _localRepository.getTasks();
   }
@@ -240,7 +221,7 @@ class _TaskController {
       );
     } else if (response.status == 400) {
       logger.i(response);
-      return await getRemoteTasks();
+      return await getTasks();
     }
     return _localRepository.getTasks();
   }
