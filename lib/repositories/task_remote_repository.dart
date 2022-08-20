@@ -4,7 +4,7 @@ import '../../models/response_data.dart';
 import '../../models/task_model.dart';
 import 'repository.dart';
 
-class TaskRepository {
+class TaskRemoteRepository {
   static const String baseUrl = 'https://beta.mrdekk.ru/todobackend';
 
   int activeRequests = 0;

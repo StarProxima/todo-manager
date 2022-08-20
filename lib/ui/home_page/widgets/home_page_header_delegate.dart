@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_manager/models/task_filter.dart';
@@ -23,7 +21,6 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
     double percentOfShrinkOffset = t > 0 ? t : 0;
     var theme = Theme.of(context);
     var textTheme = Theme.of(context).textTheme;
-    log('HomePageHeaderDelegate');
     return Material(
       color: theme.scaffoldBackgroundColor,
       elevation:

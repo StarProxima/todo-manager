@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_manager/ui/home_page/widgets/add_task_card.dart';
@@ -32,7 +30,6 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    log('HomePage');
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(

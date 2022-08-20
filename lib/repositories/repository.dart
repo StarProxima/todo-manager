@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 
@@ -13,6 +14,7 @@ abstract class Repository {
     String? body,
   }) async {
     try {
+      log('post');
       http.Response response = await http
           .post(
             Uri.parse(url),
@@ -32,6 +34,7 @@ abstract class Repository {
     Map<String, String>? headers,
   }) async {
     try {
+      log('get');
       http.Response response = await http
           .get(
             Uri.parse(url),
@@ -51,6 +54,7 @@ abstract class Repository {
     Map<String, String>? headers,
   }) async {
     try {
+      log('put');
       http.Response response = await http
           .put(
             Uri.parse(url),
