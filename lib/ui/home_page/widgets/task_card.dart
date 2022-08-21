@@ -40,7 +40,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   );
 
   final resizeDuration = const Duration(milliseconds: 300);
-  final movementDuration = const Duration(milliseconds: 300);
+  final movementDuration = const Duration(milliseconds: 150);
 
   @override
   Widget build(BuildContext context) {

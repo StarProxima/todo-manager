@@ -100,18 +100,30 @@ class _HomePageState extends ConsumerState<HomePage>
 
                             final task = tasks[index];
                             if (!lastTasksID.contains(task.id)) {
-                              return SlideTransition(
-                                position: Tween<Offset>(
-                                  begin: const Offset(0, 1),
-                                  end: const Offset(0, 0),
-                                ).animate(
-                                  CurvedAnimation(
+                              return FadeTransition(
+                                opacity: CurvedAnimation(
+                                  parent: controller,
+                                  curve: Curves.easeInOutCubic,
+                                ),
+                                child: SizeTransition(
+                                  sizeFactor: CurvedAnimation(
                                     parent: controller,
                                     curve: Curves.easeOutBack,
                                   ),
-                                ),
-                                child: TaskCard(
-                                  task: task,
+                                  child: SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: const Offset(0, 1),
+                                      end: const Offset(0, 0),
+                                    ).animate(
+                                      CurvedAnimation(
+                                        parent: controller,
+                                        curve: Curves.easeOutBack,
+                                      ),
+                                    ),
+                                    child: TaskCard(
+                                      task: task,
+                                    ),
+                                  ),
                                 ),
                               );
                             } else {
