@@ -40,9 +40,9 @@ class TaskCard extends ConsumerWidget {
     var theme = Theme.of(context);
 
     Future<void> removeTaskAsync() async {
-      final tasksList = ref.read(taskList.notifier);
+      final tasksList = ref.read(filteredDismissableTaskList.notifier);
       await Future.delayed(resizeDuration);
-      tasksList.removeWithoutNotifying(task);
+      tasksList.dismiss(task, resizeDuration);
     }
 
     Future<void> editTaskAsync() async {

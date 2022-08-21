@@ -56,7 +56,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 clipBehavior: Clip.antiAlias,
                 child: Consumer(
                   builder: (context, ref, child) {
-                    List<Task> tasks = ref.watch(filteredTaskList);
+                    List<Task> tasks = ref.watch(filteredDismissableTaskList);
                     return ListView.builder(
                       shrinkWrap: true,
                       primary: false,

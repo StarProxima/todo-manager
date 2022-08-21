@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -30,6 +31,46 @@ final completedTaskCount = Provider<int>((ref) {
   return ref.watch(taskList).where((task) => task.done).length;
 });
 
+//This provider is not updated immediately when a dismiss.
+//This is necessary so that the Dismissed widgets with multiple dismissed do not break when rebuilding.
+final filteredDismissableTaskList =
+    StateNotifierProvider<FilteredDismissableTaskList, List<Task>>(
+  (ref) {
+    return FilteredDismissableTaskList(ref);
+  },
+);
+
+class FilteredDismissableTaskList extends StateNotifier<List<Task>> {
+  StateNotifierProviderRef ref;
+  bool lastActionIsNotDismiss = true;
+  Timer? timer;
+
+  FilteredDismissableTaskList(
+    this.ref,
+  ) : super(ref.read(filteredTaskList)) {
+    ref.listen(filteredTaskList, (t0, t1) {
+      if (lastActionIsNotDismiss) {
+        state = ref.read(filteredTaskList);
+      } else {
+        lastActionIsNotDismiss = true;
+      }
+    });
+  }
+
+  void dismiss(Task task, Duration duration) {
+    timer?.cancel();
+    lastActionIsNotDismiss = false;
+    ref.read(taskList.notifier).remove(task);
+
+    //Updating state in order to avoid a possible error:
+    //A dismissed Dismissible widget is still part of the tree.
+    timer = Timer(duration + const Duration(milliseconds: 50), () {
+      state = ref.read(filteredTaskList);
+      timer?.cancel();
+    });
+  }
+}
+
 class TaskList extends StateNotifier<List<Task>> {
   TaskList(super.state) {
     _init();
@@ -48,7 +89,11 @@ class TaskList extends StateNotifier<List<Task>> {
       ...state,
       task,
     ];
-    state = await _controller.addTask(task) ?? state;
+    final tasks = await _controller.addTask(task);
+    if (tasks != null) {
+      log('tasks != null');
+      state = tasks;
+    }
   }
 
   Future<void> edit(Task task) async {
@@ -63,14 +108,6 @@ class TaskList extends StateNotifier<List<Task>> {
     state = state.where((element) => element.id != task.id).toList();
 
     state = await _controller.deleteTask(task) ?? state;
-  }
-
-  void removeWithoutNotifying(Task task) {
-    // TODO: Возможно, найти лучшее решение.
-    //Это нужно, чтобы ListView в HomePage не обновлялся при удалении,
-    //иначе ломается Dismissible и нельзя удалить несколько тасков одновременно.
-    state.remove(task);
-    _controller.deleteTask(task);
   }
 }
 
@@ -89,6 +126,7 @@ class _TaskController {
         }
       }
     }
+
     log(changes ? 'unsync data' : 'sync data');
 
     for (int i = 0; i < localTasks.length; i++) {
@@ -185,7 +223,7 @@ class _TaskController {
       logger.w(response);
       return await getTasks();
     }
-    return _localRepository.getTasks();
+    return null;
   }
 
   Future<List<Task>?> editTask(Task task) async {
@@ -204,7 +242,7 @@ class _TaskController {
       logger.w(response);
       return await getTasks();
     }
-    return _localRepository.getTasks();
+    return null;
   }
 
   Future<List<Task>?> deleteTask(Task task) async {
@@ -223,6 +261,6 @@ class _TaskController {
       logger.i(response);
       return await getTasks();
     }
-    return _localRepository.getTasks();
+    return null;
   }
 }
