@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/styles/app_theme.dart';
+import '../../../styles/app_theme.dart';
 
 import '../../../generated/l10n.dart';
 import '../../../models/importance.dart';

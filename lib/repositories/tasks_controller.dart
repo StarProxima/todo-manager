@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:todo_manager/repositories/task_local_repository.dart';
-import 'package:todo_manager/repositories/task_remote_repository.dart';
+import 'task_local_repository.dart';
+import 'task_remote_repository.dart';
 import '../models/task_filter.dart';
 import '../models/task_model.dart';
 import '../support/logger.dart';
@@ -33,19 +33,19 @@ final completedTaskCount = Provider<int>((ref) {
 
 //This provider is not updated immediately when a dismiss.
 //This is necessary so that the Dismissed widgets with multiple dismissed do not break when rebuilding.
-final filteredDismissableTaskList =
-    StateNotifierProvider<FilteredDismissableTaskList, List<Task>>(
+final filteredDismissibleTaskList =
+    StateNotifierProvider<FilteredDismissibleTaskList, List<Task>>(
   (ref) {
-    return FilteredDismissableTaskList(ref);
+    return FilteredDismissibleTaskList(ref);
   },
 );
 
-class FilteredDismissableTaskList extends StateNotifier<List<Task>> {
+class FilteredDismissibleTaskList extends StateNotifier<List<Task>> {
   StateNotifierProviderRef ref;
   bool lastActionIsNotDismiss = true;
   Timer? timer;
 
-  FilteredDismissableTaskList(
+  FilteredDismissibleTaskList(
     this.ref,
   ) : super(ref.read(filteredTaskList)) {
     ref.listen(filteredTaskList, (t0, t1) {

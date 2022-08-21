@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:todo_manager/support/hive.dart';
-import 'package:todo_manager/support/settings.dart';
+import 'support/hive.dart';
+import 'support/settings.dart';
 import 'generated/l10n.dart';
 import 'styles/app_theme.dart';
 import 'support/error_handler.dart';

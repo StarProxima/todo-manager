@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_manager/repositories/tasks_controller.dart';
-import 'package:todo_manager/styles/app_icons.dart';
-import 'package:todo_manager/styles/app_theme.dart';
-import 'package:todo_manager/ui/home_page/widgets/task_checkbox.dart';
-import 'package:todo_manager/ui/task_details_page/task_details_page.dart';
+import '../../../repositories/tasks_controller.dart';
+import '../../../styles/app_icons.dart';
+import '../../../styles/app_theme.dart';
+import 'task_checkbox.dart';
+import '../../task_details_page/task_details_page.dart';
 
 import '../../../models/importance.dart';
 import '../../../models/task_model.dart';
@@ -46,7 +46,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     Future<void> removeTaskAsync() async {
-      final tasksList = ref.read(filteredDismissableTaskList.notifier);
+      final tasksList = ref.read(filteredDismissibleTaskList.notifier);
       await Future.delayed(resizeDuration);
       tasksList.dismiss(widget.task, resizeDuration);
     }

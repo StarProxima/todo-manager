@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:todo_manager/repositories/tasks_controller.dart';
-import 'package:todo_manager/ui/task_details_page/widgets/task_details_deadline.dart';
+import '../../repositories/tasks_controller.dart';
+import 'widgets/task_details_deadline.dart';
 
 import '../../models/task_model.dart';
 import 'widgets/importance_dropdown_button.dart';

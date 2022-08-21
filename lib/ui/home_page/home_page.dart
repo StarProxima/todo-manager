@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:todo_manager/ui/home_page/widgets/add_task_card.dart';
+import 'widgets/add_task_card.dart';
 
 import '../../models/task_model.dart';
 import '../../repositories/tasks_controller.dart';
@@ -56,7 +56,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 clipBehavior: Clip.antiAlias,
                 child: Consumer(
                   builder: (context, ref, child) {
-                    List<Task> tasks = ref.watch(filteredDismissableTaskList);
+                    List<Task> tasks = ref.watch(filteredDismissibleTaskList);
                     return ListView.builder(
                       shrinkWrap: true,
                       primary: false,
