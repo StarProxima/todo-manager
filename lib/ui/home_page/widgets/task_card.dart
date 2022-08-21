@@ -11,17 +11,14 @@ import '../../task_details_page/task_details_page.dart';
 import '../../../models/importance.dart';
 import '../../../models/task_model.dart';
 
-final _currentTask = Provider<Task>((ref) {
+final currentTaskInTaskCard = Provider<Task>((ref) {
   throw UnimplementedError();
 });
 
 class TaskCard extends ConsumerStatefulWidget {
   const TaskCard({
     Key? key,
-    required this.task,
   }) : super(key: key);
-
-  final Task task;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -40,35 +37,37 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   );
 
   final resizeDuration = const Duration(milliseconds: 300);
-  final movementDuration = const Duration(milliseconds: 150);
+  final movementDuration = const Duration(milliseconds: 200);
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    final filter = ref.read(taskFilter);
+    final task = ref.watch(currentTaskInTaskCard);
 
     Future<void> removeTaskAsync() async {
       final controller = ref.read(dismissibleTaskListController.notifier);
+
       await Future.delayed(resizeDuration);
-      controller.dismissDelete(widget.task);
+
+      controller.dismissDelete(task);
     }
 
     Future<void> editTaskAsync() async {
-      final task = widget.task.edit(done: !widget.task.done);
-      if (filter == TaskFilter.uncompleted) {
+      final editedTask = task.edit(done: !task.done);
+      if (ref.read(taskFilter) == TaskFilter.uncompleted) {
         final controller = ref.read(dismissibleTaskListController.notifier);
+
         await Future.delayed(resizeDuration);
-        controller.dismissEdit(task);
+        controller.dismissEdit(editedTask);
       } else {
         final taskProvider = ref.read(taskList.notifier);
         await Future.delayed(movementDuration);
-        taskProvider.edit(task);
+        taskProvider.edit(editedTask);
       }
     }
 
     return Dismissible(
-      key: ValueKey(widget.task.id),
+      key: widget.key ?? ValueKey(task.id),
       resizeDuration: resizeDuration,
       movementDuration: movementDuration,
       onUpdate: (DismissUpdateDetails details) {
@@ -89,7 +88,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
             return true;
           case DismissDirection.startToEnd:
             editTaskAsync();
-            return filter == TaskFilter.uncompleted;
+            return ref.read(taskFilter) == TaskFilter.uncompleted;
           default:
             return false;
         }
@@ -101,7 +100,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
           children: [
             Consumer(
               builder: (context, ref, child) {
-                return AppDismissIcon(
+                return _AppDismissIcon(
                   direction: DismissDirection.startToEnd,
                   progress:
                       ref.watch(dismissProgress(DismissDirection.startToEnd)),
@@ -119,7 +118,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
           children: [
             Consumer(
               builder: (context, ref, child) {
-                return AppDismissIcon(
+                return _AppDismissIcon(
                   direction: DismissDirection.endToStart,
                   progress:
                       ref.watch(dismissProgress(DismissDirection.endToStart)),
@@ -130,23 +129,17 @@ class _TaskCardState extends ConsumerState<TaskCard> {
           ],
         ),
       ),
-      child: ProviderScope(
-        //Riverpod принял ислам
-        overrides: [
-          _currentTask.overrideWithValue(widget.task),
-        ],
-        child: const _TaskCard(),
-      ),
+      child: const _TaskCardView(),
     );
   }
 }
 
-class _TaskCard extends ConsumerWidget {
-  const _TaskCard({Key? key}) : super(key: key);
+class _TaskCardView extends ConsumerWidget {
+  const _TaskCardView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final task = ref.watch(_currentTask);
+    final task = ref.watch(currentTaskInTaskCard);
 
     final crossedOut = Theme.of(context).extension<AppTextStyle>()!.crossedOut!;
     return GestureDetector(
@@ -243,8 +236,8 @@ class _TaskCard extends ConsumerWidget {
   }
 }
 
-class AppDismissIcon extends StatelessWidget {
-  const AppDismissIcon({
+class _AppDismissIcon extends StatelessWidget {
+  const _AppDismissIcon({
     Key? key,
     required this.direction,
     required this.progress,

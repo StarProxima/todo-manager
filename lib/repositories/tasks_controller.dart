@@ -15,16 +15,26 @@ final taskList = StateNotifierProvider<TaskList, List<Task>>((ref) {
   return TaskList([]);
 });
 
+List<Task> _lastTasks = [];
+List<Task> lastTasks = [];
+
 final filteredTaskList = Provider<List<Task>>((ref) {
   final filter = ref.watch(taskFilter);
   final tasks = ref.watch(taskList);
 
+  final List<Task> filteredTask;
   switch (filter) {
     case TaskFilter.all:
-      return tasks;
+      filteredTask = tasks;
+      break;
     case TaskFilter.uncompleted:
-      return tasks.where((element) => !element.done).toList();
+      filteredTask = tasks.where((element) => !element.done).toList();
   }
+  if (!identical(filteredTask, _lastTasks)) {
+    lastTasks = _lastTasks;
+    _lastTasks = filteredTask;
+  }
+  return filteredTask;
 });
 
 final completedTaskCount = Provider<int>((ref) {

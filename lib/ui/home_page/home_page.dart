@@ -40,8 +40,6 @@ class _HomePageState extends ConsumerState<HomePage>
     super.initState();
   }
 
-  late List<String> lastTasksID = tasksToId(ref.read(filteredTaskList));
-
   List<String> tasksToId(List<Task> list) {
     return List.generate(list.length, (index) {
       return list[index].id;
@@ -81,25 +79,27 @@ class _HomePageState extends ConsumerState<HomePage>
                     child: Consumer(
                       builder: (context, ref, child) {
                         ref.watch(appThemeMode);
+
                         ref.watch(dismissibleTaskListController);
                         List<Task> tasks = ref.read(filteredTaskList);
                         controller.reset();
                         controller.forward();
-
                         return ListView.builder(
                           shrinkWrap: true,
                           primary: false,
                           itemCount: tasks.length + 1,
                           itemBuilder: (context, index) {
                             if (index == tasks.length) {
-                              lastTasksID = tasksToId(tasks);
                               return AddTaskCard(
                                 onAddTask: onAddTask,
                               );
                             }
 
                             final task = tasks[index];
-                            if (!lastTasksID.contains(task.id)) {
+                            // log(
+                            //   tasksToId(lastTasks).contains(task.id).toString(),
+                            // );
+                            if (!tasksToId(lastTasks).contains(task.id)) {
                               return FadeTransition(
                                 opacity: CurvedAnimation(
                                   parent: controller,
@@ -120,14 +120,23 @@ class _HomePageState extends ConsumerState<HomePage>
                                         curve: Curves.easeOutBack,
                                       ),
                                     ),
-                                    child: TaskCard(
-                                      task: task,
+                                    child: ProviderScope(
+                                      overrides: [
+                                        currentTaskInTaskCard
+                                            .overrideWithValue(task)
+                                      ],
+                                      child: const TaskCard(),
                                     ),
                                   ),
                                 ),
                               );
                             } else {
-                              return TaskCard(task: task);
+                              return ProviderScope(
+                                overrides: [
+                                  currentTaskInTaskCard.overrideWithValue(task)
+                                ],
+                                child: const TaskCard(),
+                              );
                             }
                           },
                         );
