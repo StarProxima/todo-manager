@@ -31,43 +31,37 @@ final completedTaskCount = Provider<int>((ref) {
   return ref.watch(taskList).where((task) => task.done).length;
 });
 
-//This provider is not updated immediately when a dismiss.
-//This is necessary so that the Dismissed widgets with multiple dismissed do not break when rebuilding.
-final filteredDismissibleTaskList =
-    StateNotifierProvider<FilteredDismissibleTaskList, List<Task>>(
+///This provider is not updated when a dismiss in taskList.
+///
+///This is necessary so that the Dismissed widgets with multiple dismissed do not break when rebuilding.
+///
+///Does not provide data.
+final dismissibleTaskListController =
+    StateNotifierProvider<DismissibleTaskListController, bool>(
   (ref) {
-    return FilteredDismissibleTaskList(ref);
+    return DismissibleTaskListController(ref);
   },
 );
 
-class FilteredDismissibleTaskList extends StateNotifier<List<Task>> {
+class DismissibleTaskListController extends StateNotifier<bool> {
   StateNotifierProviderRef ref;
   bool lastActionIsNotDismiss = true;
-  Timer? timer;
 
-  FilteredDismissibleTaskList(
+  DismissibleTaskListController(
     this.ref,
-  ) : super(ref.read(filteredTaskList)) {
+  ) : super(false) {
     ref.listen(filteredTaskList, (t0, t1) {
       if (lastActionIsNotDismiss) {
-        state = ref.read(filteredTaskList);
+        state = !state;
       } else {
         lastActionIsNotDismiss = true;
       }
     });
   }
 
-  void dismiss(Task task, Duration duration) {
-    timer?.cancel();
+  void dismiss(Task task) {
     lastActionIsNotDismiss = false;
     ref.read(taskList.notifier).remove(task);
-
-    //Updating state in order to avoid a possible error:
-    //A dismissed Dismissible widget is still part of the tree.
-    timer = Timer(duration + const Duration(milliseconds: 250), () {
-      state = ref.read(filteredTaskList);
-      timer?.cancel();
-    });
   }
 }
 

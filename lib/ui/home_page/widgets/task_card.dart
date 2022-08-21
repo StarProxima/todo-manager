@@ -46,9 +46,9 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     Future<void> removeTaskAsync() async {
-      final tasksList = ref.read(filteredDismissibleTaskList.notifier);
+      final tasksList = ref.read(dismissibleTaskListController.notifier);
       await Future.delayed(resizeDuration);
-      tasksList.dismiss(widget.task, resizeDuration);
+      tasksList.dismiss(widget.task);
     }
 
     Future<void> editTaskAsync() async {
