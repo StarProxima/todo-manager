@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../main.dart';
 import '../../../models/task_model.dart';
 import '../../../repositories/tasks_controller.dart';
 import '../../task_details_page/task_details_page.dart';
@@ -15,6 +16,21 @@ class FloatingActionPanel extends ConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        //if (kDebugMode)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: FloatingActionButton(
+            heroTag: null,
+            mini: true,
+            onPressed: () {
+              ref.watch(appThemeMode.notifier).switchTheme();
+            },
+            child: const Icon(
+              Icons.color_lens,
+              size: 25,
+            ),
+          ),
+        ),
         //if (kDebugMode)
         Padding(
           padding: const EdgeInsets.only(bottom: 5),

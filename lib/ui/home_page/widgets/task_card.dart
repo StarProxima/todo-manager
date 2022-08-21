@@ -84,7 +84,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
             return false;
         }
       },
-      background: Container(
+      background: ColoredBox(
         color: AppColors.green,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -102,7 +102,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
           ],
         ),
       ),
-      secondaryBackground: Container(
+      secondaryBackground: ColoredBox(
         color: theme.errorColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -137,6 +137,8 @@ class _TaskCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final task = ref.watch(_currentTask);
+
+    final crossedOut = Theme.of(context).extension<AppTextStyle>()!.crossedOut!;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -172,7 +174,7 @@ class _TaskCard extends ConsumerWidget {
                     overflow: TextOverflow.ellipsis,
                     text: TextSpan(
                       style: task.done
-                          ? AppTextStyle.crossedOut
+                          ? crossedOut
                           : Theme.of(context).textTheme.bodyMedium,
                       children: [
                         if (task.importance == Importance.important)
@@ -182,7 +184,7 @@ class _TaskCard extends ConsumerWidget {
                               child: AppSvgIcons(
                                 AppSvgIcon.important,
                                 color: task.done
-                                    ? AppTextStyle.crossedOut.color
+                                    ? crossedOut.color
                                     : AppColors.red,
                               ),
                             ),
@@ -193,7 +195,7 @@ class _TaskCard extends ConsumerWidget {
                               padding: const EdgeInsets.only(right: 3),
                               child: AppSvgIcons(
                                 AppSvgIcon.low,
-                                color: AppTextStyle.crossedOut.color,
+                                color: crossedOut.color,
                               ),
                             ),
                           ),
@@ -210,7 +212,9 @@ class _TaskCard extends ConsumerWidget {
                     child: Text(
                       DateFormat('dd MMMM yyyy', 'ru_RU')
                           .format(task.deadline!),
-                      style: Theme.of(context).textTheme.labelSmall,
+                      style: Theme.of(context)
+                          .extension<AppTextStyle>()!
+                          .subtitle!,
                       overflow: TextOverflow.ellipsis,
                     ),
                   )
@@ -219,14 +223,8 @@ class _TaskCard extends ConsumerWidget {
           ),
           const Padding(
             padding: EdgeInsets.only(top: 15, left: 14, right: 18),
-            child: IconButton(
-              onPressed: null,
-              padding: EdgeInsets.zero,
-              constraints: BoxConstraints(),
-              icon: Icon(
-                Icons.info_outline,
-                color: Color(0x4d000000),
-              ),
+            child: Icon(
+              Icons.info_outline,
             ),
           ),
         ],

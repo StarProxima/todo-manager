@@ -30,11 +30,23 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+final appThemeMode = StateNotifierProvider<AppThemeMode, ThemeMode>((ref) {
+  return AppThemeMode(ThemeMode.light);
+});
+
+class AppThemeMode extends StateNotifier<ThemeMode> {
+  AppThemeMode(super.state);
+
+  void switchTheme() {
+    state = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+  }
+}
+
+class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       localizationsDelegates: const [
         S.delegate,
@@ -43,7 +55,9 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: S.delegate.supportedLocales,
-      theme: AppTheme.themeData,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ref.watch(appThemeMode),
       home: const HomePage(),
     );
   }

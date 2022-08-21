@@ -4,6 +4,7 @@ import '../../../models/task_filter.dart';
 import '../../../repositories/tasks_controller.dart';
 
 import '../../../generated/l10n.dart';
+import '../../../styles/app_theme.dart';
 
 class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
   HomePageHeaderDelegate();
@@ -19,8 +20,14 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
     double diff = expandedHeight - kToolbarHeight;
     double t = (diff - shrinkOffset) / diff;
     double percentOfShrinkOffset = t > 0 ? t : 0;
-    var theme = Theme.of(context);
-    var textTheme = Theme.of(context).textTheme;
+
+    double sto =
+        percentOfShrinkOffset - (0.15 * (1 / percentOfShrinkOffset - 1));
+    double subtitleOpacity = sto > 0 ? sto : 0;
+
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final subtitle = theme.extension<AppTextStyle>()!.subtitle!;
     return Material(
       color: theme.scaffoldBackgroundColor,
       elevation:
@@ -57,14 +64,14 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                         padding:
                             EdgeInsets.only(top: 6 * percentOfShrinkOffset),
                         child: Opacity(
-                          opacity: percentOfShrinkOffset,
+                          opacity: subtitleOpacity,
                           child: Consumer(
                             builder: (context, ref, child) => Text(
                               S.of(context).homePageSubTitle(
                                     ref.watch(completedTaskCount),
                                   ),
-                              style: textTheme.bodySmall!.copyWith(
-                                fontSize: 20 * percentOfShrinkOffset,
+                              style: subtitle.copyWith(
+                                fontSize: 16 * percentOfShrinkOffset,
                               ),
                             ),
                           ),
