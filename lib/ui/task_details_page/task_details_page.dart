@@ -42,7 +42,7 @@ class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
   }
 
   void deleteTask() {
-    ref.read(taskList.notifier).remove(task);
+    ref.read(taskList.notifier).delete(task);
     Navigator.pop(context);
   }
 

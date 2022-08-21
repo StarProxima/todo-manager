@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import '../../../models/task_filter.dart';
 import '../../../repositories/tasks_controller.dart';
 import '../../../styles/app_icons.dart';
 import '../../../styles/app_theme.dart';
@@ -32,7 +33,6 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   //Легко сказать — «мы должны были сделать вот так» уже после того, как всё закончилось.
   //Однако никто не знает, чем обернётся твой выбор и сколькими жертвами,
   //пока его не сделаешь. А ты должен его сделать!
-
   final dismissProgress = StateProvider.family<double, DismissDirection>(
     (ref, direction) {
       return 0;
@@ -46,15 +46,22 @@ class _TaskCardState extends ConsumerState<TaskCard> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     Future<void> removeTaskAsync() async {
-      final tasksList = ref.read(dismissibleTaskListController.notifier);
+      final controller = ref.read(dismissibleTaskListController.notifier);
       await Future.delayed(resizeDuration);
-      tasksList.dismiss(widget.task);
+      controller.dismissDelete(widget.task);
     }
 
     Future<void> editTaskAsync() async {
-      final tasksList = ref.read(taskList.notifier);
-      await Future.delayed(movementDuration);
-      tasksList.edit(widget.task.edit(done: true));
+      final task = widget.task.edit(done: !widget.task.done);
+      if (ref.read(taskFilter) == TaskFilter.uncompleted) {
+        final controller = ref.read(dismissibleTaskListController.notifier);
+        await Future.delayed(resizeDuration);
+        controller.dismissEdit(task);
+      } else {
+        final taskProvider = ref.read(taskList.notifier);
+        await Future.delayed(movementDuration);
+        taskProvider.edit(task);
+      }
     }
 
     return Dismissible(
@@ -79,7 +86,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
             return true;
           case DismissDirection.startToEnd:
             editTaskAsync();
-            return false;
+            return ref.read(taskFilter) == TaskFilter.uncompleted;
           default:
             return false;
         }

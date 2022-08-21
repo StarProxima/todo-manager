@@ -21,7 +21,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void onDeleteTask(task) async {
-    ref.read(taskList.notifier).remove(task);
+    ref.read(taskList.notifier).delete(task);
   }
 
   void onAddTask(task) async {

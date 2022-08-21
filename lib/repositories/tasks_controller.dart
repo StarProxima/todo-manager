@@ -59,9 +59,14 @@ class DismissibleTaskListController extends StateNotifier<bool> {
     });
   }
 
-  void dismiss(Task task) {
+  void dismissDelete(Task task) {
     lastActionIsNotDismiss = false;
-    ref.read(taskList.notifier).remove(task);
+    ref.read(taskList.notifier).delete(task);
+  }
+
+  void dismissEdit(Task task) {
+    lastActionIsNotDismiss = false;
+    ref.read(taskList.notifier).edit(task);
   }
 }
 
@@ -98,7 +103,7 @@ class TaskList extends StateNotifier<List<Task>> {
     state = await _controller.editTask(task) ?? state;
   }
 
-  Future<void> remove(Task task) async {
+  Future<void> delete(Task task) async {
     state = state.where((element) => element.id != task.id).toList();
 
     state = await _controller.deleteTask(task) ?? state;
