@@ -86,66 +86,64 @@ class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
+        child: ListView(
           padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
-          child: Column(
-            children: [
-              TaskDetailsTextField(
-                controller: controller,
-              ),
-              const SizedBox(
-                height: 28,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Consumer(
-                  builder: (context, ref, child) {
-                    return ImportanceDropdownButton(
-                      value: ref.watch(
-                        currentTask.select((value) => value.importance),
-                      ),
-                      onChanged: (value) {
-                        ref
-                            .read(currentTask.notifier)
-                            .update((state) => state.edit(importance: value));
-                      },
-                    );
-                  },
-                ),
-              ),
-              Consumer(
+          children: [
+            TaskDetailsTextField(
+              controller: controller,
+            ),
+            const SizedBox(
+              height: 28,
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Consumer(
                 builder: (context, ref, child) {
-                  return TaskDetailsDeadline(
+                  return ImportanceDropdownButton(
                     value: ref.watch(
-                      currentTask.select((value) => value.deadline),
+                      currentTask.select((value) => value.importance),
                     ),
-                    onChanged: (deadline) {
-                      ref.read(currentTask.notifier).update(
-                        (state) {
-                          if (deadline == null) {
-                            return state.edit(deleteDeadline: true);
-                          } else {
-                            return state.edit(deadline: deadline);
-                          }
-                        },
-                      );
+                    onChanged: (value) {
+                      ref
+                          .read(currentTask.notifier)
+                          .update((state) => state.edit(importance: value));
                     },
                   );
                 },
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  icon: const Icon(Icons.delete),
-                  label: Text(S.of(context).deleteTaskButton),
-                  style: TextButton.styleFrom(
-                    primary: theme.errorColor,
+            ),
+            Consumer(
+              builder: (context, ref, child) {
+                return TaskDetailsDeadline(
+                  value: ref.watch(
+                    currentTask.select((value) => value.deadline),
                   ),
-                  onPressed: widget.task != null ? deleteTask : null,
+                  onChanged: (deadline) {
+                    ref.read(currentTask.notifier).update(
+                      (state) {
+                        if (deadline == null) {
+                          return state.edit(deleteDeadline: true);
+                        } else {
+                          return state.edit(deadline: deadline);
+                        }
+                      },
+                    );
+                  },
+                );
+              },
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                icon: const Icon(Icons.delete),
+                label: Text(S.of(context).deleteTaskButton),
+                style: TextButton.styleFrom(
+                  primary: theme.errorColor,
                 ),
+                onPressed: widget.task != null ? deleteTask : null,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

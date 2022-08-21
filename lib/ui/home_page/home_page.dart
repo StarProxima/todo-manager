@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../main.dart';
@@ -18,7 +16,8 @@ class HomePage extends ConsumerStatefulWidget {
   ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends ConsumerState<HomePage>
+    with TickerProviderStateMixin {
   void onEditTask(task) async {
     ref.read(taskList.notifier).edit(task);
   }
@@ -29,6 +28,24 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void onAddTask(task) async {
     ref.read(taskList.notifier).add(task);
+  }
+
+  late final controller = AnimationController(
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  late List<String> lastTasksID = tasksToId(ref.read(filteredTaskList));
+
+  List<String> tasksToId(List<Task> list) {
+    return List.generate(list.length, (index) {
+      return list[index].id;
+    });
   }
 
   @override
@@ -66,23 +83,40 @@ class _HomePageState extends ConsumerState<HomePage> {
                         ref.watch(appThemeMode);
                         ref.watch(dismissibleTaskListController);
                         List<Task> tasks = ref.read(filteredTaskList);
-                        log('message');
+                        controller.reset();
+                        controller.forward();
+
                         return ListView.builder(
                           shrinkWrap: true,
                           primary: false,
                           itemCount: tasks.length + 1,
                           itemBuilder: (context, index) {
                             if (index == tasks.length) {
+                              lastTasksID = tasksToId(tasks);
                               return AddTaskCard(
                                 onAddTask: onAddTask,
                               );
                             }
 
                             final task = tasks[index];
-
-                            return TaskCard(
-                              task: task,
-                            );
+                            if (!lastTasksID.contains(task.id)) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(0, 1),
+                                  end: const Offset(0, 0),
+                                ).animate(
+                                  CurvedAnimation(
+                                    parent: controller,
+                                    curve: Curves.easeOutBack,
+                                  ),
+                                ),
+                                child: TaskCard(
+                                  task: task,
+                                ),
+                              );
+                            } else {
+                              return TaskCard(task: task);
+                            }
                           },
                         );
                       },
