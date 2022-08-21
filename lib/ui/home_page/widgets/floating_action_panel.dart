@@ -22,6 +22,21 @@ class FloatingActionPanel extends ConsumerWidget {
             heroTag: null,
             mini: true,
             onPressed: () {
+              ref.watch(taskList.notifier).updateFromRemoteServer();
+            },
+            child: const Icon(
+              Icons.update,
+              size: 25,
+            ),
+          ),
+        ),
+        //if (kDebugMode)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: FloatingActionButton(
+            heroTag: null,
+            mini: true,
+            onPressed: () {
               var task = Task.random();
               ref.watch(taskList.notifier).add(task);
             },

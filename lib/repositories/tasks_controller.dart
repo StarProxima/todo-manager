@@ -64,7 +64,7 @@ class FilteredDismissableTaskList extends StateNotifier<List<Task>> {
 
     //Updating state in order to avoid a possible error:
     //A dismissed Dismissible widget is still part of the tree.
-    timer = Timer(duration + const Duration(milliseconds: 50), () {
+    timer = Timer(duration + const Duration(milliseconds: 250), () {
       state = ref.read(filteredTaskList);
       timer?.cancel();
     });
@@ -108,6 +108,10 @@ class TaskList extends StateNotifier<List<Task>> {
     state = state.where((element) => element.id != task.id).toList();
 
     state = await _controller.deleteTask(task) ?? state;
+  }
+
+  Future<void> updateFromRemoteServer() async {
+    state = await _controller.getTasks() ?? state;
   }
 }
 
