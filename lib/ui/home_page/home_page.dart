@@ -71,7 +71,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                         final task = tasks[index];
 
                         return TaskCard(
-                          key: ValueKey(task.id),
                           task: task,
                         );
                       },

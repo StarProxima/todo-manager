@@ -10,7 +10,7 @@ import 'importance.dart';
 part 'task_model.g.dart';
 
 @HiveType(typeId: 0)
-class Task implements Comparable {
+class Task {
   @HiveField(0)
   late final String id;
 
@@ -94,7 +94,6 @@ class Task implements Comparable {
     bool? done,
     DateTime? deadline,
     Color? color,
-    // Я не придумал, как по-другому
     bool? deleteDeadline,
   }) {
     return Task(
@@ -202,13 +201,5 @@ class Task implements Comparable {
         createdAt.hashCode ^
         changedAt.hashCode ^
         lastUpdatedBy.hashCode;
-  }
-
-  @override
-  int compareTo(other) {
-    if (other is Task) {
-      return text.compareTo(other.text);
-    }
-    return 0;
   }
 }

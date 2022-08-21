@@ -14,19 +14,26 @@ final _currentTask = Provider<Task>((ref) {
   throw UnimplementedError();
 });
 
-class TaskCard extends ConsumerWidget {
-  TaskCard({
-    required Key key,
+class TaskCard extends ConsumerStatefulWidget {
+  const TaskCard({
+    Key? key,
     required this.task,
   }) : super(key: key);
 
   final Task task;
 
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _TaskCardState();
+  }
+}
+
+class _TaskCardState extends ConsumerState<TaskCard> {
   //Легко сказать — «мы должны были сделать вот так» уже после того, как всё закончилось.
   //Однако никто не знает, чем обернётся твой выбор и сколькими жертвами,
   //пока его не сделаешь. А ты должен его сделать!
-  final dismissProgress =
-      StateProvider.autoDispose.family<double, DismissDirection>(
+
+  final dismissProgress = StateProvider.family<double, DismissDirection>(
     (ref, direction) {
       return 0;
     },
@@ -36,23 +43,22 @@ class TaskCard extends ConsumerWidget {
   final movementDuration = const Duration(milliseconds: 300);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     var theme = Theme.of(context);
-
     Future<void> removeTaskAsync() async {
       final tasksList = ref.read(filteredDismissableTaskList.notifier);
       await Future.delayed(resizeDuration);
-      tasksList.dismiss(task, resizeDuration);
+      tasksList.dismiss(widget.task, resizeDuration);
     }
 
     Future<void> editTaskAsync() async {
       final tasksList = ref.read(taskList.notifier);
       await Future.delayed(movementDuration);
-      tasksList.edit(task.edit(done: true));
+      tasksList.edit(widget.task.edit(done: true));
     }
 
     return Dismissible(
-      key: key!,
+      key: ValueKey(widget.task.id),
       resizeDuration: resizeDuration,
       movementDuration: movementDuration,
       onUpdate: (DismissUpdateDetails details) {
@@ -117,7 +123,7 @@ class TaskCard extends ConsumerWidget {
       child: ProviderScope(
         //Riverpod принял ислам
         overrides: [
-          _currentTask.overrideWithValue(task),
+          _currentTask.overrideWithValue(widget.task),
         ],
         child: const _TaskCard(),
       ),
@@ -243,6 +249,7 @@ class AppDismissIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var padding = MediaQuery.of(context).size.width * progress - 47;
+
     return Padding(
       padding: EdgeInsets.only(
         left: direction == DismissDirection.startToEnd
