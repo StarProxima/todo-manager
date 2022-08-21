@@ -7,9 +7,9 @@ import '../../../generated/l10n.dart';
 import '../../../styles/app_theme.dart';
 
 class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
-  HomePageHeaderDelegate();
+  HomePageHeaderDelegate([this.expandedHeight = 200]);
 
-  static const double expandedHeight = 200;
+  final double expandedHeight;
 
   @override
   Widget build(

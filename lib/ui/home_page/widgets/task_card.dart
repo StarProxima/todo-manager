@@ -44,7 +44,10 @@ class _TaskCardState extends ConsumerState<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
+    final theme = Theme.of(context);
+
+    final filter = ref.read(taskFilter);
+
     Future<void> removeTaskAsync() async {
       final controller = ref.read(dismissibleTaskListController.notifier);
       await Future.delayed(resizeDuration);
@@ -53,7 +56,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
 
     Future<void> editTaskAsync() async {
       final task = widget.task.edit(done: !widget.task.done);
-      if (ref.read(taskFilter) == TaskFilter.uncompleted) {
+      if (filter == TaskFilter.uncompleted) {
         final controller = ref.read(dismissibleTaskListController.notifier);
         await Future.delayed(resizeDuration);
         controller.dismissEdit(task);
@@ -86,7 +89,7 @@ class _TaskCardState extends ConsumerState<TaskCard> {
             return true;
           case DismissDirection.startToEnd:
             editTaskAsync();
-            return ref.read(taskFilter) == TaskFilter.uncompleted;
+            return filter == TaskFilter.uncompleted;
           default:
             return false;
         }

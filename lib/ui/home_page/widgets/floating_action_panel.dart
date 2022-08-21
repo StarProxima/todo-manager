@@ -23,10 +23,10 @@ class FloatingActionPanel extends ConsumerWidget {
             heroTag: null,
             mini: true,
             onPressed: () {
-              ref.watch(appThemeMode.notifier).switchTheme();
+              ref.watch(taskList.notifier).updateFromRemoteServer();
             },
             child: const Icon(
-              Icons.color_lens,
+              Icons.update,
               size: 25,
             ),
           ),
@@ -38,10 +38,10 @@ class FloatingActionPanel extends ConsumerWidget {
             heroTag: null,
             mini: true,
             onPressed: () {
-              ref.watch(taskList.notifier).updateFromRemoteServer();
+              ref.watch(appThemeMode.notifier).switchTheme();
             },
             child: const Icon(
-              Icons.update,
+              Icons.color_lens,
               size: 25,
             ),
           ),

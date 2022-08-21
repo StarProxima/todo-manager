@@ -31,7 +31,7 @@ void main() {
 }
 
 final appThemeMode = StateNotifierProvider<AppThemeMode, ThemeMode>((ref) {
-  return AppThemeMode(ThemeMode.light);
+  return AppThemeMode(ThemeMode.system);
 });
 
 class AppThemeMode extends StateNotifier<ThemeMode> {
