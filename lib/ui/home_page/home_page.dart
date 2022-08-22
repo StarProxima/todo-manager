@@ -120,23 +120,12 @@ class _HomePageState extends ConsumerState<HomePage>
                                         curve: Curves.easeOutBack,
                                       ),
                                     ),
-                                    child: ProviderScope(
-                                      overrides: [
-                                        currentTaskInTaskCard
-                                            .overrideWithValue(task)
-                                      ],
-                                      child: const TaskCard(),
-                                    ),
+                                    child: TaskCard(task: task),
                                   ),
                                 ),
                               );
                             } else {
-                              return ProviderScope(
-                                overrides: [
-                                  currentTaskInTaskCard.overrideWithValue(task)
-                                ],
-                                child: const TaskCard(),
-                              );
+                              return TaskCard(task: task);
                             }
                           },
                         );

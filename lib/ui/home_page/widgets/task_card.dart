@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -11,22 +13,39 @@ import '../../task_details_page/task_details_page.dart';
 import '../../../models/importance.dart';
 import '../../../models/task_model.dart';
 
-final currentTaskInTaskCard = Provider<Task>((ref) {
+final _currentTaskInTaskCard = Provider<Task>((ref) {
   throw UnimplementedError();
 });
 
-class TaskCard extends ConsumerStatefulWidget {
-  const TaskCard({
+class TaskCard extends StatelessWidget {
+  const TaskCard({Key? key, required this.task}) : super(key: key);
+
+  final Task task;
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
+      overrides: [
+        _currentTaskInTaskCard.overrideWithValue(
+          task,
+        ),
+      ],
+      child: const _TaskCardDismissible(),
+    );
+  }
+}
+
+class _TaskCardDismissible extends ConsumerStatefulWidget {
+  const _TaskCardDismissible({
     Key? key,
   }) : super(key: key);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _TaskCardState();
+    return _TaskCardDismissibleState();
   }
 }
 
-class _TaskCardState extends ConsumerState<TaskCard> {
+class _TaskCardDismissibleState extends ConsumerState<_TaskCardDismissible> {
   //Легко сказать — «мы должны были сделать вот так» уже после того, как всё закончилось.
   //Однако никто не знает, чем обернётся твой выбор и сколькими жертвами,
   //пока его не сделаешь. А ты должен его сделать!
@@ -41,8 +60,9 @@ class _TaskCardState extends ConsumerState<TaskCard> {
 
   @override
   Widget build(BuildContext context) {
+    log('message');
     final theme = Theme.of(context);
-    final task = ref.watch(currentTaskInTaskCard);
+    final task = ref.watch(_currentTaskInTaskCard);
 
     Future<void> removeTaskAsync() async {
       final controller = ref.read(dismissibleTaskListController.notifier);
@@ -139,7 +159,7 @@ class _TaskCardView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final task = ref.watch(currentTaskInTaskCard);
+    final task = ref.watch(_currentTaskInTaskCard);
 
     final crossedOut = Theme.of(context).extension<AppTextStyle>()!.crossedOut!;
     return GestureDetector(
