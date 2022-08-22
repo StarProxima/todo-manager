@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/providers.dart';
 import 'support/hive.dart';
 import 'support/settings.dart';
 import 'generated/l10n.dart';
@@ -28,18 +29,6 @@ void main() {
     },
     ErrorHandler.recordError,
   );
-}
-
-final appThemeMode = StateNotifierProvider<AppThemeMode, ThemeMode>((ref) {
-  return AppThemeMode(ThemeMode.system);
-});
-
-class AppThemeMode extends StateNotifier<ThemeMode> {
-  AppThemeMode(super.state);
-
-  void switchTheme() {
-    state = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-  }
 }
 
 class MyApp extends ConsumerWidget {

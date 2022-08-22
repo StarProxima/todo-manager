@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/providers.dart';
 import '../../../models/task_filter.dart';
-import '../../../repositories/tasks_controller.dart';
 
 import '../../../generated/l10n.dart';
 import '../../../styles/app_theme.dart';

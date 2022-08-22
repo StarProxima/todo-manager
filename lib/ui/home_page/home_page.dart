@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/providers.dart';
 import '../../main.dart';
 import 'widgets/add_task_card.dart';
 
 import '../../models/task_model.dart';
-import '../../repositories/tasks_controller.dart';
 import 'widgets/floating_action_panel.dart';
 import 'widgets/home_page_header_delegate.dart';
 import 'widgets/task_card.dart';
