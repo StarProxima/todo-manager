@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
@@ -29,16 +31,31 @@ class _HomePageState extends ConsumerState<HomePage>
     ref.read(taskList.notifier).add(task);
   }
 
-  late final addAnimationController = AnimationController(
+  late final animationController = AnimationController(
     duration: const Duration(milliseconds: 300),
     vsync: this,
   );
 
-  late final deleteAnimationController = AnimationController(
-    value: 1,
+  late final transformAnimationController = AnimationController(
     duration: const Duration(milliseconds: 300),
     vsync: this,
   );
+
+  // late final deleteAnimationController = AnimationController(
+  //   value: 1,
+  //   duration: const Duration(milliseconds: 300),
+  //   vsync: this,
+  // );
+
+  @override
+  void initState() {
+    super.initState();
+    transformAnimationController.addStatusListener((status) {
+      if (transformAnimationController.isCompleted) {
+        transformAnimationController.reverse();
+      }
+    });
+  }
 
   List<String> tasksToId(List<Task> list) {
     return List.generate(list.length, (index) {
@@ -53,31 +70,15 @@ class _HomePageState extends ConsumerState<HomePage>
   ) {
     List<Task> list = [];
 
-    //final newTasksId = tasksToId(newTasks);
-
-    final tasks = [...lastTasks, ...newTasks]
+    final tasks = [...newTasks, ...lastTasks]
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     for (final task in tasks) {
       if (!tasksToId(list).contains(task.id)) {
         final t = allTasks.firstWhere((element) => element.id == task.id);
         list.add(t);
-      } else {
-        final i = list.indexWhere((element) => element.id == task.id);
-        if (task.changedAt.millisecondsSinceEpoch >
-            list[i].changedAt.millisecondsSinceEpoch) {
-          list[i] = task;
-        }
       }
     }
-
-    // for (final task in newTasks) {
-    //   if (!list.contains(task)) {
-    //     list.add(task);
-    //   }
-    // }
-
-    //final lastTasksId = tasksToId(lastTasks);
 
     return list;
   }
@@ -119,10 +120,10 @@ class _HomePageState extends ConsumerState<HomePage>
                         ref.watch(dismissibleTaskListController);
                         List<Task> newtasks =
                             ref.read(sorteredFilteredTaskList);
-                        addAnimationController.reset();
-                        addAnimationController.forward();
-                        deleteAnimationController.value = 1;
-                        deleteAnimationController.reverse();
+                        transformAnimationController.reset();
+                        transformAnimationController.forward();
+                        animationController.reset();
+                        animationController.forward();
 
                         List<String> lastTasksId = tasksToId(lastTasks);
 
@@ -147,33 +148,38 @@ class _HomePageState extends ConsumerState<HomePage>
 
                             final task = mergedTasks[index];
 
+                            final taskCard = TaskCard(task: task);
+
                             if (lastTasksId.contains(task.id) &&
                                 !newTasksId.contains(task.id)) {
                               return FadeTransition(
                                 opacity: CurvedAnimation(
-                                  parent: deleteAnimationController,
+                                  parent: Tween<double>(begin: 1, end: 0)
+                                      .animate(animationController),
                                   curve: Curves.easeInOutCubic,
                                 ),
                                 child: SizeTransition(
                                   sizeFactor: CurvedAnimation(
-                                    parent: deleteAnimationController,
+                                    parent: Tween<double>(begin: 1, end: 0)
+                                        .animate(animationController),
                                     curve: Curves.easeOutBack,
                                   ),
-                                  child: TaskCard(task: task),
+                                  child: taskCard,
                                 ),
                               );
                             }
 
                             if (!lastTasksId.contains(task.id) &&
                                 newTasksId.contains(task.id)) {
+                              log('message');
                               return FadeTransition(
                                 opacity: CurvedAnimation(
-                                  parent: addAnimationController,
+                                  parent: animationController,
                                   curve: Curves.easeInOutCubic,
                                 ),
                                 child: SizeTransition(
                                   sizeFactor: CurvedAnimation(
-                                    parent: addAnimationController,
+                                    parent: animationController,
                                     curve: Curves.easeOutBack,
                                   ),
                                   child: SlideTransition(
@@ -182,19 +188,56 @@ class _HomePageState extends ConsumerState<HomePage>
                                       end: const Offset(0, 0),
                                     ).animate(
                                       CurvedAnimation(
-                                        parent: addAnimationController,
+                                        parent: animationController,
                                         curve: Curves.easeOutBack,
                                       ),
                                     ),
-                                    child: TaskCard(task: task),
+                                    child: taskCard,
                                   ),
                                 ),
                               );
                             }
 
-                            return TaskCard(
-                              task: task,
-                            );
+                            if (lastTasksId.contains(task.id) &&
+                                newTasksId.contains(task.id)) {
+                              final lastDate = lastTasks
+                                  .firstWhere(
+                                    (element) => element.id == task.id,
+                                  )
+                                  .changedAt;
+
+                              final newDate = newtasks
+                                  .firstWhere(
+                                    (element) => element.id == task.id,
+                                  )
+                                  .changedAt;
+                              if (lastDate != newDate) {
+                                final animation = Tween<double>(
+                                  begin: 0,
+                                  end: 0.5,
+                                ).animate(
+                                  CurvedAnimation(
+                                    parent: transformAnimationController,
+                                    curve: Curves.decelerate,
+                                  ),
+                                );
+
+                                return AnimatedBuilder(
+                                  animation: animation,
+                                  child: taskCard,
+                                  builder: (context, child) {
+                                    return Transform(
+                                      alignment: Alignment.center,
+                                      transform:
+                                          Matrix4.rotationX(animation.value),
+                                      child: child,
+                                    );
+                                  },
+                                );
+                              }
+                            }
+
+                            return taskCard;
                           },
                         );
                       },
