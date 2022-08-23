@@ -47,6 +47,12 @@ final filteredTaskList = Provider<List<Task>>((ref) {
   return filteredTask;
 });
 
+final sorteredFilteredTaskList = Provider<List<Task>>((ref) {
+  final tasks = ref.watch(filteredTaskList)
+    ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  return tasks;
+});
+
 final completedTaskCount = Provider<int>((ref) {
   return ref.watch(taskList).where((task) => task.done).length;
 });
@@ -70,7 +76,7 @@ class DismissibleTaskListController extends StateNotifier<bool> {
   DismissibleTaskListController(
     this.ref,
   ) : super(false) {
-    ref.listen(filteredTaskList, (t0, t1) {
+    ref.listen(filteredTaskList, (t0, t1) async {
       if (lastActionIsNotDismiss) {
         state = !state;
       } else {

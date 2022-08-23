@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -60,7 +58,6 @@ class _TaskCardDismissibleState extends ConsumerState<_TaskCardDismissible> {
 
   @override
   Widget build(BuildContext context) {
-    log('message');
     final theme = Theme.of(context);
     final task = ref.watch(_currentTaskInTaskCard);
 
@@ -87,7 +84,7 @@ class _TaskCardDismissibleState extends ConsumerState<_TaskCardDismissible> {
     }
 
     return Dismissible(
-      key: widget.key ?? ValueKey(task.id),
+      key: ValueKey(task.id),
       resizeDuration: resizeDuration,
       movementDuration: movementDuration,
       onUpdate: (DismissUpdateDetails details) {

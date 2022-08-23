@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
-import '../../main.dart';
 import 'widgets/add_task_card.dart';
 
 import '../../models/task_model.dart';
@@ -30,20 +29,57 @@ class _HomePageState extends ConsumerState<HomePage>
     ref.read(taskList.notifier).add(task);
   }
 
-  late final controller = AnimationController(
+  late final addAnimationController = AnimationController(
     duration: const Duration(milliseconds: 300),
     vsync: this,
   );
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  late final deleteAnimationController = AnimationController(
+    value: 1,
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
 
   List<String> tasksToId(List<Task> list) {
     return List.generate(list.length, (index) {
       return list[index].id;
     });
+  }
+
+  List<Task> getMergedTasks(
+    List<Task> lastTasks,
+    List<Task> newTasks,
+    List<Task> allTasks,
+  ) {
+    List<Task> list = [];
+
+    //final newTasksId = tasksToId(newTasks);
+
+    final tasks = [...lastTasks, ...newTasks]
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    for (final task in tasks) {
+      if (!tasksToId(list).contains(task.id)) {
+        final t = allTasks.firstWhere((element) => element.id == task.id);
+        list.add(t);
+      } else {
+        final i = list.indexWhere((element) => element.id == task.id);
+        if (task.changedAt.millisecondsSinceEpoch >
+            list[i].changedAt.millisecondsSinceEpoch) {
+          list[i] = task;
+        }
+      }
+    }
+
+    // for (final task in newTasks) {
+    //   if (!list.contains(task)) {
+    //     list.add(task);
+    //   }
+    // }
+
+    //final lastTasksId = tasksToId(lastTasks);
+
+    return list;
   }
 
   @override
@@ -81,33 +117,63 @@ class _HomePageState extends ConsumerState<HomePage>
                         ref.watch(appThemeMode);
 
                         ref.watch(dismissibleTaskListController);
-                        List<Task> tasks = ref.read(filteredTaskList);
-                        controller.reset();
-                        controller.forward();
+                        List<Task> newtasks =
+                            ref.read(sorteredFilteredTaskList);
+                        addAnimationController.reset();
+                        addAnimationController.forward();
+                        deleteAnimationController.value = 1;
+                        deleteAnimationController.reverse();
+
+                        List<String> lastTasksId = tasksToId(lastTasks);
+
+                        List<String> newTasksId = tasksToId(newtasks);
+
+                        List<Task> mergedTasks = getMergedTasks(
+                          lastTasks,
+                          newtasks,
+                          ref.read(taskList),
+                        );
+
                         return ListView.builder(
                           shrinkWrap: true,
                           primary: false,
-                          itemCount: tasks.length + 1,
+                          itemCount: mergedTasks.length + 1,
                           itemBuilder: (context, index) {
-                            if (index == tasks.length) {
+                            if (index == mergedTasks.length) {
                               return AddTaskCard(
                                 onAddTask: onAddTask,
                               );
                             }
 
-                            final task = tasks[index];
-                            // log(
-                            //   tasksToId(lastTasks).contains(task.id).toString(),
-                            // );
-                            if (!tasksToId(lastTasks).contains(task.id)) {
+                            final task = mergedTasks[index];
+
+                            if (lastTasksId.contains(task.id) &&
+                                !newTasksId.contains(task.id)) {
                               return FadeTransition(
                                 opacity: CurvedAnimation(
-                                  parent: controller,
+                                  parent: deleteAnimationController,
                                   curve: Curves.easeInOutCubic,
                                 ),
                                 child: SizeTransition(
                                   sizeFactor: CurvedAnimation(
-                                    parent: controller,
+                                    parent: deleteAnimationController,
+                                    curve: Curves.easeOutBack,
+                                  ),
+                                  child: TaskCard(task: task),
+                                ),
+                              );
+                            }
+
+                            if (!lastTasksId.contains(task.id) &&
+                                newTasksId.contains(task.id)) {
+                              return FadeTransition(
+                                opacity: CurvedAnimation(
+                                  parent: addAnimationController,
+                                  curve: Curves.easeInOutCubic,
+                                ),
+                                child: SizeTransition(
+                                  sizeFactor: CurvedAnimation(
+                                    parent: addAnimationController,
                                     curve: Curves.easeOutBack,
                                   ),
                                   child: SlideTransition(
@@ -116,7 +182,7 @@ class _HomePageState extends ConsumerState<HomePage>
                                       end: const Offset(0, 0),
                                     ).animate(
                                       CurvedAnimation(
-                                        parent: controller,
+                                        parent: addAnimationController,
                                         curve: Curves.easeOutBack,
                                       ),
                                     ),
@@ -124,9 +190,11 @@ class _HomePageState extends ConsumerState<HomePage>
                                   ),
                                 ),
                               );
-                            } else {
-                              return TaskCard(task: task);
                             }
+
+                            return TaskCard(
+                              task: task,
+                            );
                           },
                         );
                       },
