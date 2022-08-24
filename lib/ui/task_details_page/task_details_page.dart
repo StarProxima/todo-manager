@@ -9,40 +9,59 @@ import 'widgets/task_details_text_field.dart';
 
 import '../../generated/l10n.dart';
 
-class TaskDetailsPage extends ConsumerStatefulWidget {
-  const TaskDetailsPage({
-    Key? key,
-    this.task,
-  }) : super(key: key);
+final _currentEditableTask = StateProvider<Task>((ref) {
+  return throw UnimplementedError();
+});
+
+class TaskDetails extends ConsumerWidget {
+  const TaskDetails({Key? key, this.task}) : super(key: key);
 
   final Task? task;
-
   @override
-  ConsumerState<TaskDetailsPage> createState() => _TaskDetailsPageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ProviderScope(
+      overrides: [
+        _currentEditableTask.overrideWithValue(
+          StateController(task ?? Task.create()),
+        ),
+      ],
+      child: const _TaskDetailsPage(),
+    );
+  }
 }
 
-class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
-  late Task task = widget.task?.copyWith() ?? Task.create();
+class _TaskDetailsPage extends ConsumerStatefulWidget {
+  const _TaskDetailsPage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  ConsumerState<_TaskDetailsPage> createState() => _TaskDetailsPageState();
+}
+
+class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
+  late bool isNewTask = ref
+      .read(taskList)
+      .where((element) => element.id == ref.read(_currentEditableTask).id)
+      .isEmpty;
 
   late TextEditingController controller = TextEditingController()
-    ..text = widget.task?.text ?? '';
-
-  late final currentTask = StateProvider<Task>((ref) {
-    return task;
-  });
+    ..text = ref.read(_currentEditableTask).text;
 
   void saveTask() {
-    final editTask = ref.read(currentTask).edit(text: controller.text);
-    if (widget.task != null) {
-      ref.read(taskList.notifier).edit(editTask);
+    final editedTask =
+        ref.read(_currentEditableTask).edit(text: controller.text);
+    final notifier = ref.read(taskList.notifier);
+    if (isNewTask) {
+      notifier.add(editedTask);
     } else {
-      ref.read(taskList.notifier).add(editTask);
+      notifier.edit(editedTask);
     }
     Navigator.pop(context);
   }
 
   void deleteTask() {
-    ref.read(taskList.notifier).delete(task);
+    ref.read(taskList.notifier).delete(ref.read(_currentEditableTask));
     Navigator.pop(context);
   }
 
@@ -101,11 +120,11 @@ class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
                 builder: (context, ref, child) {
                   return ImportanceDropdownButton(
                     value: ref.watch(
-                      currentTask.select((value) => value.importance),
+                      _currentEditableTask.select((value) => value.importance),
                     ),
                     onChanged: (value) {
                       ref
-                          .read(currentTask.notifier)
+                          .read(_currentEditableTask.notifier)
                           .update((state) => state.edit(importance: value));
                     },
                   );
@@ -116,10 +135,10 @@ class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
               builder: (context, ref, child) {
                 return TaskDetailsDeadline(
                   value: ref.watch(
-                    currentTask.select((value) => value.deadline),
+                    _currentEditableTask.select((value) => value.deadline),
                   ),
                   onChanged: (deadline) {
-                    ref.read(currentTask.notifier).update(
+                    ref.read(_currentEditableTask.notifier).update(
                       (state) {
                         if (deadline == null) {
                           return state.edit(deleteDeadline: true);
@@ -140,7 +159,7 @@ class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage> {
                 style: TextButton.styleFrom(
                   primary: theme.errorColor,
                 ),
-                onPressed: widget.task != null ? deleteTask : null,
+                onPressed: !isNewTask ? deleteTask : null,
               ),
             ),
           ],

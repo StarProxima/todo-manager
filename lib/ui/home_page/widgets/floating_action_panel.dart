@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers.dart';
-import '../../../main.dart';
 import '../../../models/task_model.dart';
 import '../../task_details_page/task_details_page.dart';
 
@@ -83,7 +82,7 @@ class FloatingActionPanel extends ConsumerWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const TaskDetailsPage(),
+                builder: (context) => const TaskDetails(),
               ),
             );
           },

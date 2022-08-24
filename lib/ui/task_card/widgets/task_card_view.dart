@@ -15,7 +15,7 @@ class _TaskCardView extends ConsumerWidget {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return TaskDetailsPage(
+              return TaskDetails(
                 task: task,
               );
             },
