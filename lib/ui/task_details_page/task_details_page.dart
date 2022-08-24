@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../repositories/tasks_controller.dart';
+import '../../core/providers.dart';
 import 'widgets/task_details_deadline.dart';
 
 import '../../models/task_model.dart';

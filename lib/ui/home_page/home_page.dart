@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../main.dart';
+import '../../core/providers.dart';
 import 'widgets/add_task_card.dart';
 
-import '../../models/task_model.dart';
-import '../../repositories/tasks_controller.dart';
 import 'widgets/floating_action_panel.dart';
 import 'widgets/home_page_header_delegate.dart';
-import 'widgets/task_card.dart';
+import '../task_card/task_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,34 +16,6 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage>
     with TickerProviderStateMixin {
-  void onEditTask(task) async {
-    ref.read(taskList.notifier).edit(task);
-  }
-
-  void onDeleteTask(task) async {
-    ref.read(taskList.notifier).delete(task);
-  }
-
-  void onAddTask(task) async {
-    ref.read(taskList.notifier).add(task);
-  }
-
-  late final controller = AnimationController(
-    duration: const Duration(milliseconds: 300),
-    vsync: this,
-  );
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  List<String> tasksToId(List<Task> list) {
-    return List.generate(list.length, (index) {
-      return list[index].id;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,66 +48,24 @@ class _HomePageState extends ConsumerState<HomePage>
                     clipBehavior: Clip.antiAlias,
                     child: Consumer(
                       builder: (context, ref, child) {
-                        ref.watch(appThemeMode);
-
                         ref.watch(dismissibleTaskListController);
-                        List<Task> tasks = ref.read(filteredTaskList);
-                        controller.reset();
-                        controller.forward();
+
+                        final animatedTasks = ref.read(animatedTaskList);
+
                         return ListView.builder(
                           shrinkWrap: true,
                           primary: false,
-                          itemCount: tasks.length + 1,
+                          itemCount: animatedTasks.length + 1,
                           itemBuilder: (context, index) {
-                            if (index == tasks.length) {
+                            if (index == animatedTasks.length) {
                               return AddTaskCard(
-                                onAddTask: onAddTask,
+                                onAddTask: ref.read(taskList.notifier).add,
                               );
                             }
 
-                            final task = tasks[index];
-                            // log(
-                            //   tasksToId(lastTasks).contains(task.id).toString(),
-                            // );
-                            if (!tasksToId(lastTasks).contains(task.id)) {
-                              return FadeTransition(
-                                opacity: CurvedAnimation(
-                                  parent: controller,
-                                  curve: Curves.easeInOutCubic,
-                                ),
-                                child: SizeTransition(
-                                  sizeFactor: CurvedAnimation(
-                                    parent: controller,
-                                    curve: Curves.easeOutBack,
-                                  ),
-                                  child: SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(0, 1),
-                                      end: const Offset(0, 0),
-                                    ).animate(
-                                      CurvedAnimation(
-                                        parent: controller,
-                                        curve: Curves.easeOutBack,
-                                      ),
-                                    ),
-                                    child: ProviderScope(
-                                      overrides: [
-                                        currentTaskInTaskCard
-                                            .overrideWithValue(task)
-                                      ],
-                                      child: const TaskCard(),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return ProviderScope(
-                                overrides: [
-                                  currentTaskInTaskCard.overrideWithValue(task)
-                                ],
-                                child: const TaskCard(),
-                              );
-                            }
+                            return TaskCard(
+                              animatedTasks[index],
+                            );
                           },
                         );
                       },

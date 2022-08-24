@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/task_model.dart';
@@ -45,7 +43,6 @@ class TaskLocalRepository {
 
   void saveRevision(int revision) {
     if (revision > (_revision ?? -1)) {
-      log(revision.toString());
       _revision = revision;
       Hive.box<int>('support').put('revision', revision);
     }
