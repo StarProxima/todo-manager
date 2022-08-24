@@ -56,13 +56,16 @@ class TaskCard extends StatelessWidget {
         builder: (context, ref, _) {
           final status = ref.watch(_currentTaskStatusInTaskCard);
 
-          return status == TaskStatus.create
-              ? const _TaskCardCreated()
-              : status == TaskStatus.hide
-                  ? const TaskCardHidden()
-                  : status == TaskStatus.none
-                      ? const _TaskCardAnimated()
-                      : const SizedBox();
+          switch (status) {
+            case TaskStatus.create:
+              return const _TaskCardCreated();
+            case TaskStatus.hide:
+              return const _TaskCardHidden();
+            case TaskStatus.none:
+              return const _TaskCardAnimated();
+            case TaskStatus.empty:
+              return const SizedBox();
+          }
         },
       ),
     );

@@ -1,13 +1,13 @@
 part of '../task_card.dart';
 
-class TaskCardHidden extends ConsumerStatefulWidget {
-  const TaskCardHidden({Key? key}) : super(key: key);
+class _TaskCardHidden extends ConsumerStatefulWidget {
+  const _TaskCardHidden({Key? key}) : super(key: key);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _TaskCardHiddenState();
 }
 
-class _TaskCardHiddenState extends ConsumerState<TaskCardHidden>
+class _TaskCardHiddenState extends ConsumerState<_TaskCardHidden>
     with TickerProviderStateMixin {
   late final controller = AnimationController(
     duration: const Duration(milliseconds: 300),
