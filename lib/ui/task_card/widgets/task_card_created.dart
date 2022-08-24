@@ -23,7 +23,6 @@ class _TaskCardCreatedState extends ConsumerState<_TaskCardCreated>
   void initState() {
     controller.addStatusListener((status) {
       if (controller.isCompleted) {
-        log('animationIsCompleted');
         ref.read(_currentTaskStatusInTaskCard.notifier).state = TaskStatus.none;
       }
     });
@@ -38,6 +37,7 @@ class _TaskCardCreatedState extends ConsumerState<_TaskCardCreated>
 
   @override
   Widget build(BuildContext context) {
+    log('_TaskCardCreated');
     return FadeTransition(
       opacity: CurvedAnimation(
         parent: controller,

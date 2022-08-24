@@ -37,6 +37,7 @@ class _TaskCardHiddenState extends ConsumerState<TaskCardHidden>
 
   @override
   Widget build(BuildContext context) {
+    log('TaskCardHidden');
     return FadeTransition(
       opacity: CurvedAnimation(
         parent: Tween<double>(begin: 1, end: 0).animate(controller),

@@ -52,7 +52,7 @@ class _TaskCardAnimatedState extends ConsumerState<_TaskCardAnimated>
     } else {
       isFirstBuild = false;
     }
-
+    log('_TaskCardAnimated');
     return AnimatedBuilder(
       animation: animation,
       child: const _TaskCardDismissible(),

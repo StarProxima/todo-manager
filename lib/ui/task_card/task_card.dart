@@ -54,6 +54,7 @@ class TaskCard extends StatelessWidget {
       child: Consumer(
         builder: (context, ref, _) {
           final status = ref.watch(_currentTaskStatusInTaskCard);
+
           return status == TaskStatus.create
               ? const _TaskCardCreated()
               : status == TaskStatus.hide

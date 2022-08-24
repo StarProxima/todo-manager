@@ -6,7 +6,6 @@ class _TaskCardView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final task = ref.watch(_currentTaskInTaskCard);
-    log('message ${task.text}');
 
     final crossedOut = Theme.of(context).extension<AppTextStyle>()!.crossedOut!;
     return GestureDetector(

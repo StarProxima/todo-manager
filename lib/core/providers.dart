@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -39,9 +40,15 @@ final filteredTaskList = Provider<List<Task>>((ref) {
   }
 });
 
+final taskSort = StateProvider<int Function(Task, Task)>(
+  (ref) => (a, b) {
+    return a.createdAt.compareTo(b.createdAt);
+  },
+);
+
 final sorteredFilteredTaskList = Provider<List<Task>>((ref) {
-  final tasks = ref.watch(filteredTaskList)
-    ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  final sort = ref.watch(taskSort);
+  final tasks = ref.watch(filteredTaskList)..sort(sort);
   return tasks;
 });
 
@@ -65,8 +72,7 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
       List<Task> tasks = [];
       List<AnimatedTask> animatedTasks = [];
 
-      final allTasks = [...newTasks, ...lastTasks]
-        ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      final allTasks = [...newTasks, ...lastTasks];
 
       bool contains(List<Task> list, Task task) {
         return list.where((element) => element.id == task.id).isNotEmpty;
@@ -75,19 +81,26 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
       for (final task in allTasks) {
         if (!contains(tasks, task)) {
           final TaskStatus status;
+          Task selectTask = task;
           if (!contains(lastTasks, task) && contains(newTasks, task)) {
             status = TaskStatus.create;
           } else if (contains(lastTasks, task) && !contains(newTasks, task)) {
             status = TaskStatus.hide;
+            final list =
+                _ref.read(taskList).where((element) => element.id == task.id);
+            if (list.isNotEmpty) {
+              selectTask = list.first;
+            }
           } else {
             status = TaskStatus.none;
           }
-          tasks.add(task);
-          animatedTasks.add(AnimatedTask(status: status, task: task));
+          tasks.add(selectTask);
+          animatedTasks.add(AnimatedTask(status: status, task: selectTask));
         }
       }
 
-      state = animatedTasks;
+      state = animatedTasks
+        ..sort((a, b) => _ref.read(taskSort)(a.task, b.task));
     });
   }
 }
@@ -96,6 +109,19 @@ class AnimatedTask {
   final TaskStatus status;
   final Task task;
   AnimatedTask({required this.status, required this.task});
+
+  @override
+  bool operator ==(covariant AnimatedTask other) {
+    if (identical(this, other)) return true;
+
+    return other.status == status && other.task == task;
+  }
+
+  @override
+  int get hashCode => status.hashCode ^ task.hashCode;
+
+  @override
+  String toString() => 'AnimatedTask(status: $status, task: $task)';
 }
 
 final completedTaskCount = Provider<int>((ref) {
@@ -127,6 +153,10 @@ class DismissibleTaskListController extends StateNotifier<bool> {
       } else {
         lastActionIsNotDismiss = true;
       }
+    });
+
+    ref.listen(appThemeMode, (previous, next) {
+      state = !state;
     });
   }
 
