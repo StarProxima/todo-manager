@@ -94,8 +94,9 @@ class TaskController {
 
   Future<List<Task>?> getTasks() async {
     var response = await _remoteRepository.getTasks();
-    print(jsonDecode(response.message!)['revision']);
+
     if (response.isSuccesful) {
+      print(jsonDecode(response.message!)['revision']);
       return await checkTasks(
         response.data!,
         jsonDecode(response.message!)['revision'],

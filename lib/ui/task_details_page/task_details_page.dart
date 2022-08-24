@@ -9,14 +9,15 @@ import 'widgets/task_details_text_field.dart';
 
 import '../../generated/l10n.dart';
 
-final currentEditableTask = StateProvider<Task>((ref) {
-  return throw UnimplementedError();
+final currentEditableTask = StateProvider.autoDispose<Task>((ref) {
+  return Task.create();
 });
 
 class TaskDetails extends ConsumerWidget {
   const TaskDetails({Key? key, this.task}) : super(key: key);
 
   final Task? task;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ProviderScope(
@@ -88,17 +89,19 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton(
-              onPressed: saveTask,
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-              ),
-              child: Text(
-                S.of(context).taskDetailsSave,
-                style: textTheme.labelSmall!.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: theme.primaryColor,
+            padding: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
+            child: SizedBox(
+              child: TextButton(
+                onPressed: saveTask,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+                child: Text(
+                  S.of(context).taskDetailsSave,
+                  style: textTheme.labelSmall!.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
                 ),
               ),
             ),
@@ -119,26 +122,7 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
               alignment: Alignment.centerLeft,
               child: ImportanceDropdownButton(),
             ),
-            Consumer(
-              builder: (context, ref, child) {
-                return TaskDetailsDeadline(
-                  value: ref.watch(
-                    currentEditableTask.select((value) => value.deadline),
-                  ),
-                  onChanged: (deadline) {
-                    ref.read(currentEditableTask.notifier).update(
-                      (state) {
-                        if (deadline == null) {
-                          return state.edit(deleteDeadline: true);
-                        } else {
-                          return state.edit(deadline: deadline);
-                        }
-                      },
-                    );
-                  },
-                );
-              },
-            ),
+            const TaskDetailsDeadline(),
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
