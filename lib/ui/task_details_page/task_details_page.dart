@@ -9,7 +9,7 @@ import 'widgets/task_details_text_field.dart';
 
 import '../../generated/l10n.dart';
 
-final _currentEditableTask = StateProvider<Task>((ref) {
+final currentEditableTask = StateProvider<Task>((ref) {
   return throw UnimplementedError();
 });
 
@@ -21,7 +21,7 @@ class TaskDetails extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ProviderScope(
       overrides: [
-        _currentEditableTask.overrideWithValue(
+        currentEditableTask.overrideWithValue(
           StateController(task ?? Task.create()),
         ),
       ],
@@ -42,15 +42,15 @@ class _TaskDetailsPage extends ConsumerStatefulWidget {
 class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
   late bool isNewTask = ref
       .read(taskList)
-      .where((element) => element.id == ref.read(_currentEditableTask).id)
+      .where((element) => element.id == ref.read(currentEditableTask).id)
       .isEmpty;
 
   late TextEditingController controller = TextEditingController()
-    ..text = ref.read(_currentEditableTask).text;
+    ..text = ref.read(currentEditableTask).text;
 
   void saveTask() {
     final editedTask =
-        ref.read(_currentEditableTask).edit(text: controller.text);
+        ref.read(currentEditableTask).edit(text: controller.text);
     final notifier = ref.read(taskList.notifier);
     if (isNewTask) {
       notifier.add(editedTask);
@@ -61,7 +61,7 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
   }
 
   void deleteTask() {
-    ref.read(taskList.notifier).delete(ref.read(_currentEditableTask));
+    ref.read(taskList.notifier).delete(ref.read(currentEditableTask));
     Navigator.pop(context);
   }
 
@@ -77,6 +77,7 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
           height: 14,
           width: 14,
           child: IconButton(
+            splashRadius: 25,
             onPressed: () {
               Navigator.pop(context);
             },
@@ -114,31 +115,18 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
             const SizedBox(
               height: 28,
             ),
-            Align(
+            const Align(
               alignment: Alignment.centerLeft,
-              child: Consumer(
-                builder: (context, ref, child) {
-                  return ImportanceDropdownButton(
-                    value: ref.watch(
-                      _currentEditableTask.select((value) => value.importance),
-                    ),
-                    onChanged: (value) {
-                      ref
-                          .read(_currentEditableTask.notifier)
-                          .update((state) => state.edit(importance: value));
-                    },
-                  );
-                },
-              ),
+              child: ImportanceDropdownButton(),
             ),
             Consumer(
               builder: (context, ref, child) {
                 return TaskDetailsDeadline(
                   value: ref.watch(
-                    _currentEditableTask.select((value) => value.deadline),
+                    currentEditableTask.select((value) => value.deadline),
                   ),
                   onChanged: (deadline) {
-                    ref.read(_currentEditableTask.notifier).update(
+                    ref.read(currentEditableTask.notifier).update(
                       (state) {
                         if (deadline == null) {
                           return state.edit(deleteDeadline: true);

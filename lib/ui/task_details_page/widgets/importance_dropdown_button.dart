@@ -1,29 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../styles/app_theme.dart';
 
 import '../../../generated/l10n.dart';
 import '../../../models/importance.dart';
+import '../task_details_page.dart';
 
-class ImportanceDropdownButton extends StatefulWidget {
+class ImportanceDropdownButton extends ConsumerWidget {
   const ImportanceDropdownButton({
     Key? key,
-    required this.value,
-    required this.onChanged,
   }) : super(key: key);
 
-  final Importance value;
-  final void Function(Importance) onChanged;
-
   @override
-  State<ImportanceDropdownButton> createState() =>
-      _ImportanceDropdownButtonState();
-}
-
-class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var textTheme = Theme.of(context).textTheme;
-
+    final importance =
+        ref.watch(currentEditableTask.select((value) => value.importance));
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +30,7 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
 
             child: DropdownButtonHideUnderline(
               child: DropdownButton<Importance>(
-                value: widget.value,
+                value: importance,
                 icon: const SizedBox(),
                 borderRadius: const BorderRadius.all(Radius.circular(2)),
                 elevation: 3,
@@ -68,7 +60,8 @@ class _ImportanceDropdownButtonState extends State<ImportanceDropdownButton> {
                 ],
                 onChanged: (Importance? value) {
                   if (value != null) {
-                    widget.onChanged(value);
+                    ref.read(currentEditableTask.notifier).state =
+                        ref.read(currentEditableTask).edit(importance: value);
                   }
                 },
               ),
