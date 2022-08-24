@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/providers.dart';
+import '../../models/animated_task_model.dart';
 import '../../models/task_filter.dart';
 import '../../styles/app_icons.dart';
 import '../../styles/app_theme.dart';

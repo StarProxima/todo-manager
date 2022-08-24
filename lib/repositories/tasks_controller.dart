@@ -58,11 +58,12 @@ class TaskController {
     }
 
     Future<List<Task>?> localChanges() async {
-      log('localChanges');
+      log('localChanges $revision');
       var response = await _remoteRepository.patchTasks(
         tasks,
         _localRepository.getRevision(),
       );
+
       if (response.isSuccesful && _remoteRepository.activeRequests == 0) {
         _localRepository.saveTasks(response.data!);
         _localRepository.saveRevision(
@@ -93,6 +94,7 @@ class TaskController {
 
   Future<List<Task>?> getTasks() async {
     var response = await _remoteRepository.getTasks();
+    print(jsonDecode(response.message!)['revision']);
     if (response.isSuccesful) {
       return await checkTasks(
         response.data!,

@@ -22,7 +22,7 @@ class TaskRemoteRepository {
       return ResponseData.response(
         response,
         (jsonDecode(response.body)['list'] as Iterable)
-            .map((e) => Task.fromMap(e))
+            .map((e) => Task.fromJson(e))
             .toList(),
       );
     }
@@ -34,6 +34,12 @@ class TaskRemoteRepository {
     int revision,
   ) async {
     activeRequests++;
+
+    final body = jsonEncode({
+      "status": "ok",
+      "list": tasks.map((e) => e.toJson()).toList(),
+    });
+
     final Response response = await Repository.patch(
       url: "$baseUrl/list",
       headers: {
@@ -41,17 +47,15 @@ class TaskRemoteRepository {
         "Content-Type": "application/json",
         "X-Last-Known-Revision": "$revision",
       },
-      body: jsonEncode({
-        "status": "ok",
-        "list": tasks.map((e) => e.toMap()).toList(),
-      }),
+      body: body,
     );
+
     activeRequests--;
     if (response.isSuccesful) {
       return ResponseData.response(
         response,
         (jsonDecode(response.body)['list'] as Iterable)
-            .map((e) => Task.fromMap(e))
+            .map((e) => Task.fromJson(e))
             .toList(),
       );
     }
@@ -69,14 +73,14 @@ class TaskRemoteRepository {
       },
       body: jsonEncode({
         "status": "ok",
-        "element": task.toMap(),
+        "element": task.toJson(),
       }),
     );
     activeRequests--;
     if (response.isSuccesful) {
       return ResponseData.response(
         response,
-        Task.fromMap(jsonDecode(response.body)['element']),
+        Task.fromJson(jsonDecode(response.body)['element']),
       );
     }
 
@@ -94,14 +98,14 @@ class TaskRemoteRepository {
       },
       body: jsonEncode({
         "status": "ok",
-        "element": task.toMap(),
+        "element": task.toJson(),
       }),
     );
     activeRequests--;
     if (response.isSuccesful) {
       return ResponseData.response(
         response,
-        Task.fromMap(jsonDecode(response.body)['element']),
+        Task.fromJson(jsonDecode(response.body)['element']),
       );
     }
 

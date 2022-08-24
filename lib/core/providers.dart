@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/animated_task_model.dart';
 import '../models/task_filter.dart';
 import '../models/task_model.dart';
 import '../repositories/tasks_controller.dart';
@@ -64,7 +65,13 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
 
   List<AnimatedTask> get lastState => _lastState;
 
-  AnimatedTaskListState(this._ref) : super([]) {
+  AnimatedTaskListState(this._ref)
+      : super(
+          _ref
+              .read(sorteredFilteredTaskList)
+              .map((e) => AnimatedTask(status: TaskStatus.create, task: e))
+              .toList(),
+        ) {
     _init();
   }
 
@@ -114,35 +121,6 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
     if (index != -1) {
       state[index] = state[index].copyWith(status: task.status);
     }
-  }
-}
-
-class AnimatedTask {
-  final TaskStatus status;
-  final Task task;
-  AnimatedTask({required this.status, required this.task});
-
-  @override
-  bool operator ==(covariant AnimatedTask other) {
-    if (identical(this, other)) return true;
-
-    return other.status == status && other.task == task;
-  }
-
-  @override
-  int get hashCode => status.hashCode ^ task.hashCode;
-
-  @override
-  String toString() => 'AnimatedTask(status: $status, task: $task)';
-
-  AnimatedTask copyWith({
-    TaskStatus? status,
-    Task? task,
-  }) {
-    return AnimatedTask(
-      status: status ?? this.status,
-      task: task ?? this.task,
-    );
   }
 }
 

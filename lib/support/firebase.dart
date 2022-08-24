@@ -19,11 +19,13 @@ Future<void> initFirebase() async {
     ),
   );
   try {
+    remoteConfig.addListener(() {
+      int importanceColor = remoteConfig.getInt("importanceColor");
+      if (importanceColor != 0) {
+        Hive.box<int>('support').put('importanceColor', importanceColor);
+      }
+    });
     await remoteConfig.fetchAndActivate();
-    int importanceColor = remoteConfig.getInt("importanceColor");
-    if (importanceColor != 0) {
-      Hive.box<int>('support').put('importanceColor', importanceColor);
-    }
   } catch (e) {
     logger.e('fetchAndActivate - set importanceColor error', e);
   }

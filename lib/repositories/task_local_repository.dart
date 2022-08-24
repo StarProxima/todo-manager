@@ -38,6 +38,7 @@ class TaskLocalRepository {
     _tasks ??= (Hive.box('tasks').get('tasks') as Iterable)
         .map((e) => e as Task)
         .toList();
+
     return _tasks!;
   }
 

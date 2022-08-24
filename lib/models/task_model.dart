@@ -1,69 +1,91 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
+
 import 'dart:math';
 
-import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive/hive.dart';
-
+// ignore: unused_import
+import 'package:flutter/foundation.dart';
 import 'importance.dart';
 
 part 'task_model.g.dart';
+part 'task_model.freezed.dart';
 
-@HiveType(typeId: 0)
-class Task {
-  @HiveField(0)
-  late final String id;
+class TimestampConverter implements JsonConverter<DateTime, int> {
+  const TimestampConverter();
 
-  @HiveField(1)
-  final String text;
+  @override
+  DateTime fromJson(int timestamp) {
+    return DateTime.fromMillisecondsSinceEpoch(timestamp);
+  }
 
-  @HiveField(2)
-  final Importance importance;
+  @override
+  int toJson(DateTime date) => date.millisecondsSinceEpoch;
+}
 
-  @HiveField(3)
-  final bool done;
+class TimestampOrNullConverter implements JsonConverter<DateTime?, int?> {
+  const TimestampOrNullConverter();
 
-  @HiveField(4)
-  final DateTime? deadline;
+  @override
+  DateTime? fromJson(int? timestamp) {
+    return timestamp == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(timestamp);
+  }
 
-  @HiveField(5)
-  final Color? color;
+  @override
+  int? toJson(DateTime? date) => date?.millisecondsSinceEpoch;
+}
 
-  @HiveField(6)
-  late final DateTime createdAt;
+@Freezed()
+class Task with _$Task {
+  const Task._();
 
-  @HiveField(7)
-  late final DateTime changedAt;
-
-  @HiveField(8)
-  late final String lastUpdatedBy;
+  @HiveType(typeId: 0)
+  const factory Task({
+    @HiveField(0) required String id,
+    @HiveField(1) required String text,
+    @HiveField(2) required bool done,
+    @HiveField(3) required Importance importance,
+    @TimestampOrNullConverter() @HiveField(4) DateTime? deadline,
+    @TimestampConverter()
+    @JsonKey(name: 'created_at')
+    @HiveField(6)
+        required DateTime createdAt,
+    @TimestampConverter()
+    @JsonKey(name: 'changed_at')
+    @HiveField(7)
+        required DateTime changedAt,
+    @JsonKey(name: 'last_updated_by')
+    @HiveField(8)
+        required String lastUpdatedBy,
+  }) = _Task;
 
   static int _count = 0;
 
-  Task({
-    required this.id,
-    required this.text,
-    required this.importance,
-    this.deadline,
-    required this.done,
-    this.color,
-    required this.createdAt,
-    required this.changedAt,
-    required this.lastUpdatedBy,
-  });
+  factory Task.fromJson(Map<String, Object?> json) => _$TaskFromJson(json);
 
-  Task.create({
-    this.text = '',
-    this.importance = Importance.basic,
-    this.done = false,
-    this.deadline,
-    this.color,
+  factory Task.create({
+    String text = '',
+    bool done = false,
+    Importance importance = Importance.basic,
+    DateTime? deadline,
   }) {
     var now = DateTime.now();
-    id = '${now.millisecondsSinceEpoch}${_count++}';
-    createdAt = now;
-    changedAt = now;
-    lastUpdatedBy = 'Pacman';
+    final id = '${now.millisecondsSinceEpoch}${_count++}';
+    final createdAt = now;
+    final changedAt = now;
+    const lastUpdatedBy = 'Pacman';
+    return Task(
+      id: id,
+      text: text,
+      done: done,
+      importance: importance,
+      deadline: deadline,
+      createdAt: createdAt,
+      changedAt: changedAt,
+      lastUpdatedBy: lastUpdatedBy,
+    );
   }
 
   factory Task.random() {
@@ -76,8 +98,8 @@ class Task {
 
     return Task.create(
       text: taskTextList[random.nextInt(taskTextList.length)].trim(),
-      importance: Importance.values[random.nextInt(3)],
       done: random.nextInt(100) < 40,
+      importance: Importance.values[random.nextInt(3)],
       deadline: random.nextInt(100) < 60
           ? DateTime.fromMillisecondsSinceEpoch(
               DateTime.now().millisecondsSinceEpoch +
@@ -90,116 +112,20 @@ class Task {
 
   Task edit({
     String? text,
-    Importance? importance,
     bool? done,
+    Importance? importance,
     DateTime? deadline,
-    Color? color,
     bool? deleteDeadline,
   }) {
     return Task(
       id: id,
       text: text ?? this.text,
-      importance: importance ?? this.importance,
       done: done ?? this.done,
+      importance: importance ?? this.importance,
       deadline: deleteDeadline ?? false ? null : deadline ?? this.deadline,
-      color: color ?? this.color,
       createdAt: createdAt,
       changedAt: DateTime.now(),
       lastUpdatedBy: 'Pacman',
     );
-  }
-
-  Task copyWith({
-    String? id,
-    String? text,
-    Importance? importance,
-    bool? done,
-    DateTime? deadline,
-    Color? color,
-    DateTime? createdAt,
-    DateTime? changedAt,
-    String? lastUpdatedBy,
-  }) {
-    return Task(
-      id: id ?? this.id,
-      text: text ?? this.text,
-      importance: importance ?? this.importance,
-      done: done ?? this.done,
-      deadline: deadline ?? this.deadline,
-      color: color ?? this.color,
-      createdAt: createdAt ?? this.createdAt,
-      changedAt: changedAt ?? this.changedAt,
-      lastUpdatedBy: lastUpdatedBy ?? this.lastUpdatedBy,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'text': text,
-      'importance': importance.name,
-      'deadline': deadline?.millisecondsSinceEpoch,
-      'done': done,
-      'color': color?.value,
-      'created_at': createdAt.millisecondsSinceEpoch,
-      'changed_at': changedAt.millisecondsSinceEpoch,
-      'last_updated_by': lastUpdatedBy,
-    };
-  }
-
-  factory Task.fromMap(Map<String, dynamic> map) {
-    return Task(
-      id: map['id'] as String,
-      text: map['text'] as String,
-      importance: (map['importance'] as String).toImportance(),
-      deadline: map['deadline'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['deadline'] as int)
-          : null,
-      done: map['done'] as bool,
-      color: map['color'] != null ? Color(map['color'] as int) : null,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-      changedAt: DateTime.fromMillisecondsSinceEpoch(map['changed_at'] as int),
-      lastUpdatedBy: map['last_updated_by'] as String,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory Task.fromJson(String source) =>
-      Task.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'Task(id: $id, text: $text, importance: $importance, deadline: $deadline, done: $done, color: $color, created_at: $createdAt, changed_at: $changedAt, last_updated_by: $lastUpdatedBy)';
-  }
-
-  @override
-  bool operator ==(covariant Task other) {
-    if (identical(this, other)) return true;
-
-    return other.id == id &&
-        other.text == text &&
-        other.importance == importance &&
-        other.done == done &&
-        other.deadline == deadline &&
-        other.color == color &&
-        other.createdAt.millisecondsSinceEpoch ~/ 1000 ==
-            createdAt.millisecondsSinceEpoch ~/ 1000 &&
-        other.changedAt.millisecondsSinceEpoch ~/ 1000 ==
-            changedAt.millisecondsSinceEpoch ~/ 1000 &&
-        other.lastUpdatedBy == lastUpdatedBy;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        text.hashCode ^
-        importance.hashCode ^
-        done.hashCode ^
-        deadline.hashCode ^
-        color.hashCode ^
-        createdAt.hashCode ^
-        changedAt.hashCode ^
-        lastUpdatedBy.hashCode;
   }
 }
