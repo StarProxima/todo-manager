@@ -26,26 +26,17 @@ final taskList = StateNotifierProvider<TaskList, List<Task>>((ref) {
   return TaskList([]);
 });
 
-List<Task> _lastTasks = [];
-List<Task> lastTasks = [];
-
 final filteredTaskList = Provider<List<Task>>((ref) {
   final filter = ref.watch(taskFilter);
   final tasks = ref.watch(taskList);
 
-  final List<Task> filteredTask;
   switch (filter) {
     case TaskFilter.all:
-      filteredTask = tasks;
-      break;
+      return tasks;
+
     case TaskFilter.uncompleted:
-      filteredTask = tasks.where((element) => !element.done).toList();
+      return tasks.where((element) => !element.done).toList();
   }
-  if (!identical(filteredTask, _lastTasks)) {
-    lastTasks = _lastTasks;
-    _lastTasks = filteredTask;
-  }
-  return filteredTask;
 });
 
 final sorteredFilteredTaskList = Provider<List<Task>>((ref) {
@@ -54,36 +45,52 @@ final sorteredFilteredTaskList = Provider<List<Task>>((ref) {
   return tasks;
 });
 
-final animatedTaskList = Provider<List<AnimatedTask>>((ref) {
-  final newTasks = ref.watch(sorteredFilteredTaskList);
-
-  List<Task> tasks = [];
-  List<AnimatedTask> animatedTasks = [];
-
-  final allTasks = [...newTasks, ...lastTasks]
-    ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
-
-  bool contains(List<Task> list, Task task) {
-    return list.where((element) => element.id == task.id).isNotEmpty;
-  }
-
-  for (final task in allTasks) {
-    if (!contains(tasks, task)) {
-      final TaskStatus status;
-      if (!contains(lastTasks, task) && contains(newTasks, task)) {
-        status = TaskStatus.create;
-      } else if (contains(lastTasks, task) && !contains(newTasks, task)) {
-        status = TaskStatus.hide;
-      } else {
-        status = TaskStatus.none;
-      }
-      tasks.add(task);
-      animatedTasks.add(AnimatedTask(status: status, task: task));
-    }
-  }
-
-  return animatedTasks;
+final animatedTaskList =
+    StateNotifierProvider<AnimatedTaskListState, List<AnimatedTask>>((ref) {
+  return AnimatedTaskListState(ref);
 });
+
+class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
+  final StateNotifierProviderRef _ref;
+
+  AnimatedTaskListState(this._ref) : super([]) {
+    _init();
+  }
+
+  void _init() {
+    _ref.listen<List<Task>>(sorteredFilteredTaskList, (previous, next) {
+      final newTasks = next;
+      final lastTasks = previous ?? [];
+
+      List<Task> tasks = [];
+      List<AnimatedTask> animatedTasks = [];
+
+      final allTasks = [...newTasks, ...lastTasks]
+        ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+      bool contains(List<Task> list, Task task) {
+        return list.where((element) => element.id == task.id).isNotEmpty;
+      }
+
+      for (final task in allTasks) {
+        if (!contains(tasks, task)) {
+          final TaskStatus status;
+          if (!contains(lastTasks, task) && contains(newTasks, task)) {
+            status = TaskStatus.create;
+          } else if (contains(lastTasks, task) && !contains(newTasks, task)) {
+            status = TaskStatus.hide;
+          } else {
+            status = TaskStatus.none;
+          }
+          tasks.add(task);
+          animatedTasks.add(AnimatedTask(status: status, task: task));
+        }
+      }
+
+      state = animatedTasks;
+    });
+  }
+}
 
 class AnimatedTask {
   final TaskStatus status;
