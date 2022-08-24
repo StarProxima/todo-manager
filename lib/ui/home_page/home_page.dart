@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
@@ -38,6 +36,10 @@ class _HomePageState extends ConsumerState<HomePage>
 
   late final transformAnimationController = AnimationController(
     duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+
+  late final emptyAnimationController = AnimationController(
     vsync: this,
   );
 
@@ -171,7 +173,6 @@ class _HomePageState extends ConsumerState<HomePage>
 
                             if (!lastTasksId.contains(task.id) &&
                                 newTasksId.contains(task.id)) {
-                              log('message');
                               return FadeTransition(
                                 opacity: CurvedAnimation(
                                   parent: animationController,
@@ -198,46 +199,45 @@ class _HomePageState extends ConsumerState<HomePage>
                               );
                             }
 
-                            if (lastTasksId.contains(task.id) &&
-                                newTasksId.contains(task.id)) {
-                              final lastDate = lastTasks
-                                  .firstWhere(
-                                    (element) => element.id == task.id,
-                                  )
-                                  .changedAt;
-
-                              final newDate = newtasks
-                                  .firstWhere(
-                                    (element) => element.id == task.id,
-                                  )
-                                  .changedAt;
-                              if (lastDate != newDate) {
-                                final animation = Tween<double>(
-                                  begin: 0,
-                                  end: 0.5,
-                                ).animate(
-                                  CurvedAnimation(
-                                    parent: transformAnimationController,
-                                    curve: Curves.decelerate,
-                                  ),
-                                );
-
-                                return AnimatedBuilder(
-                                  animation: animation,
-                                  child: taskCard,
-                                  builder: (context, child) {
-                                    return Transform(
-                                      alignment: Alignment.center,
-                                      transform:
-                                          Matrix4.rotationX(animation.value),
-                                      child: child,
-                                    );
-                                  },
-                                );
-                              }
-                            }
-
                             return taskCard;
+
+                            // final lastDate = lastTasks
+                            //     .firstWhere(
+                            //       (element) => element.id == task.id,
+                            //     )
+                            //     .changedAt;
+
+                            // final newDate = newtasks
+                            //     .firstWhere(
+                            //       (element) => element.id == task.id,
+                            //     )
+                            //     .changedAt;
+
+                            // final isEditedTask = lastDate != newDate;
+
+                            // final animation = Tween<double>(
+                            //   begin: 0,
+                            //   end: 0.5,
+                            // ).animate(
+                            //   CurvedAnimation(
+                            //     parent: isEditedTask
+                            //         ? transformAnimationController
+                            //         : emptyAnimationController,
+                            //     curve: Curves.decelerate,
+                            //   ),
+                            // );
+
+                            // return AnimatedBuilder(
+                            //   animation: animation,
+                            //   child: taskCard,
+                            //   builder: (context, child) {
+                            //     return Transform(
+                            //       alignment: Alignment.center,
+                            //       transform: Matrix4.rotationX(animation.value),
+                            //       child: child,
+                            //     );
+                            //   },
+                            // );
                           },
                         );
                       },
