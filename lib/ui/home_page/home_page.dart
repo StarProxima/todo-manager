@@ -6,7 +6,7 @@ import 'widgets/add_task_card.dart';
 import '../../models/task_model.dart';
 import 'widgets/floating_action_panel.dart';
 import 'widgets/home_page_header_delegate.dart';
-import 'widgets/task_card.dart';
+import '../task_card/task_card.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -43,7 +43,6 @@ class _HomePageState extends ConsumerState<HomePage>
   List<Task> getMergedTasks(
     List<Task> lastTasks,
     List<Task> newTasks,
-    List<Task> allTasks,
   ) {
     List<Task> list = [];
 
@@ -52,8 +51,7 @@ class _HomePageState extends ConsumerState<HomePage>
 
     for (final task in tasks) {
       if (!tasksToId(list).contains(task.id)) {
-        final t = allTasks.firstWhere((element) => element.id == task.id);
-        list.add(t);
+        list.add(task);
       }
     }
 
@@ -108,7 +106,6 @@ class _HomePageState extends ConsumerState<HomePage>
                         List<Task> mergedTasks = getMergedTasks(
                           lastTasks,
                           newtasks,
-                          ref.read(taskList),
                         );
 
                         return ListView.builder(
@@ -124,19 +121,19 @@ class _HomePageState extends ConsumerState<HomePage>
 
                             final task = mergedTasks[index];
 
-                            if (lastTasksId.contains(task.id) &&
-                                !newTasksId.contains(task.id)) {
-                              return TaskCard(
-                                task: task,
-                                status: TaskStatus.delete,
-                              );
-                            }
-
                             if (!lastTasksId.contains(task.id) &&
                                 newTasksId.contains(task.id)) {
                               return TaskCard(
                                 task: task,
                                 status: TaskStatus.create,
+                              );
+                            }
+
+                            if (lastTasksId.contains(task.id) &&
+                                !newTasksId.contains(task.id)) {
+                              return TaskCard(
+                                task: task.edit(done: true),
+                                status: TaskStatus.hide,
                               );
                             }
 
