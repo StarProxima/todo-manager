@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -15,10 +17,23 @@ final _currentTaskInTaskCard = Provider<Task>((ref) {
   throw UnimplementedError();
 });
 
+final _currentTaskStatus = StateProvider<TaskStatus>((ref) {
+  throw UnimplementedError();
+});
+
+enum TaskStatus {
+  create,
+  delete,
+  basic,
+  empty,
+}
+
 class TaskCard extends StatelessWidget {
-  const TaskCard({Key? key, required this.task}) : super(key: key);
+  const TaskCard({Key? key, required this.task, this.status}) : super(key: key);
 
   final Task task;
+
+  final TaskStatus? status;
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
@@ -26,8 +41,142 @@ class TaskCard extends StatelessWidget {
         _currentTaskInTaskCard.overrideWithValue(
           task,
         ),
+        _currentTaskStatus
+            .overrideWithValue(StateController(status ?? TaskStatus.basic)),
       ],
-      child: const _TaskCardAnimated(),
+      child: Consumer(
+        builder: (context, ref, _) {
+          final status = ref.watch(_currentTaskStatus);
+          return status == TaskStatus.create
+              ? const _TaskCardCreateAnimated()
+              : status == TaskStatus.delete
+                  ? const _TaskCardDeleteAnimated()
+                  : status == TaskStatus.basic
+                      ? const _TaskCardAnimated()
+                      : const SizedBox();
+        },
+      ),
+    );
+  }
+}
+
+class _TaskCardDeleteAnimated extends ConsumerStatefulWidget {
+  const _TaskCardDeleteAnimated({Key? key}) : super(key: key);
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      __TaskCardDeleteAnimatedState();
+}
+
+class __TaskCardDeleteAnimatedState
+    extends ConsumerState<_TaskCardDeleteAnimated>
+    with TickerProviderStateMixin {
+  late final controller = AnimationController(
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  )..forward();
+
+  final animationIsCompleted = StateProvider<bool>((ref) {
+    return false;
+  });
+
+  @override
+  void initState() {
+    controller.addStatusListener((status) {
+      if (controller.isCompleted) {
+        ref.read(_currentTaskStatus.notifier).state = TaskStatus.empty;
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: CurvedAnimation(
+        parent: Tween<double>(begin: 1, end: 0).animate(controller),
+        curve: Curves.easeInOutCubic,
+      ),
+      child: SizeTransition(
+        sizeFactor: CurvedAnimation(
+          parent: Tween<double>(begin: 1, end: 0).animate(controller),
+          curve: Curves.easeOutBack,
+        ),
+        child: const _TaskCardAnimated(),
+      ),
+    );
+  }
+}
+
+class _TaskCardCreateAnimated extends ConsumerStatefulWidget {
+  const _TaskCardCreateAnimated({Key? key}) : super(key: key);
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      __TaskCardCreateAnimatedState();
+}
+
+class __TaskCardCreateAnimatedState
+    extends ConsumerState<_TaskCardCreateAnimated>
+    with TickerProviderStateMixin {
+  late final controller = AnimationController(
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  )..forward();
+
+  final animationIsCompleted = StateProvider<bool>((ref) {
+    return false;
+  });
+
+  @override
+  void initState() {
+    controller.addStatusListener((status) {
+      if (controller.isCompleted) {
+        log('animationIsCompleted');
+        ref.read(_currentTaskStatus.notifier).state = TaskStatus.basic;
+        //ref.read(animationIsCompleted.notifier).state = true;
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: CurvedAnimation(
+        parent: controller,
+        curve: Curves.easeInOutCubic,
+      ),
+      child: SizeTransition(
+        sizeFactor: CurvedAnimation(
+          parent: controller,
+          curve: Curves.easeOutBack,
+        ),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 1),
+            end: const Offset(0, 0),
+          ).animate(
+            CurvedAnimation(
+              parent: controller,
+              curve: Curves.easeOutBack,
+            ),
+          ),
+          child: const _TaskCardAnimated(),
+        ),
+      ),
     );
   }
 }
@@ -224,6 +373,7 @@ class _TaskCardView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final task = ref.watch(_currentTaskInTaskCard);
+    log('message ${task.text}');
 
     final crossedOut = Theme.of(context).extension<AppTextStyle>()!.crossedOut!;
     return GestureDetector(
