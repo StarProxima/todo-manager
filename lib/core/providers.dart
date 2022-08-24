@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/task_filter.dart';
 import '../models/task_model.dart';
 import '../repositories/tasks_controller.dart';
+import '../ui/task_card/task_card.dart';
 
 final appThemeMode = StateNotifierProvider<AppThemeMode, ThemeMode>((ref) {
   return AppThemeMode(ThemeMode.system);
@@ -52,6 +53,43 @@ final sorteredFilteredTaskList = Provider<List<Task>>((ref) {
     ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
   return tasks;
 });
+
+final animatedTaskList = Provider<List<AnimatedTask>>((ref) {
+  final newTasks = ref.watch(sorteredFilteredTaskList);
+
+  List<Task> tasks = [];
+  List<AnimatedTask> animatedTasks = [];
+
+  final allTasks = [...newTasks, ...lastTasks]
+    ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+  bool contains(List<Task> list, Task task) {
+    return list.where((element) => element.id == task.id).isNotEmpty;
+  }
+
+  for (final task in allTasks) {
+    if (!contains(tasks, task)) {
+      final TaskStatus status;
+      if (!contains(lastTasks, task) && contains(newTasks, task)) {
+        status = TaskStatus.create;
+      } else if (contains(lastTasks, task) && !contains(newTasks, task)) {
+        status = TaskStatus.hide;
+      } else {
+        status = TaskStatus.none;
+      }
+      tasks.add(task);
+      animatedTasks.add(AnimatedTask(status: status, task: task));
+    }
+  }
+
+  return animatedTasks;
+});
+
+class AnimatedTask {
+  final TaskStatus status;
+  final Task task;
+  AnimatedTask({required this.status, required this.task});
+}
 
 final completedTaskCount = Provider<int>((ref) {
   return ref.watch(taskList).where((task) => task.done).length;
