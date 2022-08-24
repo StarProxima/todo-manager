@@ -24,6 +24,12 @@ class _TaskCardHiddenState extends ConsumerState<TaskCardHidden>
       if (controller.isCompleted) {
         ref.read(_currentTaskStatusInTaskCard.notifier).state =
             TaskStatus.empty;
+        ref.read(animatedTaskList.notifier).changeStatus(
+              AnimatedTask(
+                status: TaskStatus.empty,
+                task: ref.read(_currentTaskInTaskCard),
+              ),
+            );
       }
     });
     super.initState();
@@ -37,7 +43,6 @@ class _TaskCardHiddenState extends ConsumerState<TaskCardHidden>
 
   @override
   Widget build(BuildContext context) {
-    log('TaskCardHidden');
     return FadeTransition(
       opacity: CurvedAnimation(
         parent: Tween<double>(begin: 1, end: 0).animate(controller),

@@ -60,6 +60,10 @@ final animatedTaskList =
 class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
   final StateNotifierProviderRef _ref;
 
+  final List<AnimatedTask> _lastState = [];
+
+  List<AnimatedTask> get lastState => _lastState;
+
   AnimatedTaskListState(this._ref) : super([]) {
     _init();
   }
@@ -103,6 +107,14 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
         ..sort((a, b) => _ref.read(taskSort)(a.task, b.task));
     });
   }
+
+  void changeStatus(AnimatedTask task) {
+    final index =
+        state.indexWhere((element) => element.task.id == task.task.id);
+    if (index != -1) {
+      state[index] = state[index].copyWith(status: task.status);
+    }
+  }
 }
 
 class AnimatedTask {
@@ -122,6 +134,16 @@ class AnimatedTask {
 
   @override
   String toString() => 'AnimatedTask(status: $status, task: $task)';
+
+  AnimatedTask copyWith({
+    TaskStatus? status,
+    Task? task,
+  }) {
+    return AnimatedTask(
+      status: status ?? this.status,
+      task: task ?? this.task,
+    );
+  }
 }
 
 final completedTaskCount = Provider<int>((ref) {

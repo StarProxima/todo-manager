@@ -36,20 +36,22 @@ enum TaskStatus {
 }
 
 class TaskCard extends StatelessWidget {
-  const TaskCard({Key? key, required this.task, this.status}) : super(key: key);
+  const TaskCard(
+    this.animatedTask, {
+    Key? key,
+  }) : super(key: key);
 
-  final Task task;
+  final AnimatedTask animatedTask;
 
-  final TaskStatus? status;
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
       overrides: [
         _currentTaskInTaskCard.overrideWithValue(
-          task,
+          animatedTask.task,
         ),
         _currentTaskStatusInTaskCard
-            .overrideWithValue(StateController(status ?? TaskStatus.none)),
+            .overrideWithValue(StateController(animatedTask.status)),
       ],
       child: Consumer(
         builder: (context, ref, _) {
