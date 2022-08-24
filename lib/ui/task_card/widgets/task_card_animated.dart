@@ -10,7 +10,7 @@ class _TaskCardAnimated extends ConsumerStatefulWidget {
 class _TaskCardAnimatedState extends ConsumerState<_TaskCardAnimated>
     with TickerProviderStateMixin {
   late final controller = AnimationController(
-    duration: const Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 500),
     vsync: this,
   );
 
@@ -20,7 +20,7 @@ class _TaskCardAnimatedState extends ConsumerState<_TaskCardAnimated>
   ).animate(
     CurvedAnimation(
       parent: controller,
-      curve: Curves.decelerate,
+      curve: Curves.easeInOutQuad,
     ),
   );
 

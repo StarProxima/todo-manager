@@ -31,7 +31,7 @@ final _currentTaskStatusInTaskCard = StateProvider<TaskStatus>((ref) {
 enum TaskStatus {
   create,
   hide,
-  basic,
+  none,
   empty,
 }
 
@@ -49,7 +49,7 @@ class TaskCard extends StatelessWidget {
           task,
         ),
         _currentTaskStatusInTaskCard
-            .overrideWithValue(StateController(status ?? TaskStatus.basic)),
+            .overrideWithValue(StateController(status ?? TaskStatus.none)),
       ],
       child: Consumer(
         builder: (context, ref, _) {
@@ -58,7 +58,7 @@ class TaskCard extends StatelessWidget {
               ? const _TaskCardCreated()
               : status == TaskStatus.hide
                   ? const TaskCardHidden()
-                  : status == TaskStatus.basic
+                  : status == TaskStatus.none
                       ? const _TaskCardAnimated()
                       : const SizedBox();
         },

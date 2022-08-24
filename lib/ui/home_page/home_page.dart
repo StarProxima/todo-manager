@@ -17,23 +17,6 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage>
     with TickerProviderStateMixin {
-  void onEditTask(task) async {
-    ref.read(taskList.notifier).edit(task);
-  }
-
-  void onDeleteTask(task) async {
-    ref.read(taskList.notifier).delete(task);
-  }
-
-  void onAddTask(task) async {
-    ref.read(taskList.notifier).add(task);
-  }
-
-  late final animationController = AnimationController(
-    duration: const Duration(milliseconds: 300),
-    vsync: this,
-  );
-
   List<String> tasksToId(List<Task> list) {
     return List.generate(list.length, (index) {
       return list[index].id;
@@ -96,9 +79,6 @@ class _HomePageState extends ConsumerState<HomePage>
                         List<Task> newtasks =
                             ref.read(sorteredFilteredTaskList);
 
-                        animationController.reset();
-                        animationController.forward();
-
                         List<String> lastTasksId = tasksToId(lastTasks);
 
                         List<String> newTasksId = tasksToId(newtasks);
@@ -115,7 +95,7 @@ class _HomePageState extends ConsumerState<HomePage>
                           itemBuilder: (context, index) {
                             if (index == mergedTasks.length) {
                               return AddTaskCard(
-                                onAddTask: onAddTask,
+                                onAddTask: ref.read(taskList.notifier).add,
                               );
                             }
 
