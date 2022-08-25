@@ -32,5 +32,5 @@ class NavigationStateDTO {
   NavigationStateDTO.homePage()
       : onHomePage = true,
         taskId = null;
-  NavigationStateDTO.taskDetails(this.taskId) : onHomePage = false;
+  NavigationStateDTO.taskDetails([this.taskId]) : onHomePage = false;
 }
