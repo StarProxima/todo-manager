@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'support/provider_logger.dart';
 import 'core/providers.dart';
 import 'support/app_metrica.dart';
 import 'support/hive.dart';
@@ -30,7 +31,7 @@ void main() {
       runApp(
         ProviderScope(
           observers: [
-            Logger(),
+            ProviderLogger(),
           ],
           child: const MyApp(),
         ),

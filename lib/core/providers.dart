@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 
-import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,7 +21,6 @@ class AppThemeMode extends StateNotifier<ThemeMode> {
   AppThemeMode(super.state);
 
   void switchTheme() {
-    AppMetrica.reportEvent('Switch theme');
     state = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
   }
 }
@@ -184,9 +182,11 @@ class DismissibleTaskListController extends StateNotifier<bool> {
 
 enum TaskListAction {
   create,
+  fastCreate,
   edit,
   delete,
   update,
+  none,
 }
 
 class TaskList extends StateNotifier<List<Task>> {
@@ -196,7 +196,17 @@ class TaskList extends StateNotifier<List<Task>> {
 
   late final TaskController _controller;
 
-  TaskListAction lastAction = TaskListAction.update;
+  Task? _lastTask;
+
+  Task? _originalLastTask;
+
+  TaskListAction _lastAction = TaskListAction.none;
+
+  Task? get lastTask => _lastTask;
+
+  Task? get originalLastTask => _originalLastTask;
+
+  TaskListAction get lastAction => _lastAction;
 
   Future<void> _init() async {
     _controller = TaskController();
@@ -204,8 +214,14 @@ class TaskList extends StateNotifier<List<Task>> {
     state = await _controller.getTasks() ?? state;
   }
 
-  Future<void> add(Task task) async {
-    lastAction = TaskListAction.create;
+  Future<void> add(Task task, [bool isFastTask = false]) async {
+    if (isFastTask) {
+      _lastAction = TaskListAction.fastCreate;
+    } else {
+      _lastAction = TaskListAction.create;
+    }
+    _lastTask = task;
+
     state = [
       ...state,
       task,
@@ -218,23 +234,29 @@ class TaskList extends StateNotifier<List<Task>> {
   }
 
   Future<void> edit(Task task) async {
-    lastAction = TaskListAction.edit;
-    state = [
-      for (final element in state)
-        if (element.id == task.id) task else element,
-    ];
-    state = await _controller.editTask(task) ?? state;
+    final index = state.indexWhere((element) => element.id == task.id);
+    if (index != -1) {
+      _lastAction = TaskListAction.edit;
+      _lastTask = task;
+      _originalLastTask = state[index];
+      state = [
+        for (final element in state)
+          if (element.id == task.id) task else element,
+      ];
+      state = await _controller.editTask(task) ?? state;
+    }
   }
 
   Future<void> delete(Task task) async {
-    lastAction = TaskListAction.delete;
+    _lastAction = TaskListAction.delete;
+    _lastTask = task;
     state = state.where((element) => element.id != task.id).toList();
 
     state = await _controller.deleteTask(task) ?? state;
   }
 
   Future<void> updateFromRemoteServer() async {
-    lastAction = TaskListAction.update;
+    _lastAction = TaskListAction.update;
     state = await _controller.getTasks() ?? state;
   }
 }
