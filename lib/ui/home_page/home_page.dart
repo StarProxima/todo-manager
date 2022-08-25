@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
@@ -20,7 +18,6 @@ class _HomePageState extends ConsumerState<HomePage>
     with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    log('HomePage build');
     return Scaffold(
       body: SafeArea(
         child: OrientationBuilder(

@@ -26,6 +26,8 @@ class _TaskCardAnimatedState extends ConsumerState<_TaskCardAnimated>
 
   bool isFirstBuild = true;
 
+  Task? lastTask;
+
   @override
   void initState() {
     super.initState();
@@ -44,13 +46,20 @@ class _TaskCardAnimatedState extends ConsumerState<_TaskCardAnimated>
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(_currentTaskInTaskCard);
+    final task = ref.watch(_currentTaskInTaskCard);
 
-    if (!isFirstBuild) {
+    final lastTaskInTaskList = ref.read(taskList.notifier).lastTask;
+
+    final bool isEditedTask = lastTaskInTaskList?.id == task.id &&
+        lastTask?.changedAt != task.changedAt &&
+        !isFirstBuild;
+
+    lastTask = lastTaskInTaskList;
+    isFirstBuild = false;
+
+    if (isEditedTask) {
       controller.reset();
       controller.forward();
-    } else {
-      isFirstBuild = false;
     }
 
     return AnimatedBuilder(

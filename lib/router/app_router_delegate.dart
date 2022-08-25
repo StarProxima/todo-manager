@@ -51,27 +51,28 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
     return SynchronousFuture(null);
   }
 
+  final MaterialPage _homePage = MaterialPage(
+    child: HomePage(
+      key: GlobalKey(),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, _) {
-        final pages = [
-          if (state.onHomePage && !state.onTaskDetails)
-            const MaterialPage(
-              child: HomePage(),
-            ),
-          if (state.onTaskDetails)
-            MaterialPage(
-              child: TaskDetails(
-                task: ref.read(taskList.notifier).getTaskById(state.taskId),
-              ),
-            ),
-        ];
-
         return Navigator(
           onPopPage: (route, result) => route.didPop(result),
           key: navigatorKey,
-          pages: pages,
+          pages: [
+            if (state.onHomePage) _homePage,
+            if (state.onTaskDetails)
+              MaterialPage(
+                child: TaskDetails(
+                  task: ref.read(taskList.notifier).getTaskById(state.taskId),
+                ),
+              ),
+          ],
         );
       },
     );
