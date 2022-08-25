@@ -259,4 +259,12 @@ class TaskList extends StateNotifier<List<Task>> {
     _lastAction = TaskListAction.update;
     state = await _controller.getTasks() ?? state;
   }
+
+  Task? getTaskById(String? taskId) {
+    final list = state.where((element) => element.id == taskId);
+    if (list.isNotEmpty) {
+      return list.first;
+    }
+    return null;
+  }
 }
