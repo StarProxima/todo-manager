@@ -61,7 +61,7 @@ class Task with _$Task {
         required String lastUpdatedBy,
   }) = _Task;
 
-  static int _count = 0;
+  static int _taskCountInCurrentSession = 0;
 
   factory Task.fromJson(Map<String, Object?> json) => _$TaskFromJson(json);
 
@@ -72,7 +72,7 @@ class Task with _$Task {
     DateTime? deadline,
   }) {
     var now = DateTime.now();
-    final id = '${now.millisecondsSinceEpoch}${_count++}';
+    final id = '${now.millisecondsSinceEpoch}${_taskCountInCurrentSession++}';
     final createdAt = now;
     final changedAt = now;
     const lastUpdatedBy = 'Pacman';

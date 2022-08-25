@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/providers.dart';
+import 'support/app_metrica.dart';
 import 'support/hive.dart';
 import 'support/settings.dart';
 import 'generated/l10n.dart';
@@ -22,10 +23,18 @@ void main() {
       await initHive();
       await initFirebase();
       initErrorHandler();
+      initAppMetrica();
 
       applySupportSettings();
 
-      runApp(const ProviderScope(child: MyApp()));
+      runApp(
+        ProviderScope(
+          observers: [
+            Logger(),
+          ],
+          child: const MyApp(),
+        ),
+      );
     },
     ErrorHandler.recordError,
   );

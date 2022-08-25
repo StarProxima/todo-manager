@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 
+import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,23 +11,33 @@ import '../models/task_model.dart';
 import '../repositories/tasks_controller.dart';
 import '../ui/task_card/task_card.dart';
 
-final appThemeMode = StateNotifierProvider<AppThemeMode, ThemeMode>((ref) {
-  return AppThemeMode(ThemeMode.system);
-});
+final appThemeMode = StateNotifierProvider<AppThemeMode, ThemeMode>(
+  (ref) {
+    return AppThemeMode(ThemeMode.system);
+  },
+  name: 'appThemeMode',
+);
 
 class AppThemeMode extends StateNotifier<ThemeMode> {
   AppThemeMode(super.state);
 
   void switchTheme() {
+    AppMetrica.reportEvent('Switch theme');
     state = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
   }
 }
 
-final taskFilter = StateProvider<TaskFilter>((ref) => TaskFilter.all);
+final taskFilter = StateProvider<TaskFilter>(
+  (ref) => TaskFilter.all,
+  name: 'taskFilter',
+);
 
-final taskList = StateNotifierProvider<TaskList, List<Task>>((ref) {
-  return TaskList([]);
-});
+final taskList = StateNotifierProvider<TaskList, List<Task>>(
+  (ref) {
+    return TaskList([]);
+  },
+  name: 'taskList',
+);
 
 final filteredTaskList = Provider<List<Task>>((ref) {
   final filter = ref.watch(taskFilter);
@@ -171,12 +182,21 @@ class DismissibleTaskListController extends StateNotifier<bool> {
   }
 }
 
+enum TaskListAction {
+  create,
+  edit,
+  delete,
+  update,
+}
+
 class TaskList extends StateNotifier<List<Task>> {
   TaskList(super.state) {
     _init();
   }
 
   late final TaskController _controller;
+
+  TaskListAction lastAction = TaskListAction.update;
 
   Future<void> _init() async {
     _controller = TaskController();
@@ -185,6 +205,7 @@ class TaskList extends StateNotifier<List<Task>> {
   }
 
   Future<void> add(Task task) async {
+    lastAction = TaskListAction.create;
     state = [
       ...state,
       task,
@@ -197,6 +218,7 @@ class TaskList extends StateNotifier<List<Task>> {
   }
 
   Future<void> edit(Task task) async {
+    lastAction = TaskListAction.edit;
     state = [
       for (final element in state)
         if (element.id == task.id) task else element,
@@ -205,12 +227,14 @@ class TaskList extends StateNotifier<List<Task>> {
   }
 
   Future<void> delete(Task task) async {
+    lastAction = TaskListAction.delete;
     state = state.where((element) => element.id != task.id).toList();
 
     state = await _controller.deleteTask(task) ?? state;
   }
 
   Future<void> updateFromRemoteServer() async {
+    lastAction = TaskListAction.update;
     state = await _controller.getTasks() ?? state;
   }
 }
