@@ -86,6 +86,7 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
 
   void _init() {
     _ref.listen<List<Task>>(sorteredFilteredTaskList, (previous, next) {
+      log('animatedTaskList');
       final newTasks = next;
       final lastTasks = previous ?? [];
 

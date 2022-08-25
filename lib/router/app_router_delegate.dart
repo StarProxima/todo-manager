@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,20 +11,14 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<NavigationStateDTO> {
   NavigationState state = NavigationState(
     onHomePage: true,
+    onTaskDetails: false,
     taskId: null,
   );
-
-  bool get onHomePage => state.onHomePage;
-
-  bool get onNewTaskDetails => !state.onHomePage && state.taskId == null;
-
-  bool get onTaskDetails => !state.onHomePage && state.taskId != null;
-
-  MaterialPage? _homePage;
 
   void gotoHomePage() {
     state = NavigationState(
       onHomePage: true,
+      onTaskDetails: false,
       taskId: null,
     );
     notifyListeners();
@@ -31,7 +26,8 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
 
   void gotoTaskDetails([String? taskId]) {
     state = NavigationState(
-      onHomePage: false,
+      onHomePage: true,
+      onTaskDetails: true,
       taskId: taskId,
     );
     notifyListeners();
@@ -39,7 +35,11 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
 
   @override
   NavigationStateDTO? get currentConfiguration {
-    return NavigationStateDTO(state.onHomePage, state.taskId);
+    return NavigationStateDTO(
+      onHomePage: state.onHomePage,
+      onTaskDetails: state.onTaskDetails,
+      taskId: state.taskId,
+    );
   }
 
   @override
@@ -47,24 +47,20 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
 
   @override
   Future<void> setNewRoutePath(NavigationStateDTO configuration) {
-    state.taskId = configuration.taskId;
-    state.onHomePage = configuration.onHomePage;
-    return Future.value();
+    state = NavigationState.fromDTO(configuration);
+    return SynchronousFuture(null);
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, _) {
-        _homePage ??= MaterialPage(
-          child: HomePage(
-            key: GlobalKey(),
-          ),
-        );
-
         final pages = [
-          _homePage!,
-          if (!state.onHomePage)
+          if (state.onHomePage && !state.onTaskDetails)
+            const MaterialPage(
+              child: HomePage(),
+            ),
+          if (state.onTaskDetails)
             MaterialPage(
               child: TaskDetails(
                 task: ref.read(taskList.notifier).getTaskById(state.taskId),

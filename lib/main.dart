@@ -6,10 +6,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'router/app_route_information_parser.dart';
 import 'router/app_router_delegate.dart';
-import 'support/provider_logger.dart';
 import 'core/providers.dart';
 import 'support/app_metrica.dart';
 import 'support/hive.dart';
+import 'support/provider_logger.dart';
 import 'support/settings.dart';
 import 'generated/l10n.dart';
 import 'styles/app_theme.dart';
@@ -51,21 +51,19 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ProviderScope(
-      child: MaterialApp.router(
-        routerDelegate: routerDelegate,
-        routeInformationParser: routeInformationParser,
-        localizationsDelegates: const [
-          S.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: S.delegate.supportedLocales,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ref.watch(appThemeMode),
-      ),
+    return MaterialApp.router(
+      routerDelegate: routerDelegate,
+      routeInformationParser: routeInformationParser,
+      localizationsDelegates: const [
+        S.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: S.delegate.supportedLocales,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ref.watch(appThemeMode),
     );
   }
 }

@@ -23,9 +23,11 @@ class AppRouteInformationParser
         return Future.value(
           NavigationStateDTO.taskDetails(),
         );
-      } else {
+      }
+    } else if (uri.pathSegments.length == 3) {
+      if (uri.pathSegments[1] == AppRoute.taskDetails.str) {
         return Future.value(
-          NavigationStateDTO.taskDetails(uri.pathSegments[1]),
+          NavigationStateDTO.taskDetails(uri.pathSegments[2]),
         );
       }
     }
@@ -35,16 +37,17 @@ class AppRouteInformationParser
 
   @override
   RouteInformation? restoreRouteInformation(NavigationStateDTO configuration) {
+    String location = '';
     if (configuration.onHomePage) {
-      return RouteInformation(location: '/' + AppRoute.homePage.str);
-    } else if (configuration.taskId != null) {
-      return RouteInformation(
-        location: '/' + AppRoute.homePage.str + '/' + configuration.taskId!,
-      );
-    } else {
-      return RouteInformation(
-        location: '/' + AppRoute.homePage.str + '/' + AppRoute.taskDetails.str,
-      );
+      location += '/' + AppRoute.homePage.str;
     }
+    if (configuration.onTaskDetails) {
+      location += '/' + AppRoute.taskDetails.str;
+    }
+    if (configuration.taskId != null) {
+      location += '/' + configuration.taskId!;
+    }
+
+    return RouteInformation(location: location);
   }
 }
