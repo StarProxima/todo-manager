@@ -29,7 +29,7 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
     notifyListeners();
   }
 
-  void gotoTaskDetails(String? taskId) {
+  void gotoTaskDetails([String? taskId]) {
     state = NavigationState(
       onHomePage: false,
       taskId: taskId,

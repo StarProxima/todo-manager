@@ -11,16 +11,8 @@ class _TaskCardView extends ConsumerWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return TaskDetails(
-                task: task,
-              );
-            },
-          ),
-        );
+        (Router.of(context).routerDelegate as AppRouterDelegate)
+            .gotoTaskDetails(task.id);
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

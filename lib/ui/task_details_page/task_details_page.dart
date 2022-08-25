@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/providers.dart';
+import '../../router/app_router_delegate.dart';
 import 'widgets/task_details_deadline.dart';
 
 import '../../models/task_model.dart';
@@ -49,6 +50,10 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
   late TextEditingController controller = TextEditingController()
     ..text = ref.read(currentEditableTask).text;
 
+  void pop() {
+    (Router.of(context).routerDelegate as AppRouterDelegate).gotoHomePage();
+  }
+
   void saveTask() {
     final editedTask =
         ref.read(currentEditableTask).edit(text: controller.text);
@@ -58,12 +63,12 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
     } else {
       notifier.edit(editedTask);
     }
-    Navigator.pop(context);
+    pop();
   }
 
   void deleteTask() {
     ref.read(taskList.notifier).delete(ref.read(currentEditableTask));
-    Navigator.pop(context);
+    pop();
   }
 
   @override
@@ -79,9 +84,7 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
           width: 14,
           child: IconButton(
             splashRadius: 25,
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: pop,
             icon: const Icon(
               Icons.close,
             ),

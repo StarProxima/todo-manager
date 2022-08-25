@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/providers.dart';
 import '../../../models/task_model.dart';
-import '../../task_details_page/task_details_page.dart';
+import '../../../router/app_router_delegate.dart';
 
 class FloatingActionPanel extends ConsumerWidget {
   const FloatingActionPanel({Key? key}) : super(key: key);
@@ -79,12 +79,8 @@ class FloatingActionPanel extends ConsumerWidget {
         FloatingActionButton(
           heroTag: null,
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const TaskDetails(),
-              ),
-            );
+            (Router.of(context).routerDelegate as AppRouterDelegate)
+                .gotoTaskDetails();
           },
           child: const Icon(
             Icons.add,

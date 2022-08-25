@@ -4,10 +4,10 @@ import 'package:intl/intl.dart';
 import '../../core/providers.dart';
 import '../../models/animated_task_model.dart';
 import '../../models/task_filter.dart';
+import '../../router/app_router_delegate.dart';
 import '../../styles/app_icons.dart';
 import '../../styles/app_theme.dart';
 import '../home_page/widgets/task_checkbox.dart';
-import '../task_details_page/task_details_page.dart';
 
 import '../../models/importance.dart';
 import '../../models/task_model.dart';
