@@ -63,6 +63,8 @@ class TaskList extends StateNotifier<List<Task>> {
   }
 
   Future<void> add(Task task, [bool isFastTask = false]) async {
+    if (state.where((element) => element.id == task.id).isNotEmpty) return;
+
     if (isFastTask) {
       _lastAction = TaskListAction.fastCreate;
     } else {

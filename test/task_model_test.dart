@@ -25,13 +25,15 @@ void main() {
 
       test(
         'Task edit method works correctly',
-        () {
+        () async {
           final task = Task.create(
             text: 'Test task text',
             done: true,
             importance: Importance.low,
             deadline: DateTime(2024, 1, 1, 12),
           );
+
+          await Future.delayed(const Duration(milliseconds: 10));
 
           final editedTask = task.edit(
             text: 'Edited task text',
@@ -48,6 +50,8 @@ void main() {
           expect(editedTask.done, false);
           expect(editedTask.importance, Importance.important);
           expect(editedTask.deadline, DateTime(2023));
+          expect(editedTask.createdAt, task.createdAt);
+          expect(task.changedAt.isBefore(editedTask.changedAt), true);
           expect(taskWithoutDeadline.deadline, null);
         },
       );

@@ -7,8 +7,13 @@ import '../models/task_model.dart';
 import '../support/logger.dart';
 
 class TaskController {
-  final TaskRemoteRepository _remoteRepository = TaskRemoteRepository();
-  final TaskLocalRepository _localRepository = TaskLocalRepository();
+  late final TaskRemoteRepository _remoteRepository;
+  late final TaskLocalRepository _localRepository;
+
+  TaskController({TaskRemoteRepository? remote, TaskLocalRepository? local}) {
+    _remoteRepository = remote ?? TaskRemoteRepository();
+    _localRepository = local ?? TaskLocalRepository();
+  }
 
   bool checkChanges(List<Task> localTasks, List<Task> serverTasks) {
     bool changes = localTasks.length != serverTasks.length;

@@ -66,7 +66,7 @@ class TaskRemoteRepository {
     return ResponseData.response(response);
   }
 
-  Future<ResponseData> addTask(Task task, int revision) async {
+  Future<ResponseData<Rev>> addTask(Task task, int revision) async {
     activeRequests++;
     final Response response = await Repository.post(
       url: "$baseUrl/list",
