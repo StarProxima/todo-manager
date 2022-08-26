@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -64,7 +65,7 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
                 child: HomePage(),
               ),
             if (state.onTaskDetails)
-              MaterialPage(
+              AppPage(
                 child: TaskDetails(
                   task: ref.read(taskList.notifier).getTaskById(state.taskId),
                 ),
@@ -73,5 +74,57 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
         );
       },
     );
+  }
+}
+
+enum AppPageRoute {
+  material,
+  cupertino,
+  slide,
+}
+
+class AppPage extends Page {
+  const AppPage({
+    LocalKey? key,
+    this.appPageRoute = AppPageRoute.cupertino,
+    required this.child,
+  }) : super(key: key);
+
+  final Widget child;
+
+  final AppPageRoute appPageRoute;
+
+  @override
+  Route createRoute(BuildContext context) {
+    switch (appPageRoute) {
+      case AppPageRoute.material:
+        return MaterialPageRoute(
+          settings: this,
+          builder: (context) => child,
+        );
+      case AppPageRoute.cupertino:
+        return CupertinoPageRoute(
+          settings: this,
+          builder: (context) => child,
+        );
+      case AppPageRoute.slide:
+        return PageRouteBuilder(
+          settings: this,
+          pageBuilder: (context, animation, _) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeInOut,
+                ),
+              ),
+              child: child,
+            );
+          },
+        );
+    }
   }
 }
