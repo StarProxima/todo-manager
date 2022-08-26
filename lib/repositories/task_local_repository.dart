@@ -7,7 +7,8 @@ class TaskLocalRepository {
 
   int? _revision;
 
-  void saveTasks(List<Task> tasks) {
+  void saveTasks(List<Task>? tasks) {
+    if (tasks == null) return;
     _tasks = tasks;
     Hive.box('tasks').put('tasks', tasks);
   }
@@ -42,7 +43,8 @@ class TaskLocalRepository {
     return _tasks!;
   }
 
-  void saveRevision(int revision) {
+  void saveRevision(int? revision) {
+    if (revision == null) return;
     if (revision > (_revision ?? -1)) {
       _revision = revision;
       Hive.box<int>('support').put('revision', revision);

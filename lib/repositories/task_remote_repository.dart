@@ -9,7 +9,7 @@ class TaskRemoteRepository {
 
   int activeRequests = 0;
 
-  Future<ResponseData<List<Task>>> getTasks() async {
+  Future<ResponseData<Rev<List<Task>>>> getTasks() async {
     activeRequests++;
     final Response response = await Repository.get(
       url: "$baseUrl/list",
@@ -19,17 +19,19 @@ class TaskRemoteRepository {
     );
     activeRequests--;
     if (response.isSuccesful) {
+      final json = jsonDecode(response.body);
       return ResponseData.response(
         response,
-        (jsonDecode(response.body)['list'] as Iterable)
-            .map((e) => Task.fromJson(e))
-            .toList(),
+        Rev(
+          json['revision'],
+          (json['list'] as Iterable).map((e) => Task.fromJson(e)).toList(),
+        ),
       );
     }
     return ResponseData.response(response);
   }
 
-  Future<ResponseData<List<Task>>> patchTasks(
+  Future<ResponseData<Rev<List<Task>>>> patchTasks(
     List<Task> tasks,
     int revision,
   ) async {
@@ -52,17 +54,19 @@ class TaskRemoteRepository {
 
     activeRequests--;
     if (response.isSuccesful) {
+      final json = jsonDecode(response.body);
       return ResponseData.response(
         response,
-        (jsonDecode(response.body)['list'] as Iterable)
-            .map((e) => Task.fromJson(e))
-            .toList(),
+        Rev(
+          json['revision'],
+          (json['list'] as Iterable).map((e) => Task.fromJson(e)).toList(),
+        ),
       );
     }
     return ResponseData.response(response);
   }
 
-  Future<ResponseData<Task>> addTask(Task task, int revision) async {
+  Future<ResponseData> addTask(Task task, int revision) async {
     activeRequests++;
     final Response response = await Repository.post(
       url: "$baseUrl/list",
@@ -80,14 +84,16 @@ class TaskRemoteRepository {
     if (response.isSuccesful) {
       return ResponseData.response(
         response,
-        Task.fromJson(jsonDecode(response.body)['element']),
+        Rev(
+          jsonDecode(response.body)['revision'],
+        ),
       );
     }
 
     return ResponseData.response(response);
   }
 
-  Future<ResponseData<Task>> editTask(Task task, int revision) async {
+  Future<ResponseData<Rev>> editTask(Task task, int revision) async {
     activeRequests++;
     final Response response = await Repository.put(
       url: "$baseUrl/list/${task.id}",
@@ -105,14 +111,16 @@ class TaskRemoteRepository {
     if (response.isSuccesful) {
       return ResponseData.response(
         response,
-        Task.fromJson(jsonDecode(response.body)['element']),
+        Rev(
+          jsonDecode(response.body)['revision'],
+        ),
       );
     }
 
     return ResponseData.response(response);
   }
 
-  Future<ResponseData> deleteTask(Task task, int revision) async {
+  Future<ResponseData<Rev>> deleteTask(Task task, int revision) async {
     activeRequests++;
     final Response response = await Repository.delete(
       url: "$baseUrl/list/${task.id}",
@@ -123,6 +131,20 @@ class TaskRemoteRepository {
       },
     );
     activeRequests--;
+    if (response.isSuccesful) {
+      return ResponseData.response(
+        response,
+        Rev(
+          jsonDecode(response.body)['revision'],
+        ),
+      );
+    }
     return ResponseData.response(response);
   }
+}
+
+class Rev<T> {
+  final int? revision;
+  final T? data;
+  Rev([this.revision, this.data]);
 }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 
 import 'task_local_repository.dart';
@@ -65,13 +64,13 @@ class TaskController {
       );
 
       if (response.isSuccesful && _remoteRepository.activeRequests == 0) {
-        _localRepository.saveTasks(response.data!);
+        _localRepository.saveTasks(response.data!.data);
         _localRepository.saveRevision(
-          jsonDecode(response.message!)['revision'],
+          response.data!.revision,
         );
-        checkChanges(tasks, response.data!);
+        checkChanges(tasks, response.data!.data!);
         logger.e(tasks);
-        return response.data!;
+        return response.data!.data!;
       }
       return null;
     }
@@ -96,10 +95,10 @@ class TaskController {
     var response = await _remoteRepository.getTasks();
 
     if (response.isSuccesful) {
-      print(jsonDecode(response.message!)['revision']);
+      print(response.data!.revision);
       return await checkTasks(
-        response.data!,
-        jsonDecode(response.message!)['revision'],
+        response.data!.data!,
+        response.data!.revision!,
       );
     }
 
@@ -114,11 +113,10 @@ class TaskController {
       _localRepository.getRevision(),
     );
 
-    if (response.isSuccesful) {
-      _localRepository.saveRevision(
-        jsonDecode(response.message!)['revision'],
-      );
-    } else if (response.status == 400) {
+    _localRepository.saveRevision(
+      response.data?.revision,
+    );
+    if (response.status == 400) {
       logger.w(response);
       return await getTasks();
     }
@@ -133,11 +131,10 @@ class TaskController {
       _localRepository.getRevision(),
     );
 
-    if (response.isSuccesful) {
-      _localRepository.saveRevision(
-        jsonDecode(response.message!)['revision'],
-      );
-    } else if (response.status == 400) {
+    _localRepository.saveRevision(
+      response.data?.revision,
+    );
+    if (response.status == 400) {
       logger.w(response);
       return await getTasks();
     }
@@ -152,11 +149,10 @@ class TaskController {
       _localRepository.getRevision(),
     );
 
-    if (response.isSuccesful) {
-      _localRepository.saveRevision(
-        jsonDecode(response.message!)['revision'],
-      );
-    } else if (response.status == 400) {
+    _localRepository.saveRevision(
+      response.data?.revision,
+    );
+    if (response.status == 400) {
       logger.i(response);
       return await getTasks();
     }
