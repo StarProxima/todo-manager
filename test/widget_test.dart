@@ -9,8 +9,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:todo_manager/main.dart';
+import 'package:todo_manager/models/importance.dart';
+import 'package:todo_manager/models/task_model.dart';
 
 void main() {
+  test(
+    '',
+    () {
+      final task = Task.create(
+        text: 'Test task text',
+        done: true,
+        importance: Importance.low,
+        deadline: DateTime(2024, 1, 1, 12),
+      );
+
+      expect(task.text, 'Test task text');
+      expect(task.done, true);
+      expect(task.importance, Importance.low);
+      expect(task.deadline, DateTime(2024, 1, 1, 12));
+    },
+  );
+
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyApp());
