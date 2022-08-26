@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,19 +42,13 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
   }
 
   @override
-  GlobalKey<NavigatorState>? get navigatorKey => GlobalKey();
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Future<void> setNewRoutePath(NavigationStateDTO configuration) {
     state = NavigationState.fromDTO(configuration);
-    return SynchronousFuture(null);
+    return Future.value();
   }
-
-  final MaterialPage _homePage = MaterialPage(
-    child: HomePage(
-      key: GlobalKey(),
-    ),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -65,13 +58,17 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
           onPopPage: (route, result) => route.didPop(result),
           key: navigatorKey,
           pages: [
-            if (state.onHomePage) _homePage,
+            if (state.onHomePage)
+              const MaterialPage(
+                key: ValueKey('HomePage'),
+                child: HomePage(),
+              ),
             if (state.onTaskDetails)
               MaterialPage(
                 child: TaskDetails(
                   task: ref.read(taskList.notifier).getTaskById(state.taskId),
                 ),
-              ),
+              )
           ],
         );
       },
