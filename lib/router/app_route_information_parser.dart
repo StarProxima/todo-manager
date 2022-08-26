@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import '../models/app_route.dart';
 import 'navigation_state.dart';
 
+// adb shell am start -W -a android.intent.action.VIEW -d http://starproxima.nullexp.dev/home_page/task_details com.example.todo_manager
+// adb shell am start -W -a android.intent.action.VIEW -c android.intent.category.DEFAULT -d https://starproxima.nullexp.dev/home_page/task_details/ com.example.todo_manager
+// adb shell am start -W -a android.intent.action.VIEW -c android.intent.category.DEFAULT -d https://starproxima.nullexp.dev/home_page/task_details/16615357673033 com.example.todo_manager
+
 class AppRouteInformationParser
     extends RouteInformationParser<NavigationStateDTO> {
   @override
