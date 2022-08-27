@@ -29,6 +29,12 @@ class _TaskDetailsDeadlineState extends ConsumerState<TaskDetailsDeadline>
   );
 
   @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = Theme.of(context).textTheme;
@@ -69,8 +75,9 @@ class _TaskDetailsDeadlineState extends ConsumerState<TaskDetailsDeadline>
                   ref.read(currentEditableTask).edit(deadline: date);
             }
           },
-          child: SizedBox(
-            height: 64,
+          child: Container(
+            height: 48,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,

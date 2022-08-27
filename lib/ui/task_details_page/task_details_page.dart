@@ -5,7 +5,7 @@ import '../../router/app_router_delegate.dart';
 import 'widgets/task_details_deadline.dart';
 
 import '../../models/task_model.dart';
-import 'widgets/importance_dropdown_button.dart';
+import 'widgets/task_details_importance.dart';
 import 'widgets/task_details_text_field.dart';
 
 import '../../generated/l10n.dart';
@@ -113,28 +113,47 @@ class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
+          padding: const EdgeInsets.only(top: 8),
           children: [
-            TaskDetailsTextField(
-              controller: controller,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TaskDetailsTextField(
+                controller: controller,
+              ),
             ),
-            const SizedBox(
-              height: 28,
+            const SizedBox(height: 28),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TaskDetailsImportance(),
+              ),
             ),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: ImportanceDropdownButton(),
+            const SizedBox(height: 8),
+            const Divider(
+              indent: 16,
+              endIndent: 16,
             ),
-            const TaskDetailsDeadline(),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                icon: const Icon(Icons.delete),
-                label: Text(S.of(context).deleteTaskButton),
-                style: TextButton.styleFrom(
-                  primary: theme.errorColor,
+            const SizedBox(height: 6),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: TaskDetailsDeadline(),
+            ),
+            const SizedBox(height: 18),
+            const Divider(),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  icon: const Icon(Icons.delete),
+                  label: Text(S.of(context).deleteTaskButton),
+                  style: TextButton.styleFrom(
+                    primary: theme.errorColor,
+                  ),
+                  onPressed: !isNewTask ? deleteTask : null,
                 ),
-                onPressed: !isNewTask ? deleteTask : null,
               ),
             ),
           ],
