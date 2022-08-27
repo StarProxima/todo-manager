@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/task_providers/animated_task_list_provider.dart';
 import '../../providers/task_providers/dismissible_animated_task_list_provider.dart';
 import '../../providers/task_providers/task_list_provider.dart';
 import 'widgets/add_task_card.dart';
@@ -50,9 +49,8 @@ class _HomePageState extends ConsumerState<HomePage>
                     clipBehavior: Clip.antiAlias,
                     child: Consumer(
                       builder: (context, ref, child) {
-                        ref.watch(dismissibleTaskListController);
-
-                        final animatedTasks = ref.read(animatedTaskList);
+                        final animatedTasks =
+                            ref.watch(dismissibleAnimatedTaskList);
 
                         return ListView.builder(
                           shrinkWrap: true,

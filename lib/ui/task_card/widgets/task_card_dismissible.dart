@@ -29,24 +29,19 @@ class _TaskCardDismissibleState extends ConsumerState<_TaskCardDismissible> {
     final theme = Theme.of(context);
     final task = ref.watch(_currentTaskInTaskCard);
 
-    Future<void> removeTaskAsync() async {
-      final controller = ref.read(dismissibleTaskListController.notifier);
-
-      await Future.delayed(resizeDuration);
-
+    void deleteTask() {
+      final controller = ref.read(dismissibleAnimatedTaskList.notifier);
       controller.dismissDelete(task);
     }
 
-    Future<void> editTaskAsync() async {
+    void editTask() {
       final editedTask = task.edit(done: !task.done);
       if (ref.read(taskFilter) == TaskFilter.uncompleted) {
-        final controller = ref.read(dismissibleTaskListController.notifier);
-
-        await Future.delayed(resizeDuration);
+        final controller = ref.read(dismissibleAnimatedTaskList.notifier);
         controller.dismissEdit(editedTask);
       } else {
         final taskProvider = ref.read(taskList.notifier);
-        await Future.delayed(movementDuration);
+
         taskProvider.edit(editedTask);
       }
     }
@@ -69,10 +64,10 @@ class _TaskCardDismissibleState extends ConsumerState<_TaskCardDismissible> {
       confirmDismiss: (DismissDirection direction) async {
         switch (direction) {
           case DismissDirection.endToStart:
-            removeTaskAsync();
+            deleteTask();
             return true;
           case DismissDirection.startToEnd:
-            editTaskAsync();
+            editTask();
             return ref.read(taskFilter) == TaskFilter.uncompleted;
           default:
             return false;

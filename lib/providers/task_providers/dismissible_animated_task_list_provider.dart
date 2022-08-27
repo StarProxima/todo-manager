@@ -1,49 +1,60 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'other_task_providers.dart';
-
+import '../../models/animated_task_model.dart';
+import '../../ui/task_card/task_card.dart';
 import '../app_providers.dart';
+import 'animated_task_list_provider.dart';
+
 import '../../models/task_model.dart';
 import 'task_list_provider.dart';
 
-///This provider is not updated when a dismiss in taskList.
-///
-///This is necessary so that the Dismissed widgets with multiple dismissed do not break when rebuilding.
-///
-///Does not provide data.
-final dismissibleTaskListController =
-    StateNotifierProvider<DismissibleTaskListController, bool>(
+final dismissibleAnimatedTaskList =
+    StateNotifierProvider<DismissibleAnimatedTaskListState, List<AnimatedTask>>(
   (ref) {
-    return DismissibleTaskListController(ref);
+    return DismissibleAnimatedTaskListState(ref);
   },
 );
 
-class DismissibleTaskListController extends StateNotifier<bool> {
+class DismissibleAnimatedTaskListState
+    extends StateNotifier<List<AnimatedTask>> {
   StateNotifierProviderRef ref;
   bool lastActionIsNotDismiss = true;
 
-  DismissibleTaskListController(
+  DismissibleAnimatedTaskListState(
     this.ref,
-  ) : super(false) {
-    ref.listen(filteredTaskList, (t0, t1) async {
+  ) : super(ref.read(animatedTaskList)) {
+    ref.listen(animatedTaskList, (t0, t1) async {
       if (lastActionIsNotDismiss) {
-        state = !state;
+        state = ref.read(animatedTaskList);
       } else {
         lastActionIsNotDismiss = true;
       }
     });
 
     ref.listen(appThemeMode, (previous, next) {
-      state = !state;
+      state = ref.read(animatedTaskList);
     });
   }
 
   void dismissDelete(Task task) {
     lastActionIsNotDismiss = false;
+
     ref.read(taskList.notifier).delete(task);
+    ref.read(animatedTaskList.notifier).changeStatus(
+          AnimatedTask(
+            status: TaskStatus.empty,
+            task: task,
+          ),
+        );
   }
 
   void dismissEdit(Task task) {
     lastActionIsNotDismiss = false;
     ref.read(taskList.notifier).edit(task);
+    ref.read(animatedTaskList.notifier).changeStatus(
+          AnimatedTask(
+            status: TaskStatus.empty,
+            task: task,
+          ),
+        );
   }
 }
