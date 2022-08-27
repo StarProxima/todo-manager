@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/task_providers/dismissible_animated_task_list_provider.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
+import '../../providers/task_providers/task_list_provider.dart';
+import 'widgets/add_task_card.dart';
 import 'widgets/floating_action_panel.dart';
 import 'widgets/home_page_header_delegate.dart';
 import '../task_card/task_card.dart';
@@ -28,7 +30,6 @@ class HomePage extends ConsumerWidget {
                 SliverStack(
                   children: [
                     SliverPositioned.fill(
-                      bottom: -16,
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
@@ -49,7 +50,15 @@ class HomePage extends ConsumerWidget {
                     ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
+                        childCount: animatedTasks.length + 1,
                         (context, index) {
+                          if (index == animatedTasks.length) {
+                            return AddTaskCard(
+                              onAddTask: (task) {
+                                ref.read(taskList.notifier).add(task, true);
+                              },
+                            );
+                          }
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             child: ClipRect(
@@ -59,7 +68,6 @@ class HomePage extends ConsumerWidget {
                             ),
                           );
                         },
-                        childCount: animatedTasks.length,
                       ),
                     ),
                   ],
