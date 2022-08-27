@@ -4,11 +4,20 @@ import 'task_list_provider.dart';
 
 import '../../models/animated_task_model.dart';
 import '../../models/task_model.dart';
-import '../../ui/task_card/task_card.dart';
 
 final animatedTaskList =
     StateNotifierProvider<AnimatedTaskListState, List<AnimatedTask>>((ref) {
-  return AnimatedTaskListState(ref);
+  final tasks = ref.read(sorteredFilteredTaskList);
+
+  final animTasks = List.generate(tasks.length, (index) {
+    return AnimatedTask(
+      animation: TaskCardAnimation.show,
+      position: index == 0 ? TaskCardPosition.top : TaskCardPosition.middle,
+      task: tasks[index],
+    );
+  });
+
+  return AnimatedTaskListState(ref, animTasks);
 });
 
 class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
@@ -18,13 +27,7 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
 
   List<AnimatedTask> get lastState => _lastState;
 
-  AnimatedTaskListState(this._ref)
-      : super(
-          _ref
-              .read(sorteredFilteredTaskList)
-              .map((e) => AnimatedTask(status: TaskStatus.create, task: e))
-              .toList(),
-        ) {
+  AnimatedTaskListState(this._ref, super.state) {
     _init();
   }
 
@@ -44,22 +47,30 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
 
       for (final task in allTasks) {
         if (!contains(tasks, task)) {
-          final TaskStatus status;
+          final TaskCardAnimation status;
           Task selectTask = task;
           if (!contains(lastTasks, task) && contains(newTasks, task)) {
-            status = TaskStatus.create;
+            status = TaskCardAnimation.show;
           } else if (contains(lastTasks, task) && !contains(newTasks, task)) {
-            status = TaskStatus.hide;
+            status = TaskCardAnimation.hide;
             final list =
                 _ref.read(taskList).where((element) => element.id == task.id);
             if (list.isNotEmpty) {
               selectTask = list.first;
             }
           } else {
-            status = TaskStatus.none;
+            status = TaskCardAnimation.basic;
           }
           tasks.add(selectTask);
-          animatedTasks.add(AnimatedTask(status: status, task: selectTask));
+          animatedTasks.add(
+            AnimatedTask(
+              animation: status,
+              position: animatedTasks.isEmpty
+                  ? TaskCardPosition.top
+                  : TaskCardPosition.middle,
+              task: selectTask,
+            ),
+          );
         }
       }
 
@@ -68,11 +79,10 @@ class AnimatedTaskListState extends StateNotifier<List<AnimatedTask>> {
     });
   }
 
-  void changeStatus(AnimatedTask task) {
-    final index =
-        state.indexWhere((element) => element.task.id == task.task.id);
+  void changeAnimation(Task task, TaskCardAnimation animation) {
+    final index = state.indexWhere((element) => element.task.id == task.id);
     if (index != -1) {
-      state[index] = state[index].copyWith(status: task.status);
+      state[index] = state[index].copyWith(animation: animation);
     }
   }
 }

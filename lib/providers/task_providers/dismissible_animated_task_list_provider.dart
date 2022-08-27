@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/animated_task_model.dart';
-import '../../ui/task_card/task_card.dart';
 import '../app_providers.dart';
 import 'animated_task_list_provider.dart';
 
@@ -39,22 +38,18 @@ class DismissibleAnimatedTaskListState
     lastActionIsNotDismiss = false;
 
     ref.read(taskList.notifier).delete(task);
-    ref.read(animatedTaskList.notifier).changeStatus(
-          AnimatedTask(
-            status: TaskStatus.empty,
-            task: task,
-          ),
+    ref.read(animatedTaskList.notifier).changeAnimation(
+          task,
+          TaskCardAnimation.empty,
         );
   }
 
   void dismissEdit(Task task) {
     lastActionIsNotDismiss = false;
     ref.read(taskList.notifier).edit(task);
-    ref.read(animatedTaskList.notifier).changeStatus(
-          AnimatedTask(
-            status: TaskStatus.empty,
-            task: task,
-          ),
+    ref.read(animatedTaskList.notifier).changeAnimation(
+          task,
+          TaskCardAnimation.empty,
         );
   }
 }

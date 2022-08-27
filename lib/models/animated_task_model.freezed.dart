@@ -16,7 +16,8 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$AnimatedTask {
-  TaskStatus get status => throw _privateConstructorUsedError;
+  TaskCardAnimation get animation => throw _privateConstructorUsedError;
+  TaskCardPosition get position => throw _privateConstructorUsedError;
   Task get task => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -29,7 +30,8 @@ abstract class $AnimatedTaskCopyWith<$Res> {
   factory $AnimatedTaskCopyWith(
           AnimatedTask value, $Res Function(AnimatedTask) then) =
       _$AnimatedTaskCopyWithImpl<$Res>;
-  $Res call({TaskStatus status, Task task});
+  $Res call(
+      {TaskCardAnimation animation, TaskCardPosition position, Task task});
 
   $TaskCopyWith<$Res> get task;
 }
@@ -44,14 +46,19 @@ class _$AnimatedTaskCopyWithImpl<$Res> implements $AnimatedTaskCopyWith<$Res> {
 
   @override
   $Res call({
-    Object? status = freezed,
+    Object? animation = freezed,
+    Object? position = freezed,
     Object? task = freezed,
   }) {
     return _then(_value.copyWith(
-      status: status == freezed
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as TaskStatus,
+      animation: animation == freezed
+          ? _value.animation
+          : animation // ignore: cast_nullable_to_non_nullable
+              as TaskCardAnimation,
+      position: position == freezed
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as TaskCardPosition,
       task: task == freezed
           ? _value.task
           : task // ignore: cast_nullable_to_non_nullable
@@ -74,7 +81,8 @@ abstract class _$$_AnimatedTaskCopyWith<$Res>
           _$_AnimatedTask value, $Res Function(_$_AnimatedTask) then) =
       __$$_AnimatedTaskCopyWithImpl<$Res>;
   @override
-  $Res call({TaskStatus status, Task task});
+  $Res call(
+      {TaskCardAnimation animation, TaskCardPosition position, Task task});
 
   @override
   $TaskCopyWith<$Res> get task;
@@ -93,14 +101,19 @@ class __$$_AnimatedTaskCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object? status = freezed,
+    Object? animation = freezed,
+    Object? position = freezed,
     Object? task = freezed,
   }) {
     return _then(_$_AnimatedTask(
-      status: status == freezed
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as TaskStatus,
+      animation: animation == freezed
+          ? _value.animation
+          : animation // ignore: cast_nullable_to_non_nullable
+              as TaskCardAnimation,
+      position: position == freezed
+          ? _value.position
+          : position // ignore: cast_nullable_to_non_nullable
+              as TaskCardPosition,
       task: task == freezed
           ? _value.task
           : task // ignore: cast_nullable_to_non_nullable
@@ -112,16 +125,20 @@ class __$$_AnimatedTaskCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_AnimatedTask extends _AnimatedTask {
-  const _$_AnimatedTask({required this.status, required this.task}) : super._();
+  const _$_AnimatedTask(
+      {required this.animation, required this.position, required this.task})
+      : super._();
 
   @override
-  final TaskStatus status;
+  final TaskCardAnimation animation;
+  @override
+  final TaskCardPosition position;
   @override
   final Task task;
 
   @override
   String toString() {
-    return 'AnimatedTask(status: $status, task: $task)';
+    return 'AnimatedTask(animation: $animation, position: $position, task: $task)';
   }
 
   @override
@@ -129,14 +146,16 @@ class _$_AnimatedTask extends _AnimatedTask {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_AnimatedTask &&
-            const DeepCollectionEquality().equals(other.status, status) &&
+            const DeepCollectionEquality().equals(other.animation, animation) &&
+            const DeepCollectionEquality().equals(other.position, position) &&
             const DeepCollectionEquality().equals(other.task, task));
   }
 
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      const DeepCollectionEquality().hash(status),
+      const DeepCollectionEquality().hash(animation),
+      const DeepCollectionEquality().hash(position),
       const DeepCollectionEquality().hash(task));
 
   @JsonKey(ignore: true)
@@ -147,12 +166,15 @@ class _$_AnimatedTask extends _AnimatedTask {
 
 abstract class _AnimatedTask extends AnimatedTask {
   const factory _AnimatedTask(
-      {required final TaskStatus status,
+      {required final TaskCardAnimation animation,
+      required final TaskCardPosition position,
       required final Task task}) = _$_AnimatedTask;
   const _AnimatedTask._() : super._();
 
   @override
-  TaskStatus get status;
+  TaskCardAnimation get animation;
+  @override
+  TaskCardPosition get position;
   @override
   Task get task;
   @override
