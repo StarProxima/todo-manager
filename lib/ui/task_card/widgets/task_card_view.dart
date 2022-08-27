@@ -1,7 +1,7 @@
 part of '../task_card.dart';
 
-class _TaskCardView extends ConsumerWidget {
-  const _TaskCardView({Key? key}) : super(key: key);
+class TaskCardView extends ConsumerWidget {
+  const TaskCardView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,6 +43,7 @@ class _TaskCardView extends ConsumerWidget {
                             child: Padding(
                               padding: const EdgeInsets.only(right: 3),
                               child: AppSvgIcons(
+                                key: Key(AppSvgIcon.important.toString()),
                                 AppSvgIcon.important,
                                 color: task.done
                                     ? crossedOut.color
@@ -55,6 +56,7 @@ class _TaskCardView extends ConsumerWidget {
                             child: Padding(
                               padding: const EdgeInsets.only(right: 3),
                               child: AppSvgIcons(
+                                key: Key(AppSvgIcon.low.toString()),
                                 AppSvgIcon.low,
                                 color: crossedOut.color,
                               ),
@@ -71,8 +73,7 @@ class _TaskCardView extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      DateFormat('dd MMMM yyyy', 'ru_RU')
-                          .format(task.deadline!),
+                      DateFormat('dd MMMM yyyy').format(task.deadline!),
                       style: Theme.of(context)
                           .extension<AppTextStyle>()!
                           .subtitle!,

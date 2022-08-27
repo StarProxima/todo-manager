@@ -8,8 +8,8 @@ import 'package:todo_manager/models/task_model.dart';
 import 'package:todo_manager/repositories/task_remote_repository.dart';
 import 'package:todo_manager/repositories/tasks_controller.dart';
 
-import 'mock_task_local_repository.dart';
-import 'mock_task_remote_repository.dart';
+import '../../mocks/mock_task_local_repository.dart';
+import '../../mocks/mock_task_remote_repository.dart';
 
 void main() {
   late TaskController taskController;

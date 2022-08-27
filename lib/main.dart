@@ -43,7 +43,9 @@ void main() {
 }
 
 class MyApp extends ConsumerWidget {
-  MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key, this.supportedLocales}) : super(key: key);
+
+  final List<Locale>? supportedLocales;
 
   final routerDelegate = AppRouterDelegate();
 
@@ -60,7 +62,7 @@ class MyApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: S.delegate.supportedLocales,
+      supportedLocales: supportedLocales ?? S.delegate.supportedLocales,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ref.watch(appThemeMode),
