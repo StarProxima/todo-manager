@@ -36,13 +36,18 @@ class MockTaskRemoteRepository extends Mock implements TaskRemoteRepository {
 
   @override
   Future<ResponseData<Rev<List<Task>>>> getTasks() {
-    return Future.value(
+    final response = Future.value(
       ResponseData<Rev<List<Task>>>(
         isSuccesful: false,
         data: Rev(
           _revision,
         ),
       ),
+    );
+    return super.noSuchMethod(
+      Invocation.method(#getTasks, null),
+      returnValue: response,
+      returnValueForMissingStub: response,
     );
   }
 
@@ -51,13 +56,18 @@ class MockTaskRemoteRepository extends Mock implements TaskRemoteRepository {
     List<Task> tasks,
     int revision,
   ) {
-    return Future.value(
+    final response = Future.value(
       ResponseData<Rev<List<Task>>>(
         isSuccesful: false,
         data: Rev(
           _revision,
         ),
       ),
+    );
+    return super.noSuchMethod(
+      Invocation.method(#patchTasks, null),
+      returnValue: response,
+      returnValueForMissingStub: response,
     );
   }
 }

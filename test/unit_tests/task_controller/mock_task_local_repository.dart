@@ -22,12 +22,20 @@ class MockTaskLocalRepository extends Mock implements TaskLocalRepository {
 
   @override
   int getRevision() {
-    return revision;
+    return super.noSuchMethod(
+      Invocation.method(#getRevision, null),
+      returnValue: revision,
+      returnValueForMissingStub: revision,
+    );
   }
 
   @override
   List<Task> getTasks() {
-    return tasks;
+    return super.noSuchMethod(
+      Invocation.method(#getTasks, null),
+      returnValue: tasks,
+      returnValueForMissingStub: tasks,
+    );
   }
 
   @override
