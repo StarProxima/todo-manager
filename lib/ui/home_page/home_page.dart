@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/task_providers/dismissible_animated_task_list_provider.dart';
-import '../../providers/task_providers/task_list_provider.dart';
-import 'widgets/add_task_card.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 import 'widgets/floating_action_panel.dart';
 import 'widgets/home_page_header_delegate.dart';
 import '../task_card/task_card.dart';
 
-class HomePage extends ConsumerStatefulWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends ConsumerState<HomePage>
-    with TickerProviderStateMixin {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
         child: OrientationBuilder(
           builder: (context, orientation) {
+            final animatedTasks = ref.watch(dismissibleAnimatedTaskList);
             return CustomScrollView(
               slivers: [
                 SliverPersistentHeader(
@@ -31,46 +25,44 @@ class _HomePageState extends ConsumerState<HomePage>
                     orientation == Orientation.portrait ? 200 : 125,
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: Container(
-                    margin: const EdgeInsets.all(8),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      boxShadow: [
-                        BoxShadow(
-                          offset: const Offset(0, 2),
-                          color: Theme.of(context).shadowColor.withOpacity(0.2),
-                          blurRadius: 2,
+                SliverStack(
+                  children: [
+                    SliverPositioned.fill(
+                      bottom: -16,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
+                          boxShadow: [
+                            BoxShadow(
+                              offset: const Offset(0, 2),
+                              color: Theme.of(context)
+                                  .shadowColor
+                                  .withOpacity(0.2),
+                              blurRadius: 2,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Consumer(
-                      builder: (context, ref, child) {
-                        final animatedTasks =
-                            ref.watch(dismissibleAnimatedTaskList);
-
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          primary: false,
-                          itemCount: animatedTasks.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == animatedTasks.length) {
-                              return AddTaskCard(
-                                onAddTask: ref.read(taskList.notifier).add,
-                              );
-                            }
-
-                            return TaskCard(
-                              animatedTasks[index],
-                            );
-                          },
-                        );
-                      },
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: ClipRect(
+                              child: TaskCard(
+                                animatedTasks[index],
+                              ),
+                            ),
+                          );
+                        },
+                        childCount: animatedTasks.length,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             );

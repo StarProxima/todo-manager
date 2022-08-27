@@ -79,7 +79,7 @@ class _TaskCardView extends ConsumerWidget {
                           .subtitle!,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  )
+                  ),
               ],
             ),
           ),
