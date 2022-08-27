@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/providers.dart';
 import '../../../models/task_filter.dart';
 
 import '../../../generated/l10n.dart';
+import '../../../providers/task_providers/other_task_providers.dart';
+import '../../../providers/task_providers/task_list_provider.dart';
 import '../../../styles/app_theme.dart';
 
 class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {

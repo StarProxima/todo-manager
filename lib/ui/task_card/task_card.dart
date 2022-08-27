@@ -1,11 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../core/providers.dart';
 import '../../models/animated_task_model.dart';
 import '../../models/task_filter.dart';
+import '../../providers/task_providers/animated_task_list_provider.dart';
+import '../../providers/task_providers/dismissible_animated_task_list_provider.dart';
+import '../../providers/task_providers/other_task_providers.dart';
+import '../../providers/task_providers/task_list_provider.dart';
 import '../../router/app_router_delegate.dart';
 import '../../styles/app_icons.dart';
 import '../../styles/app_theme.dart';

@@ -6,7 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'router/app_route_information_parser.dart';
 import 'router/app_router_delegate.dart';
-import 'core/providers.dart';
+import 'providers/app_providers.dart';
 import 'support/app_metrica.dart';
 import 'support/hive.dart';
 import 'support/provider_logger.dart';

@@ -2,9 +2,9 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:todo_manager/core/providers.dart';
 import 'package:todo_manager/models/importance.dart';
 import 'package:todo_manager/models/task_model.dart';
+import 'package:todo_manager/providers/task_providers/task_list_provider.dart';
 import 'package:todo_manager/repositories/tasks_controller.dart';
 
 import '../../mocks/mock_task_local_repository.dart';

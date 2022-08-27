@@ -1,8 +1,8 @@
 import 'package:appmetrica_plugin/appmetrica_plugin.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/providers.dart';
 
 import '../models/task_model.dart';
+import '../providers/task_providers/task_list_provider.dart';
 
 class ProviderLogger extends ProviderObserver {
   @override

@@ -1,7 +1,7 @@
 part of '../task_card.dart';
 
-class TaskCardView extends ConsumerWidget {
-  const TaskCardView({Key? key}) : super(key: key);
+class _TaskCardView extends ConsumerWidget {
+  const _TaskCardView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

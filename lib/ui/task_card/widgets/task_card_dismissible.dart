@@ -114,7 +114,7 @@ class _TaskCardDismissibleState extends ConsumerState<_TaskCardDismissible> {
           ],
         ),
       ),
-      child: const TaskCardView(),
+      child: const _TaskCardView(),
     );
   }
 }

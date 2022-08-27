@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/providers.dart';
+import '../../providers/task_providers/animated_task_list_provider.dart';
+import '../../providers/task_providers/dismissible_animated_task_list_provider.dart';
+import '../../providers/task_providers/task_list_provider.dart';
 import 'widgets/add_task_card.dart';
 
 import 'widgets/floating_action_panel.dart';

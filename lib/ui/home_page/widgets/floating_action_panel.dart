@@ -3,8 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/providers.dart';
+import '../../../providers/app_providers.dart';
 import '../../../models/task_model.dart';
+import '../../../providers/task_providers/task_list_provider.dart';
 import '../../../router/app_router_delegate.dart';
 
 class FloatingActionPanel extends ConsumerWidget {

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/providers.dart';
+import '../providers/task_providers/task_list_provider.dart';
 import '../ui/home_page/home_page.dart';
 import '../ui/task_details_page/task_details_page.dart';
 import 'navigation_state.dart';
