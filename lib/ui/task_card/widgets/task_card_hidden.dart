@@ -23,10 +23,12 @@ class _TaskCardHiddenState extends ConsumerState<_TaskCardHidden>
     controller.addStatusListener((status) {
       if (controller.isCompleted) {
         ref.read(_currentTaskStatusInTaskCard.notifier).state =
-            TaskCardAnimation.empty;
-        ref.read(animatedTaskList.notifier).changeAnimation(
-              ref.read(_currentTaskInTaskCard),
-              TaskCardAnimation.empty,
+            TaskStatus.empty;
+        ref.read(animatedTaskList.notifier).changeStatus(
+              AnimatedTask(
+                status: TaskStatus.empty,
+                task: ref.read(_currentTaskInTaskCard),
+              ),
             );
       }
     });

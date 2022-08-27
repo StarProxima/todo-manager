@@ -26,9 +26,16 @@ final _currentTaskInTaskCard = Provider<Task>((ref) {
   throw UnimplementedError();
 });
 
-final _currentTaskStatusInTaskCard = StateProvider<TaskCardAnimation>((ref) {
+final _currentTaskStatusInTaskCard = StateProvider<TaskStatus>((ref) {
   throw UnimplementedError();
 });
+
+enum TaskStatus {
+  create,
+  hide,
+  none,
+  empty,
+}
 
 class TaskCard extends StatelessWidget {
   const TaskCard(
@@ -46,20 +53,20 @@ class TaskCard extends StatelessWidget {
           animatedTask.task,
         ),
         _currentTaskStatusInTaskCard
-            .overrideWithValue(StateController(animatedTask.animation)),
+            .overrideWithValue(StateController(animatedTask.status)),
       ],
       child: Consumer(
         builder: (context, ref, _) {
           final status = ref.watch(_currentTaskStatusInTaskCard);
 
           switch (status) {
-            case TaskCardAnimation.show:
+            case TaskStatus.create:
               return const _TaskCardCreated();
-            case TaskCardAnimation.hide:
+            case TaskStatus.hide:
               return const _TaskCardHidden();
-            case TaskCardAnimation.basic:
+            case TaskStatus.none:
               return const _TaskCardAnimated();
-            case TaskCardAnimation.empty:
+            case TaskStatus.empty:
               return const SizedBox();
           }
         },

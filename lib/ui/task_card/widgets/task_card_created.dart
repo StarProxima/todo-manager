@@ -23,11 +23,12 @@ class _TaskCardCreatedState extends ConsumerState<_TaskCardCreated>
   void initState() {
     controller.addStatusListener((status) {
       if (controller.isCompleted) {
-        ref.read(_currentTaskStatusInTaskCard.notifier).state =
-            TaskCardAnimation.basic;
-        ref.read(animatedTaskList.notifier).changeAnimation(
-              ref.read(_currentTaskInTaskCard),
-              TaskCardAnimation.basic,
+        ref.read(_currentTaskStatusInTaskCard.notifier).state = TaskStatus.none;
+        ref.read(animatedTaskList.notifier).changeStatus(
+              AnimatedTask(
+                status: TaskStatus.none,
+                task: ref.read(_currentTaskInTaskCard),
+              ),
             );
       }
     });
