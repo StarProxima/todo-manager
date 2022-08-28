@@ -24,6 +24,7 @@ class MyApp extends ConsumerWidget {
       child: MaterialApp.router(
         debugShowCheckedModeBanner:
             FlavorConfig.instance.variables['showDefaultDebugBanner'] ?? true,
+        backButtonDispatcher: RootBackButtonDispatcher(),
         routerDelegate: routerDelegate,
         routeInformationParser: routeInformationParser,
         localizationsDelegates: const [

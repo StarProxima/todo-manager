@@ -56,7 +56,14 @@ class AppRouterDelegate extends RouterDelegate<NavigationStateDTO>
     return Consumer(
       builder: (context, ref, _) {
         return Navigator(
-          onPopPage: (route, result) => route.didPop(result),
+          onPopPage: (route, result) {
+            if (!route.didPop(result)) return false;
+            if (state.onTaskDetails) {
+              gotoHomePage();
+            }
+            popRoute();
+            return true;
+          },
           key: navigatorKey,
           pages: [
             if (state.onHomePage)
