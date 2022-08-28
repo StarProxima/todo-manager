@@ -56,7 +56,7 @@ void main() {
             ],
             child: MyApp(
               supportedLocales: const [
-                Locale('en', 'US'),
+                Locale('en'),
               ],
             ),
           ),
