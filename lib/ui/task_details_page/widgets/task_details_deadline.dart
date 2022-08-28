@@ -59,7 +59,7 @@ class _TaskDetailsDeadlineState extends ConsumerState<TaskDetailsDeadline>
     return Row(
       children: [
         InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(3),
           highlightColor: theme.primaryColor.withOpacity(0.25),
           onTap: () async {
             var date = await showDatePicker(

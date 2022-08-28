@@ -62,7 +62,10 @@ class MyApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: supportedLocales ?? S.delegate.supportedLocales,
+      supportedLocales: supportedLocales?.where(
+            (element) => S.delegate.supportedLocales.contains(element),
+          ) ??
+          S.delegate.supportedLocales,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ref.watch(appThemeMode),
