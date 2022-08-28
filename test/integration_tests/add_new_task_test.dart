@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_manager/main.dart';
 import 'package:todo_manager/models/importance.dart';
 import 'package:todo_manager/models/task_model.dart';
 import 'package:todo_manager/providers/task_providers/task_list_provider.dart';
 import 'package:todo_manager/repositories/tasks_controller.dart';
 import 'package:todo_manager/styles/app_icons.dart';
+import 'package:todo_manager/ui/my_app.dart';
 import 'package:todo_manager/ui/task_card/task_card.dart';
 import 'package:todo_manager/ui/task_details_page/widgets/task_details_importance.dart';
 import 'package:todo_manager/ui/task_details_page/widgets/task_details_deadline.dart';
@@ -21,24 +21,7 @@ import '../mocks/mock_task_remote_repository.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // Widget getApp() {
-  //   return ProviderScope(
-  //     overrides: [
-  //       taskList.overrideWithValue(
-  //         TaskList(
-  //           [],
-  //           TaskController(
-  //             remote: MockTaskRemoteRepository(),
-  //             local: MockTaskLocalRepository(),
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //     child: MyApp(),
-  //   );
-  // }
-
-  Future<void> getapp() async {
+  Future<void> getApp() async {
     runZonedGuarded(
       () {
         runApp(
@@ -69,7 +52,7 @@ void main() {
   testWidgets(
     'Adding new Task by TaskDetails and check on HomePage',
     (tester) async {
-      await getapp();
+      await getApp();
 
       await tester.pumpAndSettle();
       expect(find.byType(TaskCard), findsNothing);

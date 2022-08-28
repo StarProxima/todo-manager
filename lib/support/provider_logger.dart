@@ -5,6 +5,9 @@ import '../models/task_model.dart';
 import '../providers/task_providers/task_list_provider.dart';
 
 class ProviderLogger extends ProviderObserver {
+  ProviderLogger(this._logger);
+
+  final AppLogger _logger;
   @override
   void didUpdateProvider(
     ProviderBase provider,
@@ -14,10 +17,10 @@ class ProviderLogger extends ProviderObserver {
   ) {
     switch (provider.name) {
       case 'appThemeMode':
-        AppMetrica.reportEvent('Theme mode changed to $newValue');
+        _logger.event('Theme mode changed to $newValue');
         break;
       case 'taskFilter':
-        AppMetrica.reportEvent('Task filter changed to $newValue');
+        _logger.event('Task filter changed to $newValue');
         break;
       case 'taskList':
         {
@@ -27,34 +30,34 @@ class ProviderLogger extends ProviderObserver {
           );
           switch (notifier.lastAction) {
             case TaskListAction.create:
-              AppMetrica.reportEvent(
+              _logger.event(
                 'Task create',
               );
               break;
             case TaskListAction.fastCreate:
-              AppMetrica.reportEvent(
+              _logger.event(
                 'Fast Task create',
               );
               break;
             case TaskListAction.edit:
               if (notifier.lastTask?.done != notifier.originalLastTask?.done) {
                 if (notifier.lastTask?.done == true) {
-                  AppMetrica.reportEvent('Task done');
+                  _logger.event('Task done');
                 } else {
-                  AppMetrica.reportEvent('Task undone');
+                  _logger.event('Task undone');
                 }
               } else {
-                AppMetrica.reportEvent('Task edit');
+                _logger.event('Task edit');
               }
 
               break;
             case TaskListAction.delete:
-              AppMetrica.reportEvent(
+              _logger.event(
                 'Task delete',
               );
               break;
             case TaskListAction.update:
-              AppMetrica.reportEvent('Tasks update');
+              _logger.event('Tasks update');
               break;
 
             case TaskListAction.none:
@@ -64,6 +67,20 @@ class ProviderLogger extends ProviderObserver {
 
         break;
       default:
+    }
+  }
+}
+
+class AppLogger {
+  final bool reportAppMetrica;
+
+  AppLogger({
+    this.reportAppMetrica = true,
+  });
+
+  Future<void> event(String eventName) async {
+    if (reportAppMetrica) {
+      await AppMetrica.reportEvent(eventName);
     }
   }
 }
