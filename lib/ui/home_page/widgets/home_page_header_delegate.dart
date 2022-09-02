@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/repositories/tasks_controller.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../models/task_filter.dart';
 
 import '../../../generated/l10n.dart';
+import '../../../providers/task_providers/other_task_providers.dart';
+import '../../../providers/task_providers/task_list_provider.dart';
+import '../../../styles/app_theme.dart';
 
 class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
-  HomePageHeaderDelegate({
-    required this.visibilityCompletedTask,
-    required this.onChangeVisibilityCompletedTask,
-  });
+  HomePageHeaderDelegate([this.expandedHeight = 200]);
 
-  final bool visibilityCompletedTask;
-  final Function(bool) onChangeVisibilityCompletedTask;
-
-  static const double expandedHeight = 200;
+  final double expandedHeight;
 
   @override
   Widget build(
@@ -23,8 +21,14 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
     double diff = expandedHeight - kToolbarHeight;
     double t = (diff - shrinkOffset) / diff;
     double percentOfShrinkOffset = t > 0 ? t : 0;
-    var theme = Theme.of(context);
-    var textTheme = Theme.of(context).textTheme;
+
+    double sto =
+        percentOfShrinkOffset - (0.15 * (1 / percentOfShrinkOffset - 1));
+    double subtitleOpacity = sto > 0 ? sto : 0;
+
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final subtitle = theme.extension<AppTextStyle>()!.subtitle!;
     return Material(
       color: theme.scaffoldBackgroundColor,
       elevation:
@@ -61,32 +65,23 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
                         padding:
                             EdgeInsets.only(top: 6 * percentOfShrinkOffset),
                         child: Opacity(
-                          opacity: percentOfShrinkOffset,
-                          child: ValueListenableBuilder(
-                            valueListenable:
-                                TasksController().getListenableTasksBox(),
-                            builder: (context, value, child) {
-                              return Text(
-                                S.of(context).homePageSubTitle(
-                                      TasksController().getCompletedTaskCount(),
-                                    ),
-                                style: textTheme.bodySmall!.copyWith(
-                                  fontSize: 20 * percentOfShrinkOffset,
-                                ),
-                              );
-                            },
+                          opacity: subtitleOpacity,
+                          child: Consumer(
+                            builder: (context, ref, child) => Text(
+                              S.of(context).homePageSubTitle(
+                                    ref.watch(completedTaskCount),
+                                  ),
+                              style: subtitle.copyWith(
+                                fontSize: 16 * percentOfShrinkOffset,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                   ],
                 ),
                 const Spacer(),
-                VisibilityButton(
-                  value: visibilityCompletedTask,
-                  onChangeVisibilityCompletedTask: (value) {
-                    onChangeVisibilityCompletedTask(value);
-                  },
-                ),
+                const VisibilityButton(),
                 SizedBox(
                   height: 16 + 2 * percentOfShrinkOffset,
                 ),
@@ -108,23 +103,13 @@ class HomePageHeaderDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
 }
 
-class VisibilityButton extends StatefulWidget {
+class VisibilityButton extends ConsumerWidget {
   const VisibilityButton({
     Key? key,
-    required this.value,
-    required this.onChangeVisibilityCompletedTask,
   }) : super(key: key);
 
-  final bool value;
-  final Function(bool) onChangeVisibilityCompletedTask;
   @override
-  State<VisibilityButton> createState() => _VisibilityButtonState();
-}
-
-class _VisibilityButtonState extends State<VisibilityButton> {
-  late bool value = widget.value;
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var theme = Theme.of(context);
     return SizedBox(
       width: 24,
@@ -133,11 +118,13 @@ class _VisibilityButtonState extends State<VisibilityButton> {
         padding: EdgeInsets.zero,
         splashRadius: 28,
         onPressed: () {
-          value = !value;
-          widget.onChangeVisibilityCompletedTask(value);
-          setState(() {});
+          ref.read(taskFilter.notifier).update(
+                (state) => state == TaskFilter.all
+                    ? TaskFilter.uncompleted
+                    : TaskFilter.all,
+              );
         },
-        icon: value
+        icon: ref.watch(taskFilter) == TaskFilter.all
             ? Icon(
                 Icons.visibility_off,
                 size: 24,

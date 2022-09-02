@@ -23,18 +23,21 @@ class AddTaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
-    return TextField(
-      focusNode: focusNode,
-      controller: controller,
-      maxLines: null,
-      textInputAction: TextInputAction.done,
-      onEditingComplete: onEditingComplete,
-      style: textTheme.bodyMedium,
-      decoration: InputDecoration(
-        contentPadding:
-            const EdgeInsets.only(top: 14, bottom: 14, left: 52, right: 16),
-        hintText: S.of(context).addTaskCardHint,
-        border: InputBorder.none,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: TextField(
+        focusNode: focusNode,
+        controller: controller,
+        maxLines: null,
+        textInputAction: TextInputAction.done,
+        onEditingComplete: onEditingComplete,
+        style: textTheme.bodyMedium,
+        decoration: InputDecoration(
+          contentPadding:
+              const EdgeInsets.only(top: 14, bottom: 14, left: 52, right: 16),
+          hintText: S.of(context).addTaskCardHint,
+          border: InputBorder.none,
+        ),
       ),
     );
   }

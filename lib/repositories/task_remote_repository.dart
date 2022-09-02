@@ -4,12 +4,12 @@ import '../../models/response_data.dart';
 import '../../models/task_model.dart';
 import 'repository.dart';
 
-class TaskRepository {
+class TaskRemoteRepository {
   static const String baseUrl = 'https://beta.mrdekk.ru/todobackend';
 
   int activeRequests = 0;
 
-  Future<ResponseData<List<Task>>> getTasks() async {
+  Future<ResponseData<Rev<List<Task>>>> getTasks() async {
     activeRequests++;
     final Response response = await Repository.get(
       url: "$baseUrl/list",
@@ -19,21 +19,29 @@ class TaskRepository {
     );
     activeRequests--;
     if (response.isSuccesful) {
+      final json = jsonDecode(response.body);
       return ResponseData.response(
         response,
-        (jsonDecode(response.body)['list'] as Iterable)
-            .map((e) => Task.fromMap(e))
-            .toList(),
+        Rev(
+          json['revision'],
+          (json['list'] as Iterable).map((e) => Task.fromJson(e)).toList(),
+        ),
       );
     }
     return ResponseData.response(response);
   }
 
-  Future<ResponseData<List<Task>>> patchTasks(
+  Future<ResponseData<Rev<List<Task>>>> patchTasks(
     List<Task> tasks,
     int revision,
   ) async {
     activeRequests++;
+
+    final body = jsonEncode({
+      "status": "ok",
+      "list": tasks.map((e) => e.toJson()).toList(),
+    });
+
     final Response response = await Repository.patch(
       url: "$baseUrl/list",
       headers: {
@@ -41,24 +49,24 @@ class TaskRepository {
         "Content-Type": "application/json",
         "X-Last-Known-Revision": "$revision",
       },
-      body: jsonEncode({
-        "status": "ok",
-        "list": tasks.map((e) => e.toMap()).toList(),
-      }),
+      body: body,
     );
+
     activeRequests--;
     if (response.isSuccesful) {
+      final json = jsonDecode(response.body);
       return ResponseData.response(
         response,
-        (jsonDecode(response.body)['list'] as Iterable)
-            .map((e) => Task.fromMap(e))
-            .toList(),
+        Rev(
+          json['revision'],
+          (json['list'] as Iterable).map((e) => Task.fromJson(e)).toList(),
+        ),
       );
     }
     return ResponseData.response(response);
   }
 
-  Future<ResponseData<Task>> addTask(Task task, int revision) async {
+  Future<ResponseData<Rev>> addTask(Task task, int revision) async {
     activeRequests++;
     final Response response = await Repository.post(
       url: "$baseUrl/list",
@@ -69,21 +77,23 @@ class TaskRepository {
       },
       body: jsonEncode({
         "status": "ok",
-        "element": task.toMap(),
+        "element": task.toJson(),
       }),
     );
     activeRequests--;
     if (response.isSuccesful) {
       return ResponseData.response(
         response,
-        Task.fromMap(jsonDecode(response.body)['element']),
+        Rev(
+          jsonDecode(response.body)['revision'],
+        ),
       );
     }
 
     return ResponseData.response(response);
   }
 
-  Future<ResponseData<Task>> editTask(Task task, int revision) async {
+  Future<ResponseData<Rev>> editTask(Task task, int revision) async {
     activeRequests++;
     final Response response = await Repository.put(
       url: "$baseUrl/list/${task.id}",
@@ -94,21 +104,23 @@ class TaskRepository {
       },
       body: jsonEncode({
         "status": "ok",
-        "element": task.toMap(),
+        "element": task.toJson(),
       }),
     );
     activeRequests--;
     if (response.isSuccesful) {
       return ResponseData.response(
         response,
-        Task.fromMap(jsonDecode(response.body)['element']),
+        Rev(
+          jsonDecode(response.body)['revision'],
+        ),
       );
     }
 
     return ResponseData.response(response);
   }
 
-  Future<ResponseData> deleteTask(Task task, int revision) async {
+  Future<ResponseData<Rev>> deleteTask(Task task, int revision) async {
     activeRequests++;
     final Response response = await Repository.delete(
       url: "$baseUrl/list/${task.id}",
@@ -119,6 +131,20 @@ class TaskRepository {
       },
     );
     activeRequests--;
+    if (response.isSuccesful) {
+      return ResponseData.response(
+        response,
+        Rev(
+          jsonDecode(response.body)['revision'],
+        ),
+      );
+    }
     return ResponseData.response(response);
   }
+}
+
+class Rev<T> {
+  final int? revision;
+  final T? data;
+  Rev([this.revision, this.data]);
 }

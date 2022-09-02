@@ -25,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -70,7 +67,19 @@ class DefaultFirebaseOptions {
     messagingSenderId: '898195697004',
     projectId: 'todo-manager-2f46a',
     storageBucket: 'todo-manager-2f46a.appspot.com',
-    iosClientId: '898195697004-slls22j4a43hg3vj2amhmq63o2rfnafp.apps.googleusercontent.com',
+    iosClientId:
+        '898195697004-slls22j4a43hg3vj2amhmq63o2rfnafp.apps.googleusercontent.com',
+    iosBundleId: 'com.example.todoManager',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyBOwgkTXJvnaXGE8z6dZYs-VwTp8QUNzLU',
+    appId: '1:898195697004:ios:9080dcdd2ae3dce23d1749',
+    messagingSenderId: '898195697004',
+    projectId: 'todo-manager-2f46a',
+    storageBucket: 'todo-manager-2f46a.appspot.com',
+    iosClientId:
+        '898195697004-slls22j4a43hg3vj2amhmq63o2rfnafp.apps.googleusercontent.com',
     iosBundleId: 'com.example.todoManager',
   );
 }

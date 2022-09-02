@@ -1,52 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../generated/l10n.dart';
+import '../task_details_page.dart';
 
-class TaskDetailsDeadline extends StatefulWidget {
+class TaskDetailsDeadline extends ConsumerStatefulWidget {
   const TaskDetailsDeadline({
     Key? key,
-    this.value,
-    required this.onChanged,
   }) : super(key: key);
 
-  final DateTime? value;
-
-  final Function(DateTime?) onChanged;
   @override
-  State<TaskDetailsDeadline> createState() => _TaskDetailsDeadlineState();
+  ConsumerState<TaskDetailsDeadline> createState() =>
+      _TaskDetailsDeadlineState();
 }
 
-class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
-  late DateTime? value = widget.value;
+class _TaskDetailsDeadlineState extends ConsumerState<TaskDetailsDeadline>
+    with SingleTickerProviderStateMixin {
+  DateTime? savedDeadline;
 
-  late bool active = widget.value != null;
+  late final activeProvider = StateProvider<bool?>((ref) {
+    return null;
+  });
+
+  late final animationController = AnimationController(
+    duration: const Duration(milliseconds: 400),
+    vsync: this,
+  );
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
-    var textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final textTheme = Theme.of(context).textTheme;
+
+    final deadline =
+        ref.watch(currentEditableTask.select((value) => value.deadline));
+
+    savedDeadline = deadline ?? savedDeadline;
+
+    ref
+        .read(activeProvider.notifier)
+        .update((state) => state ?? deadline != null);
+
+    final active = ref.watch(activeProvider);
+
+    if (active!) {
+      animationController.forward();
+    } else {
+      animationController.reverse();
+    }
+
     return Row(
       children: [
         InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: active
-              ? () async {
-                  var date = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      value = date;
-                      widget.onChanged(value);
-                    });
-                  }
-                }
-              : null,
-          child: SizedBox(
-            height: 72,
+          borderRadius: BorderRadius.circular(3),
+          highlightColor: theme.primaryColor.withOpacity(0.25),
+          onTap: () async {
+            var date = await showDatePicker(
+              context: context,
+              initialDate: deadline ?? DateTime.now(),
+              firstDate: DateTime.now(),
+              lastDate: DateTime(2100),
+            );
+            if (date != null) {
+              savedDeadline = date;
+              ref.read(activeProvider.notifier).state = true;
+              ref.read(currentEditableTask.notifier).state =
+                  ref.read(currentEditableTask).edit(deadline: date);
+            }
+          },
+          child: Container(
+            height: 48,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -54,17 +85,39 @@ class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
                 Text(
                   S.of(context).deadlineTitle,
                 ),
-                if (active)
-                  Text(
-                    value != null
-                        ? DateFormat('dd MMMM yyyy').format(value!)
-                        : S.of(context).deadlineNotSet,
-                    style: textTheme.bodyMedium!.copyWith(
-                      color: value != null
-                          ? theme.primaryColor
-                          : textTheme.bodySmall!.color,
+                SizeTransition(
+                  sizeFactor: CurvedAnimation(
+                    parent: animationController,
+                    curve: Curves.easeInOut,
+                  ),
+                  child: FadeTransition(
+                    opacity: CurvedAnimation(
+                      parent: animationController,
+                      curve: Curves.easeInQuad,
+                    ),
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, -1),
+                        end: const Offset(0, 0),
+                      ).animate(
+                        CurvedAnimation(
+                          parent: animationController,
+                          curve: Curves.easeInOut,
+                        ),
+                      ),
+                      child: Text(
+                        savedDeadline != null
+                            ? DateFormat('dd MMMM yyyy').format(savedDeadline!)
+                            : S.of(context).deadlineNotSet,
+                        style: textTheme.bodyMedium!.copyWith(
+                          color: savedDeadline != null
+                              ? theme.primaryColor
+                              : textTheme.bodySmall!.color,
+                        ),
+                      ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
@@ -73,15 +126,12 @@ class _TaskDetailsDeadlineState extends State<TaskDetailsDeadline> {
         Switch(
           value: active,
           onChanged: (value) {
-            setState(() {
-              active = value;
-            });
-
-            if (value) {
-              widget.onChanged(this.value);
-            } else {
-              widget.onChanged(null);
-            }
+            ref.read(activeProvider.notifier).state = value;
+            ref.read(currentEditableTask.notifier).state =
+                ref.read(currentEditableTask).edit(
+                      deleteDeadline: !value,
+                      deadline: savedDeadline,
+                    );
           },
         ),
       ],

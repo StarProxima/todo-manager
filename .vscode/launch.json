@@ -5,18 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "todo-manager",
+            "name": "todo-manager DEV debug",
+            "program": "${workspaceFolder}/lib/main_dev.dart",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "todo-manager (profile mode)",
+            "name": "todo-manager DEV release",
+            "program": "${workspaceFolder}/lib/main_dev.dart",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "release"
         },
         {
-            "name": "todo-manager (release mode)",
+            "name": "todo-manager PROD debug ",
+            "program": "${workspaceFolder}/lib/main_prod.dart",
+            "request": "launch",
+            "type": "dart",
+        },
+        {
+            "name": "todo-manager PROD release ",
+            "program": "${workspaceFolder}/lib/main_prod.dart",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

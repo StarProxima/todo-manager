@@ -6,23 +6,22 @@ part of 'task_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class TaskAdapter extends TypeAdapter<Task> {
+class TaskAdapter extends TypeAdapter<_$_Task> {
   @override
   final int typeId = 0;
 
   @override
-  Task read(BinaryReader reader) {
+  _$_Task read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Task(
+    return _$_Task(
       id: fields[0] as String,
       text: fields[1] as String,
-      importance: fields[2] as Importance,
+      done: fields[2] as bool,
+      importance: fields[3] as Importance,
       deadline: fields[4] as DateTime?,
-      done: fields[3] as bool,
-      color: fields[5] as Color?,
       createdAt: fields[6] as DateTime,
       changedAt: fields[7] as DateTime,
       lastUpdatedBy: fields[8] as String,
@@ -30,21 +29,19 @@ class TaskAdapter extends TypeAdapter<Task> {
   }
 
   @override
-  void write(BinaryWriter writer, Task obj) {
+  void write(BinaryWriter writer, _$_Task obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.text)
       ..writeByte(2)
-      ..write(obj.importance)
-      ..writeByte(3)
       ..write(obj.done)
+      ..writeByte(3)
+      ..write(obj.importance)
       ..writeByte(4)
       ..write(obj.deadline)
-      ..writeByte(5)
-      ..write(obj.color)
       ..writeByte(6)
       ..write(obj.createdAt)
       ..writeByte(7)
@@ -63,3 +60,36 @@ class TaskAdapter extends TypeAdapter<Task> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_$_Task _$$_TaskFromJson(Map<String, dynamic> json) => _$_Task(
+      id: json['id'] as String,
+      text: json['text'] as String,
+      done: json['done'] as bool,
+      importance: $enumDecode(_$ImportanceEnumMap, json['importance']),
+      deadline:
+          const TimestampOrNullConverter().fromJson(json['deadline'] as int?),
+      createdAt: const TimestampConverter().fromJson(json['created_at'] as int),
+      changedAt: const TimestampConverter().fromJson(json['changed_at'] as int),
+      lastUpdatedBy: json['last_updated_by'] as String,
+    );
+
+Map<String, dynamic> _$$_TaskToJson(_$_Task instance) => <String, dynamic>{
+      'id': instance.id,
+      'text': instance.text,
+      'done': instance.done,
+      'importance': _$ImportanceEnumMap[instance.importance]!,
+      'deadline': const TimestampOrNullConverter().toJson(instance.deadline),
+      'created_at': const TimestampConverter().toJson(instance.createdAt),
+      'changed_at': const TimestampConverter().toJson(instance.changedAt),
+      'last_updated_by': instance.lastUpdatedBy,
+    };
+
+const _$ImportanceEnumMap = {
+  Importance.low: 'low',
+  Importance.basic: 'basic',
+  Importance.important: 'important',
+};

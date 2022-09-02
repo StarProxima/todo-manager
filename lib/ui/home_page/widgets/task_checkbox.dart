@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/styles/app_theme.dart';
+import '../../../styles/app_theme.dart';
 
 import '../../../models/importance.dart';
 import '../../../models/task_model.dart';

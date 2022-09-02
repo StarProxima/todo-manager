@@ -1,47 +1,74 @@
 import 'package:flutter/material.dart';
-import 'package:todo_manager/support/logger.dart';
-import 'package:todo_manager/ui/task_details_page/widgets/task_details_deadline.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/task_providers/task_list_provider.dart';
+import '../../router/app_router_delegate.dart';
+import 'widgets/task_details_deadline.dart';
 
 import '../../models/task_model.dart';
-import 'widgets/importance_dropdown_button.dart';
+import 'widgets/task_details_importance.dart';
 import 'widgets/task_details_text_field.dart';
 
 import '../../generated/l10n.dart';
 
-class TaskDetailsPage extends StatefulWidget {
-  const TaskDetailsPage({
-    Key? key,
-    this.task,
-    required this.onSave,
-    this.onDelete,
-  }) : super(key: key);
+final currentEditableTask = StateProvider.autoDispose<Task>((ref) {
+  return Task.create();
+});
+
+class TaskDetails extends ConsumerWidget {
+  const TaskDetails({Key? key, this.task}) : super(key: key);
 
   final Task? task;
 
-  final void Function(Task) onSave;
-  final void Function(Task)? onDelete;
   @override
-  State<TaskDetailsPage> createState() => _TaskDetailsPageState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ProviderScope(
+      overrides: [
+        currentEditableTask.overrideWithValue(
+          StateController(task ?? Task.create()),
+        ),
+      ],
+      child: const _TaskDetailsPage(),
+    );
+  }
 }
 
-class _TaskDetailsPageState extends State<TaskDetailsPage> {
-  late Task task =
-      widget.task != null ? widget.task!.copyWith() : Task.create();
-
-  late TextEditingController controller = TextEditingController()
-    ..text = widget.task?.text ?? '';
-
-  void saveTask() {
-    var editTask = task.editAndCopyWith(text: controller.text);
-    widget.onSave(editTask);
-    logger.i(editTask);
-    Navigator.pop(context);
-  }
+class _TaskDetailsPage extends ConsumerStatefulWidget {
+  const _TaskDetailsPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  void initState() {
-    logger.i(widget.task);
-    super.initState();
+  ConsumerState<_TaskDetailsPage> createState() => _TaskDetailsPageState();
+}
+
+class _TaskDetailsPageState extends ConsumerState<_TaskDetailsPage> {
+  late bool isNewTask = ref
+      .read(taskList)
+      .where((element) => element.id == ref.read(currentEditableTask).id)
+      .isEmpty;
+
+  late TextEditingController controller = TextEditingController()
+    ..text = ref.read(currentEditableTask).text;
+
+  void pop() {
+    (Router.of(context).routerDelegate as AppRouterDelegate).gotoHomePage();
+  }
+
+  void saveTask() {
+    final editedTask =
+        ref.read(currentEditableTask).edit(text: controller.text);
+    final notifier = ref.read(taskList.notifier);
+    if (isNewTask) {
+      notifier.add(editedTask);
+    } else {
+      notifier.edit(editedTask);
+    }
+    pop();
+  }
+
+  void deleteTask() {
+    ref.read(taskList.notifier).delete(ref.read(currentEditableTask));
+    pop();
   }
 
   @override
@@ -56,9 +83,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           height: 14,
           width: 14,
           child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            splashRadius: 25,
+            onPressed: pop,
             icon: const Icon(
               Icons.close,
             ),
@@ -66,17 +92,19 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: TextButton(
-              onPressed: saveTask,
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-              ),
-              child: Text(
-                S.of(context).taskDetailsSave,
-                style: textTheme.labelSmall!.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: theme.primaryColor,
+            padding: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
+            child: SizedBox(
+              child: TextButton(
+                onPressed: saveTask,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+                child: Text(
+                  S.of(context).taskDetailsSave,
+                  style: textTheme.labelSmall!.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
                 ),
               ),
             ),
@@ -84,36 +112,39 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 8),
-          child: Column(
-            children: [
-              TaskDetailsTextField(
+        child: ListView(
+          padding: const EdgeInsets.only(top: 8),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TaskDetailsTextField(
                 controller: controller,
               ),
-              const SizedBox(
-                height: 28,
-              ),
-              Align(
+            ),
+            const SizedBox(height: 28),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Align(
                 alignment: Alignment.centerLeft,
-                child: ImportanceDropdownButton(
-                  value: task.importance,
-                  onChanged: (value) {
-                    task = task.editAndCopyWith(importance: value);
-                  },
-                ),
+                child: TaskDetailsImportance(),
               ),
-              TaskDetailsDeadline(
-                value: task.deadline,
-                onChanged: (deadline) {
-                  if (deadline == null) {
-                    task = task.editAndCopyWith(deleteDeadline: true);
-                  } else {
-                    task = task.editAndCopyWith(deadline: deadline);
-                  }
-                },
-              ),
-              Align(
+            ),
+            const SizedBox(height: 8),
+            const Divider(
+              indent: 16,
+              endIndent: 16,
+            ),
+            const SizedBox(height: 6),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: TaskDetailsDeadline(),
+            ),
+            const SizedBox(height: 18),
+            const Divider(),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
                   icon: const Icon(Icons.delete),
@@ -121,16 +152,11 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                   style: TextButton.styleFrom(
                     primary: theme.errorColor,
                   ),
-                  onPressed: widget.task != null
-                      ? () {
-                          widget.onDelete?.call(widget.task!);
-                          Navigator.pop(context);
-                        }
-                      : null,
+                  onPressed: !isNewTask ? deleteTask : null,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
